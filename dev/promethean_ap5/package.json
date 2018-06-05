@@ -1,0 +1,204 @@
+{
+  "name": "promethean_ap5",
+  "version": "1.0.0-beta.2",
+  "description": "Driver for Promethean ActivPanel 5 using GC RS232",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "AVD_Toby",
+  "license": "Unlicensed",
+  "overture": {
+    "brand": "Promethean",
+    "model": "AP5-70",
+    "type": "device",
+    "subtype": "display",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "enums": ["Off", "On"],
+        "perform": {
+          "action": "Set Power",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "Source",
+        "type": "enum",
+        "enums": ["HDMI1", "HDMI2", "HDMI3", "HDMI4", "VGA", "YPbPr", "AV", "OPS", "MultiMedia"],
+        "perform": {
+          "action": "Select Source",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      },
+      {
+        "name": "AudioMute",
+        "type": "enum",
+        "enums": ["Off", "On"],
+        "perform": {
+          "action": "Set Audio Mute",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "AudioLevel",
+        "type": "integer",
+        "min": 0,
+        "max": 100,
+        "perform": {
+          "action": "Set Audio Level",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      },
+      {
+        "name": "Brightness",
+        "type": "integer",
+        "min": 0,
+        "max": 100,
+        "perform": {
+          "action": "Set Brightness",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      },
+      {
+        "name": "Contrast",
+        "type": "integer",
+        "min": 0,
+        "max": 100,
+        "perform": {
+          "action": "Set Constrast",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      },
+      {
+        "name": "Sharpness",
+        "type": "integer",
+        "min": 0,
+        "max": 100,
+        "perform": {
+          "action": "Set Sharpness",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      }
+    ],
+
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Select Source",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Set Audio Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Set Audio Level",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Set Brightness",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Set Contrast",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Set Sharpness",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        }
+      }
+    ],
+
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Setup for Promethean ActivePanel 5 via GC RS232",
+      "properties": {
+        "host": {
+          "title": "GC RS232 IP/Hostname",
+          "type": "string",
+          "default": "192.168.1.1"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 4999,
+          "description": "Default: 4999"
+        },
+        "module": {
+          "title": "Module#:",
+          "type": "string",
+          "default": "1",
+          "description": "Module of GC (1 for Itach)"
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "module"
+      ]
+    }
+  }
+}

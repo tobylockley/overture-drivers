@@ -1,0 +1,157 @@
+{
+  "name": "barco_clickshare",
+  "version": "2.0.1",
+  "description": "Overture Driver for ClickShare monitoring by Barco. Support CSM-1, CSE-200, CSC-1, CSE-800",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsc -w",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "FR",
+  "license": "Unlicensed",
+  "devDependencies": {},
+  "dependencies": {
+
+  },
+  "overture": {
+    "brand": "Barco",
+    "models": ["CSM-1", "CSC-1", "CSE-200", "CSE-800"],
+    "type": "device",
+    "subtype": "clickshare",
+    "pointSetupSchema": {
+      "title": "ClickShare Setup",
+      "type": "object",
+      "properties": {
+        "model": {
+          "title": "Clickshare Base Model",
+          "type": "string",
+          "description": "ModelName of the clickshare base",
+          "enum": ["CSM-1", "CSC-1", "CSE-200", "CSE-800"]
+        },
+        "ip": {
+          "title": "Address",
+          "type": "string",
+          "description": "IP address or URL of the Clickshare device"
+        },
+        "user": {
+          "title": "User",
+          "type": "string",
+          "default": "integrator"
+        },
+        "password": {
+          "title": "Password",
+          "type": "string",
+          "default": "integrator"
+        },
+        "refreshInterval": {
+          "title": "Refresh Interval",
+          "description": "in ms.",
+          "type": "integer",
+          "default": 1000
+        },
+        "temperatureUnit": {
+          "title": "Temperatures Unit",
+          "type": "string",
+          "enum": ["Celsius", "Fahrenheit"],
+          "default": "Celsius"
+        }
+      }
+    },
+    "variables": [
+      {
+        "name": "ModelName",
+        "type": "string"
+      },
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Restarting",
+          "Warning",
+          "Error",
+          "Connected",
+          "Standby"
+        ],
+        "perform": {
+          "action": "Set Status",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "StatusMessage",
+        "type": "string"
+      },
+      {
+        "name": "SharingStatus",
+        "type": "enum",
+        "enums": [
+          "Not Sharing",
+          "Sharing"
+        ]
+      },
+      {
+        "name": "FirmwareVersion",
+        "type": "string"
+      },
+      {
+        "name": "CurrentUptime",
+        "type": "integer",
+        "min": 0,
+        "max": 100000000
+      },
+      {
+        "name": "TotalUptime",
+        "type": "integer",
+        "min": 0,
+        "max": 100000000
+      },
+      {
+        "name": "Location",
+        "type": "string",
+        "perform": {
+          "action": "Update Location",
+          "params": {
+            "value": "$value"
+          }
+        }
+      },
+      {
+        "name": "MeetingRoomName",
+        "type": "string",
+        "perform": {
+          "action": "Update Meeting Room Name",
+          "params": {
+            "value": "$value"
+          }
+        }
+      },
+      {
+        "name": "SerialNumber",
+        "type": "string"
+      }
+    ],
+    "commands": [
+      {
+        "name": "Restart System",
+        "description": "Restart the base unit"
+      },
+      {
+        "name": "Shutdown System",
+        "description": "Stop the base unit. Be careful, cannot start the base remotely when it is stopped. Not available on CSE-200"
+      },
+      {
+        "name": "Standby System",
+        "description": "Put the base unit in standby mode"
+      },
+      {
+        "name": "Awake System",
+        "description": "Awake the base unit from standby mode"
+      }
+    ]
+  }
+}

@@ -1,0 +1,185 @@
+.med-main-section {
+	border-color: black;
+    padding: 8px;
+    border: 1px solid #DDD;
+    border-radius: .2em;
+    margin: 8px 0;
+}
+
+.med-variables-section,
+.med-macros-section {
+	width: 100%;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+.med-variable-name > div{
+	width: 260px;
+}
+
+.med-variable-name > div > input {
+  width: 200px;
+  display: inline-block;
+  border: 1px solid #DDD;
+  border-radius: .2em;
+  height: 30px;
+  padding: 0 4px;
+  margin-left: 5px;
+}
+
+.med-variable-type {
+  width: 125px;
+}
+
+.med-variable-hide {
+  width: 100%;
+}
+
+.med-variable-type  > div {
+  width: 125px;
+}
+
+.med-variable-type  > div > select {
+  width: 75px;
+  border: 1px solid #DDD;
+  border-radius: .2em;
+  height: 30px;
+}
+
+
+.macro-label {
+  vertical-align: top;
+  padding-top: 7px;
+}
+
+.med-values-actions {
+  margin-left: 40px;
+}
+
+.macro-value-label > label {
+	margin-bottom: 0;
+	padding-top: 8px;
+	margin-left: 10px;
+    width: 200px;
+}
+.macro-actions-label > label {
+  margin-bottom: 0;
+  padding-top: 8px;
+  margin-left: 10px;
+}
+
+.med-value {
+  margin-left: 10px;
+}
+
+.med-values {
+  vertical-align: top;
+  padding-right: 8px;
+}
+
+.med-values > input {
+  width: 200px;
+  display: inline-block;
+  border: 1px solid #DDD;
+  border-radius: .2em;
+  height: 30px;
+  padding: 0 4px;
+}
+
+.macro-action {
+	width: 100%;
+}
+
+cue-list-editor {
+  margin: 0;
+}
+
+.delete-value {
+  vertical-align: top
+}
+
+button.add-value {
+    font-size: 1.45em;
+    padding: .25em 0;
+}
+button.add-value > span{
+  font-size: 12px;
+}
+
+button.add-variable {
+	padding-top: 15px;
+    color: #f00000;
+    font-size: 1.45em;
+    padding: .25em 0;
+}
+button.add-variable  > span{
+  font-size: 12px;
+}
+button.remove-variable {
+    color: #f00000;
+    font-size: 1.45em;
+    padding: .25em 0;
+}
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 14px;
+  top: 8px;
+  left: 2px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {display:none;}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgb(158,158,158);
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 0px;
+  bottom: -3px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 2px 1px -1px rgba(0,0,0,.12);
+}
+
+input:checked + .slider {
+  background-color: rgba(255,82,82,0.5);
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+	background-color: rgb(255,82,82);
+  -webkit-transform: translateX(16px);
+  -ms-transform: translateX(16px);
+  transform: translateX(16px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 14px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}

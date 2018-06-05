@@ -1,0 +1,84 @@
+{
+  "name": "av_pro_connect_dynamic",
+  "version": "1.0.0-beta.1",
+  "description": "Driver for AV Pro Connect Matrix",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "AVD_Toby",
+  "license": "Unlicensed",
+  "overture": {
+    "brand": "AV Pro Connect",
+    "models": [
+      "MX42",
+      "MX44",
+      "MX88"
+    ],
+    "type": "device",
+    "subtype": "matrix",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "AV Pro Connect Matrix Driver",
+      "properties": {
+        "host": {
+          "title": "Device IP",
+          "type": "string",
+          "default": "192.168.10.120"
+        },
+        "port": {
+          "title": "Device TCP port",
+          "type": "integer",
+          "default": 21
+        },
+        "model": {
+          "title": "Model:",
+          "type": "string",
+          "default": "MX42",
+          "enum": [
+            "MX42",
+            "MX44",
+            "MX88"
+          ]
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "model"
+      ]
+    }
+  }
+}

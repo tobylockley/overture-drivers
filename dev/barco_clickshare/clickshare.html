@@ -1,0 +1,62 @@
+<!--
+Clickshare Template
+
+Control of Clickshare
+-->
+<div ng-init="
+    modelName = findPoint({parent: point, variableName: 'ModelName'});
+    meetingRoomName = findPoint({parent: point, variableName: 'MeetingRoomName'});
+"></div>
+
+<center>{{meetingRoomName.value}}</center>
+
+<med-led
+        med-point=".Status"
+        med-colors="black, orange, orange, red, green, blue"
+></med-led>
+<med-led
+        med-point=".SharingStatus"
+        med-colors="black, green"
+></med-led>
+
+<med-button-bar>
+    <med-button
+            med-label="Wake Up"
+            med-click="perform(point, 'Awake System')"
+            med-point=".Status"
+            med-on-state="4"
+    ></med-button>
+    <med-button
+            med-label="Standby"
+            med-click="perform(point, 'Standby System')"
+            med-point=".Status"
+            med-on-state="5"
+    ></med-button>
+</med-button-bar>
+
+<med-point-table
+        med-point="point"
+        med-subpoints=".Status,.SharingStatus,.CurrentUptime,.TotalUptime"
+></med-point-table>
+
+<med-progress
+        med-point=".CpuTemperature"
+        med-min="30"
+        med-max="65"
+></med-progress>
+
+<med-button-bar>
+    <med-button
+            ng-hide="modelName.value == 'CSE-200' || modelName.value == 'CSE-800'"
+            med-label="Power Off"
+            med-click="perform(point, 'Shutdown System')"
+            med-point=".Status"
+            med-on-state="0"
+    ></med-button>
+    <med-button
+            med-label="Restart"
+            med-click="perform(point, 'Restart System')"
+            med-point=".Status"
+            med-on-state="1"
+    ></med-button>
+</med-button-bar>

@@ -1,0 +1,158 @@
+{
+  "name": "nec_display_x-series",
+  "version": "1.0.3",
+  "description": "Overture Driver For NEC Display X-Series",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Medialon",
+  "license": "SEE LICENSE IN license.txt",
+  "overture": {
+    "brand": "NEC",
+    "model": "X-Series",
+    "models": ["X551UHD", "X651UHD-2", "X841UHD-2", "X981UHD-2", "X554UN"],
+    "type": "device",
+    "subtype": "display",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": ["Disconnected","Connected"]
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "enums": ["Off","On"]  ,
+        "perform":{"action":"Set Power", "params": { "Status":"$string"}},
+        "smooth": 6000    
+      },
+      {
+        "name": "Sources",
+        "type": "enum",
+        "enums": [
+          "Display Port",
+          "DVI1",
+          "DVI2",
+          "HDMI 1",
+          "HDMI 2",
+          "HDMI 3",
+          "HDMI 4",
+          "Option"
+        ],
+        "perform":{"action":"Select Source", "params": { "Name":"$string"}},
+        "smooth": 6000
+      },
+      {
+        "name": "AudioMute",
+        "type": "enum",
+        "enums": ["Off","On"],
+        "perform":{"action":"Set Audio Mute", "params": { "Status":"$string"}},
+        "smooth": 6000
+      },
+      {
+        "name": "AudioLevel",
+        "type": "integer",
+        "perform":{"action":"Set Audio Level", "params": { "Level":"$value"}},
+        "min": 0, "max": 100
+      },
+      {
+        "name": "Contrast",
+        "type": "integer",
+        "perform":{"action":"Set Contrast", "params": { "Level":"$value"}},
+        "min": 0, "max": 100,
+        "smooth": 4000
+      },
+      {
+        "name": "Brightness",
+        "type": "integer",
+        "perform":{"action":"Set Brightness", "params": { "Level":"$value"}},
+        "min": 0, "max": 100,
+        "smooth": 4000
+      },
+      {
+        "name": "Temperature",
+        "type": "integer",
+        "unit": "celsius"
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off","On"]
+          }
+        }
+      },
+      {
+        "name": "Set Audio Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off","On"]
+          }
+        }
+      },
+      {
+        "name": "Set Audio Level",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Select Source",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Set Contrast",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Set Brightness",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Driver",
+      "properties": {
+        "host": {
+          "title": "host name or IP address:",
+          "type": "string",
+          "default": "127.0.0.1"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 7142,
+          "description": "Default: 7142"
+        },
+        "model": {
+          "title": "Model:",
+          "type": "string",
+          "enum": ["X551UHD", "X651UHD-2", "X841UHD-2", "X981UHD-2", "X554UN"]
+        }
+      },
+      "required": [
+        "host",
+        "port"
+      ]
+    }
+  }
+}

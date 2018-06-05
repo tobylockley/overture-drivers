@@ -1,0 +1,127 @@
+{
+  "name": "toa_m9000m2",
+  "version": "1.0.0-beta.4",
+  "description": "Driver For Barco Overture Training",
+  "main": "index.js",
+  "scripts": {
+	  "start": "node index.js"
+  },
+  "author": "Barco",
+  "license": "MIT",
+  "overture": {
+    "brand": "toa",
+    "models": ["M-9000M2"],
+    "type": "device",
+    "subtype": "Audio System",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": ["Disconnected","Connected"]
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "enums": ["Off", "On"],
+        "perform": {
+          "action": "Set Power",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "Presets",
+        "type": "enum",
+        "enums": ["Preset1", "Preset2", "Preset3", "Preset4", "Preset5", "Preset6", "Preset7", "Preset8"],
+        "perform": {
+          "action": "Recall Preset",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      },
+      {
+        "name": "AudioLevel1",
+        "type": "integer",
+        "min": 0,
+        "max": 126,
+        "perform": {
+          "action": "Set Audio Level 1",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      },
+      {
+        "name": "AudioLevel2",
+        "type": "integer",
+        "min": 0,
+        "max": 126,
+        "perform": {
+          "action": "Set Audio Level 2",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off","On"]
+          }
+        }
+      },
+      {
+        "name": "Recall Preset",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Set Audio Level 1",
+        "params": {
+          "Level":{
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Set Audio Level 2",
+        "params": {
+          "Level":{
+            "type": "integer"
+          }
+        }
+      }
+
+    ],    
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "TOA mixer amp driver module",
+      "properties": {
+        "host": {
+          "title": "Host name or IP of Global Cache",
+          "type": "string",
+          "default": "192.168.1.74"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 4999,
+          "description": "Default: 4999"
+        }
+      },
+      "required": [
+        "host",
+        "port"
+      ]
+    }
+  }
+}
