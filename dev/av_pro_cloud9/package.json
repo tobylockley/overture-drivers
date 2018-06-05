@@ -1,0 +1,97 @@
+{
+  "name": "av_pro_cloud9",
+  "version": "1.0.0-beta.2",
+  "description": "Driver for AV Pro Cloud 9 Matrix",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "AVD_Toby",
+  "license": "Unlicensed",
+  "overture": {
+    "brand": "AV Pro Edge",
+    "model": "AC-MX9XHDL-HDBT",
+    "type": "device",
+    "subtype": "matrix",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ]
+      },
+      {
+        "name": "MV Mode",
+        "type": "enum",
+        "enums": [
+          "3x3",
+          "4x4"
+        ],
+        "perform": {
+          "action": "Set Multiview",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      }
+    ],
+
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Set Multiview",
+        "params": {
+          "Name": {
+            "type": "enum",
+            "enums": [
+              "3x3",
+              "4x4"
+            ]
+          }
+        }
+      }
+    ],
+
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "AV Pro Cloud 9 Matrix Driver",
+      "properties": {
+        "host": {
+          "title": "Device IP",
+          "type": "string",
+          "default": "192.168.1.126"
+        },
+        "port": {
+          "title": "Device TCP port",
+          "type": "integer",
+          "default": 23
+        }
+      },
+      "required": [
+        "host",
+        "port"
+      ]
+    }
+  }
+}

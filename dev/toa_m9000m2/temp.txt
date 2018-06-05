@@ -1,0 +1,28 @@
+Audio System
+Simple audio system may be restrain to audio level according to the feature list
+
+Commands
+Set Audio Level (Channel: Integer, Level: Real )
+Set Audio Level In (Channel: Integer, Level: Real)
+Recall Preset (Name: String)
+Select Source (Channel: Integer, Name: String)
+Set Bass (Channel: Integer, Level: Real)
+Set Treble (Channel: Integer, Level: Real)
+Set Audio Mute (Channel: Integer, Status: Enum:[Off/On])
+Set Audio Mute In (Channel: Integer, Status: Enum:[Off/On])
+
+Variables
+Status (Enum:[Disconnected/Connected])
+Presets (Enum: [None/DynamicList])
+Sources - Per Output (Enum: [Based On Device])
+AudioLevelInput - Per Input (Real)
+AudioMuteInput - Per Input (Status: Enum:[Off/On])
+AudioLevel - Per Output (Real)
+AudioMute - Per Output (Status: Enum:[Off/On])
+Bass - per Channel (Real)
+Treble - per Channel (Real)
+
+setAudioLevelIn
+setAudioMuteIn
+setAudioLevel
+setAudioMute

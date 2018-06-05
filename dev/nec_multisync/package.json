@@ -1,0 +1,132 @@
+{
+  "name": "nec_multisync",
+  "version": "1.0.0-beta.3",
+  "description": "Driver For NEC Multisync Display",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "AVD_Toby",
+  "license": "Unlicensed",
+  "overture": {
+    "brand": "NEC",
+    "models": [
+      "P461",
+      "E705",
+      "E805",
+      "E905"
+    ],
+    "type": "device",
+    "subtype": "display",
+    
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "enums": ["Off", "On", "Stand-by", "Suspend"],
+        "perform": {
+          "action": "Set Power",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      },
+      {
+        "name": "Temperature",
+        "type": "integer",
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "AudioLevel",
+        "type": "integer",
+        "min": 0,
+        "max": 100,
+        "perform": {
+          "action": "Set Audio Level",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      },
+      {
+        "name": "AudioMute",
+        "type": "enum",
+        "enums": ["Off", "On"],
+        "perform": {
+          "action": "Set Audio Mute",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      }
+    ],
+
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off", "On", "Stand-by", "Suspend"]
+          }
+        }
+      },
+      {
+        "name": "Set Audio Level",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Set Audio Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off", "On"]
+          }
+        }
+      }
+    ],
+
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "NEC Multisync Display Device Setup",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address:",
+          "type": "string",
+          "default": "192.168.1.115",
+          "description": "Factory default: 192.168.0.10"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 7142,
+          "description": "Default: 7142"
+        },
+        "display_id": {
+          "title": "Display ID:",
+          "type": "integer",
+          "default": 1,
+          "description": "Default: 1"
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "display_id"
+      ]
+    }
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "name": "panasonic_dvd_ir",
+  "version": "1.0.0-beta.5",
+  "description": "Driver For IR control of Panasonic Blueray Player",
+  "main": "index.js",
+  "scripts": {
+	  "start": "node index.js"
+  },
+  "author": "Barco",
+  "license": "MIT",
+  "overture": {
+    "brand": "Panasonic",
+    "models": ["DMP-UB300"],
+    "type": "device",
+    "subtype": "player",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": ["Disconnected","Connected"]
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "enums": ["Off", "On"],
+        "perform": {
+          "action": "Set Power",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "Commands",
+        "type": "enum",
+        "enums": ["Up", "Down", "Left", "Right", "Ok", "Return", "Eject" ],
+        "perform": {
+          "action": "Send Command",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      },
+      {
+        "name": "Track",
+        "type": "enum",
+        "enums": ["Play", "Pause", "Stop","Forward", "Reverse", "Next", "Previous"],
+        "perform": {
+          "action": "Send Track Command",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off","On"]
+          }
+        }
+      },
+      {
+        "name": "Send Command",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Send Track Command",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      }
+    ],    
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Setup for  GC IR emitter",
+      "properties": {
+        "host": {
+          "title": "GC IR emitter IP/Hostname",
+          "type": "string",
+          "default": "192.168.1.70"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 4998,
+          "description": "Default: 4998"
+        },
+        "module": {
+          "title": "Module#:",
+          "type": "string",
+          "default": "1",
+          "description": "Module of GC (1 for Itach)"
+        },
+        "ir_port": {
+          "title": "IR Port:",
+          "type": "string",
+          "default": "1",
+          "description": "IR blaster port in use (1-3)"
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "module",
+        "ir_port"
+      ]
+    }
+  }
+}

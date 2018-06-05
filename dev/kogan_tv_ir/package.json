@@ -1,0 +1,98 @@
+{
+  "name": "kogan_tv_ir",
+  "version": "1.0.0-beta.2",
+  "description": "Driver for Kogan IR commands",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "AudioVisualDistributors_Toby",
+  "license": "Unlicensed",
+  "overture": {
+    "brand": "Kogan",
+    "model": "KALED24DVDZE",
+    "type": "device",
+    "subtype": "display",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Commands",
+        "type": "enum",
+        "enums": [
+          "Channel Down",
+          "Channel Up",
+          "Cursor Down",
+          "Cursor Left",
+          "Cursor Right",
+          "Cursor Up",
+          "Cursor Enter",
+          "Menu Main",
+          "Exit",
+          "Input Scroll",
+          "Mute Toggle",
+          "Power Toggle",
+          "Volume Down",
+          "Volume Up"
+        ],
+        "perform": {
+          "action": "Send Command",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Send Command",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Setup for  GC IR emitter",
+      "properties": {
+        "host": {
+          "title": "GC IR emitter IP/Hostname",
+          "type": "string",
+          "default": "192.168.1.140"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 4998,
+          "description": "Default: 4998"
+        },
+        "module": {
+          "title": "Module#:",
+          "type": "string",
+          "default": "1",
+          "description": "Module of GC (1 for Itach)"
+        },
+        "ir_port": {
+          "title": "IR Port:",
+          "type": "string",
+          "default": "1",
+          "description": "IR blaster port in use (1-3)"
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "module",
+        "ir_port"
+      ]
+    }
+  }
+}

@@ -1,0 +1,217 @@
+{
+  "name": "techlogix_a70_40w",
+  "version": "1.0.0",
+  "description": "Driver for Techlogix TL-A70-40W Power Amplifier using GC RS232",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "AVD_Toby",
+  "license": "Unlicensed",
+  "overture": {
+    "brand": "TechLogix",
+    "model": "TL-A70-40W",
+    "type": "device",
+    "subtype": "audiosystem",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Sources",
+        "type": "enum",
+        "enums": ["Input1", "Input2", "Input3"],
+        "perform": {
+          "action": "Select Source",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      },
+      {
+        "name": "AudioMute",
+        "type": "enum",
+        "enums": ["Off", "On"],
+        "perform": {
+          "action": "Set Audio Mute",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "DuckingFunction",
+        "type": "enum",
+        "enums": ["Off", "On"],
+        "perform": {
+          "action": "Set Ducking",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "DuckingLevel",
+        "type": "integer",
+        "min": 0,
+        "max": 60,
+        "perform": {
+          "action": "Set Ducking Level",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      },
+      {
+        "name": "AudioLevelInput",
+        "type": "integer",
+        "min": 0,
+        "max": 60,
+        "perform": {
+          "action": "Set Audio Level In",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      },
+      {
+        "name": "AudioLevel",
+        "type": "integer",
+        "min": 0,
+        "max": 60,
+        "perform": {
+          "action": "Set Audio Level",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      },
+      {
+        "name": "Bass",
+        "type": "integer",
+        "min": 0,
+        "max": 8,
+        "perform": {
+          "action": "Set Bass",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      },
+      {
+        "name": "Treble",
+        "type": "integer",
+        "min": 0,
+        "max": 8,
+        "perform": {
+          "action": "Set Treble",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      }
+    ],
+
+    "commands": [
+      {
+        "name": "Select Source",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Set Audio Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Set Ducking",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Set Ducking Level",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Set Audio Level In",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Set Audio Level",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Set Bass",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Set Treble",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        }
+      }
+    ],
+
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Setup for Techlogix TL-A70-40W Power Amplifier via GC RS232",
+      "properties": {
+        "host": {
+          "title": "GC RS232 IP/Hostname",
+          "type": "string",
+          "default": "192.168.1.1"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 4999,
+          "description": "Default: 4999"
+        }
+      },
+      "required": [
+        "host",
+        "port"
+      ]
+    }
+  }
+}

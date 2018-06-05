@@ -1,0 +1,99 @@
+<div class="overture-macros">
+  <h2>Macros</h2>
+  <span>The list of device variables created by the behavior. Depending of theirs values, actions can be trigerred. See the README</span>
+
+  <div ng-repeat="variable in setupData.variables" class="med-main-section">
+    <table class="med-variables-section">
+      <tr class="med-variable-section">
+        <td class="med-variable-name">
+          <div>
+            <label>Name: </label>
+            <input type="text" ng-model="variable.name" required="required">
+          </div>
+        </td>
+        <td class="med-variable-type">
+          <div>
+            <label>Type: </label>
+            <select ng-model="variable.type">
+              <option value="enum">Enum</option>
+              <option value="integer">Integer</option>
+              <option value="string">String</option>
+              <option value="real">Real</option>
+            </select>
+          </div>
+        </td>
+        <td class="med-variable-hide">
+          <div>
+            <label>Hide widget : </label>
+            <label class="switch">
+              <input type="checkbox" ng-model="variable.hidden">
+              <span class="slider round"></span>
+            </label>
+          </div>
+        </td>
+        <td class="variable-delete">
+          <button class="remove-variable" ng-click="removeVariable($index)">
+            <i class="glyphicons-remove"></i>
+          </button>
+        </td>
+      </tr>
+    </table>
+
+    <div class="med-values-actions">
+
+      <table class="med-titles-section">
+        <tr>
+          <td class="macro-value-label">
+            <label>Value</label>
+          </td>
+          <td class="macro-actions-label">
+            <label>Actions</label>
+          </td>
+        </tr>
+      </table>
+
+      <div ng-repeat="macro in variable.values">
+        <table class="med-macros-section">
+          <tr class="med-value-section">
+            <td class="med-values">
+              <input type="text" ng-model="macro.value">
+            </td>
+            <td class="macro-action">
+              <cue-list-editor ref-point="point" actions="macro.actions" api="api" />
+            </td>
+            <td class="delete-value">
+              <button ng-click="removeValue(variable, $index)">
+                <i class="glyphicons-remove"></i>
+              </button>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="med-value">
+        <button class="add-value" ng-click="addValue(variable)">
+          <i class="glyphicons-plus-sign"></i>
+          <span>Value</span>
+        </button>
+      </div>
+
+    </div>
+
+    </table>
+  </div>
+
+  <div>
+    <button class="add-variable" ng-click="addVariable()">
+      <i class="glyphicons-plus-sign"></i>
+      <span>Macro</span>
+    </button>
+  </div>
+
+  <!--
+  <a ng-click="showJson=!showJson">Debug</a>
+  <pre ng-show="showJson">
+  setupData
+  {{setupData | json }}
+  </pre>
+  -->
+</div>

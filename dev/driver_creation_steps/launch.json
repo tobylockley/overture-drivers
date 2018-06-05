@@ -1,0 +1,21 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "OvertureCS",
+			"runtimeExecutable": "C:\\Program Files\\Barco\\Barco Overture Control Server\\OvertureCS.exe",
+			"windows": {
+				"runtimeExecutable": "C:\\Program Files\\Barco\\Barco Overture Control Server\\OvertureCS.exe"
+			},
+			"protocol": "legacy",
+			"env": {
+				"data": "C:\\Program Files\\Barco\\Barco Overture Control Server\\data\\",
+				"driverPath": "${workspaceRoot}",
+				"debugDriver": "false",
+				"logLevel": "debug"
+			}
+		}
+	]
+}
