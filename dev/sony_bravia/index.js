@@ -7,15 +7,20 @@ exports.createDevice = base => {
   const logger = base.logger || host.logger
   let config
   let tcpClient
-  var getFlag = false
+  let getFlag = false
+
+  let frameParser = host.createFrameParser()
+  frameParser.setSeparator('\n')
+  frameParser.on('data', data => onFrame(data))
 
   const setup = _config => {
     config = _config
-    base.setPoll('Get Power', 5000)
-    base.setPoll('Get Source', 5000)
-    base.setPoll('Get Audio Level', 5000)
-    base.setPoll('Get Audio Mute', 5000)
-    base.setPoll('Get Channel', 5000)
+    let poll_period = 5000
+    base.setPoll('Get Power', poll_period)
+    base.setPoll('Get Source', poll_period)
+    base.setPoll('Get Audio Level', poll_period)
+    base.setPoll('Get Audio Mute', poll_period)
+    base.setPoll('Get Channel', poll_period)
   }
 
   const start = () => {
@@ -28,56 +33,60 @@ exports.createDevice = base => {
     disconnect()
   }
 
+  const startPolling = () => {
+    base.perform('Get Power')
+    base.perform('Get Source')
+    base.perform('Get Audio Level')
+    base.perform('Get Audio Mute')
+    base.perform('Get Channel')
+  }
+
   const getPower = () => { getFlag = true; sendDefer(Buffer.from("*SEPOWR################\n")); }
   const getSource = () => { getFlag = true; sendDefer(Buffer.from("*SEINPT################\n")); }
   const getAudioLevel = () => { getFlag = true; sendDefer(Buffer.from("*SEVOLU################\n")); }
   const getAudioMute = () => { getFlag = true; sendDefer("*SEAMUT################\n"); }
-  const getChannel = () => { 
-    getFlag = true; 
-    let source = base.getVar('Sources').string
-    source == "DTV" && sendDefer("*SECHNN################\n"); }
+  const getChannel = () => {
+    if (base.getVar('Sources').string == 'DTV') {
+      getFlag = true;
+      sendDefer("*SECHNN################\n");
+    }
+  }
 
-  var timerPower
   const setPower = params => {
     if (params.Status == 'Off') sendDefer(Buffer.from(`*SCPOWR0000000000000000\n`))
     else if (params.Status == 'On') sendDefer(Buffer.from(`*SCPOWR0000000000000001\n`))
-    clearTimeout(timerPower)
-    timerPower = setTimeout(getPower, 1000)
   }
 
-  var timerSource
   const selectSource = params => {
     if (params.Name == 'DTV') sendDefer("*SCINPT0000000000000000\n")
     else {
       let match = params.Name.match(/HDMI(\d)/)
       match && sendDefer(`*SCINPT000000010000000${match[1]}\n`)
     }
-    clearTimeout(timerSource)
-    timerSource = setTimeout(getSource, 1000)
   }
 
-  var timerVolume
   const setAudioLevel = params => {
     let vol = params.Level.toString().padStart(3, '0')
     sendDefer(Buffer.from(`*SCVOLU0000000000000${vol}\n`))
-    clearTimeout(timerVolume)
-    timerVolume = setTimeout(getAudioLevel, 1000)
   }
 
-  var timerMute
   const setAudioMute = params => {
     if (params.Status == 'Off') sendDefer("*SCAMUT0000000000000000\n")
     else if (params.Status == 'On') sendDefer("*SCAMUT0000000000000001\n")
-    clearTimeout(timerMute)
-    timerMute = setTimeout(getAudioMute, 1000)
   }
 
-  var timerChannel
   const setChannel = params => {
-    let channel = params.Name.toString().padStart(8, '0')
-    sendDefer(Buffer.from(`*SCCHNN${channel}.0000000\n`))
-    clearTimeout(timerChannel)
-    timerChannel = setTimeout(getChannel, 1000)
+    if (base.getVar('Sources').string == 'DTV') {
+      let channel = params.Name.toString().padStart(8, '0')
+      sendDefer(Buffer.from(`*SCCHNN${channel}.0000000\n`))
+    }
+  }
+
+  const shiftChannel = params => {
+    if (base.getVar('Sources').string == 'DTV') {
+      if (params.Name == 'Up') sendDefer(Buffer.from(`*SCIRCC0000000000000033\n`))
+      else if (params.Name == 'Down') sendDefer(Buffer.from(`*SCIRCC0000000000000034\n`))
+    }
   }
 
   const initTcpClient = () => {
@@ -87,12 +96,13 @@ exports.createDevice = base => {
       tcpClient.on('connect', () => {
         logger.silly(`TCPClient connected`)
         base.getVar('Status').string = 'Connected'
+        startPolling()
       })
 
       tcpClient.on('data', data => {
         data = data.toString()
         logger.silly(`TCPClient data: ${data}`)
-        onFrame(data)
+        frameParser.push(data)
       })
 
       tcpClient.on('close', () => {
@@ -123,8 +133,9 @@ exports.createDevice = base => {
   }
 
   const onFrame = data => {
+    base.commandDone()
     let match
-    if (getFlag) {
+    if (getFlag || data[2] == 'N') {  // 'N' means the device is notifying after a change
       match = data.match(/POWR(\d+)/)
       match && (base.getVar('Power').string = (parseInt(match[1]) == 1) ? 'On' : 'Off')
       
@@ -132,7 +143,7 @@ exports.createDevice = base => {
       match && (base.getVar('Sources').string = 'DTV')
       
       match = data.match(/INPT0{7}1(\d+)/)
-      match && (base.getVar('Sources').string = `HDMI${match[1]}`)
+      match && (base.getVar('Sources').string = `HDMI${parseInt(match[1])}`)
       
       match = data.match(/VOLU(\d+)/)
       match && (base.getVar('AudioLevel').value = parseInt(match[1]))
@@ -145,7 +156,6 @@ exports.createDevice = base => {
 
       getFlag = false
     }
-    base.commandDone()
   }
 
   function tick() {
@@ -157,7 +167,7 @@ exports.createDevice = base => {
 
   return {
     setup, start, stop, tick,
-    setPower, selectSource, setAudioLevel, setAudioMute, setChannel,
+    setPower, selectSource, setAudioLevel, setAudioMute, setChannel, shiftChannel,
     getPower, getSource, getAudioLevel, getAudioMute, getChannel
   }
 }

@@ -6,7 +6,7 @@ Driver for a Sony Bravia device over a TCP connection.
   
 ## Setup
 
- - "Host": The IP address or host name of the device.(Default 192.168.3.20)
+ - "Host": The IP address or host name of the device. (Default 192.168.3.20)
  - "Port": The port of TCP communication. (Default 20060)
 
 ## Variables
@@ -26,6 +26,7 @@ Driver for a Sony Bravia device over a TCP connection.
 ### Sources
 
 [enum] List of input sources user can select from
+ - "DTV": Change input source to DTV
  - "HDMI1": Change input source to HDMI1
  - "HDMI2": Change input source to HDMI2
  - "HDMI3": Change input source to HDMI3
@@ -36,6 +37,18 @@ Driver for a Sony Bravia device over a TCP connection.
 [integer] Set the audio level of the device.
  - minimum: 0
  - maximum: 100
+
+### Audio Mute
+
+[enum] The mute status of the device.
+ - "Off": The device is unmuted.
+ - "On" : The device is muted.
+
+### Channel
+
+[integer] Set the channel of the device.
+ - minimum: 1
+ - maximum: 99
 
 ## Commands
 
@@ -51,11 +64,19 @@ To select the input source to display.
 Set Audio level of the device (between 0 and 100)
  - "Level": [integer] audio level for the display.
 
+### Set Audio Mute
+Mute or unmute the device.
+ - "Status": [enum] "On" or "Off" to mute or unmute the display.
+
+### Set Channel
+Set the DTV channel of the display (only available in DTV mode).
+ - "Name": [integer] channel for the display.
+
 
   
 ## Revisions
 
-### 0.0.1
+### 1.0.0
 
 - initial version
 
