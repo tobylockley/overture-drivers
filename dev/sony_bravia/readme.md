@@ -50,6 +50,13 @@ Driver for a Sony Bravia device over a TCP connection.
  - minimum: 1
  - maximum: 99
 
+### Channel Shift
+
+[enum] Shift the channel of the device up or down.
+ - "": First val is null, for UI purposes
+ - "Up": Change channel up.
+ - "Down" : Change channel down.
+
 ## Commands
 
 ### Set Power
@@ -69,14 +76,20 @@ Mute or unmute the device.
  - "Status": [enum] "On" or "Off" to mute or unmute the display.
 
 ### Set Channel
-Set the DTV channel of the display (only available in DTV mode).
+Only available in DTV mode. Set the DTV channel of the display.
  - "Name": [integer] channel for the display.
 
+### Shift Channel
+Only available in DTV mode. Shift the DTV channel of the display up or down.
+ - "Name": [enum] "Up" or "Down" to change channel accordingly.
 
-  
 ## Revisions
 
 ### 1.0.0
 
-- initial version
+- Initial version
+
+### 1.0.1
+
+- Added 'Shift Channel' variable to allow UI controls to be added.
 

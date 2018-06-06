@@ -1,6 +1,6 @@
 {
   "name": "sony_bravia",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Driver for Sony Bravia TCP Connection",
   "main": "index.js",
   "scripts": {
@@ -75,6 +75,17 @@
             "Name": "$value"
           }
         }
+      },
+      {
+        "name": "ChannelShift",
+        "type": "enum",
+        "enums": ["", "Up", "Down"],
+        "perform": {
+          "action": "Shift Channel",
+          "params": {
+            "Name": "$string"
+          }
+        }
       }
     ],
     
@@ -124,6 +135,19 @@
         "params": {
           "Name": {
             "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Shift Channel",
+        "params": {
+          "Name": {
+            "type": "enum",
+            "enums": [
+              "",
+              "Up",
+              "Down"
+            ]
           }
         }
       }
