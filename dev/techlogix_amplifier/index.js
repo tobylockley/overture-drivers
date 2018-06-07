@@ -63,6 +63,17 @@ exports.createDevice = base => {
           }
         }
       });
+      base.createVariable({
+        name: 'AudioMuteInput',
+        type: 'enum',
+        enums: ['Off', 'On'],
+        perform: {
+          action: 'Set Audio Mute In',
+          params: {
+            Status: '$string'
+          }
+        }
+      });
     }
 
     if (ducking) {
@@ -71,15 +82,12 @@ exports.createDevice = base => {
         type: 'enum',
         enums: ['Off', 'On'],
         perform: {
-          action: 'Set Ducking',
-          params: {
-            Status: '$string'
-          }
+          action: 'Toggle Ducking'
         }
       });
       base.createVariable({
         name: 'DuckingLevel',
-        type: 'enum',
+        type: 'integer',
         min: 0,
         max: 60,
         perform: {
@@ -214,19 +222,28 @@ exports.createDevice = base => {
 
   const setAudioMute = params => {
     if (params.Status == 'Off') send(Buffer.from('0A1.'))
-    else if (params.Status == 'On') send(Buffer.from('0A0.'))
+    else if (params.Status == 'On') {
+      if (config.model == 'TL-A8O-50W') send(Buffer.from('0A0.'))  // This model has no 'line only' mute
+      else send(Buffer.from('2A0.'))  // Mute line only
+    }
   }
 
-  const setDucking = params => send(Buffer.from('610%'))
-  const setDuckingLevel = params => send(Buffer.from(`4${params.Level.toString().padStart(2, '0')}%`))
-  const setAudioLevelIn = params => send(Buffer.from(`5${params.Level.toString().padStart(2, '0')}%`))
-  const setAudioLevel = params => send(Buffer.from(`7${params.Level.toString().padStart(2, '0')}%`))
-  const setBass = params => send(Buffer.from(`8${params.Level.toString().padStart(2, '0')}%`))
-  const setTreble = params => send(Buffer.from(`9${params.Level.toString().padStart(2, '0')}%`))
+  const setAudioMuteIn = params => {
+    if (params.Status == 'Off') send(Buffer.from('0A1.'))
+    else if (params.Status == 'On') send(Buffer.from('1A0.'))  // Mute mic only
+  }
+
+  const muteAll = () => send(Buffer.from('0A0.'));
+  const setDucking = () => send(Buffer.from('610%'));
+  const setDuckingLevel = params => send(Buffer.from(`4${params.Level.toString().padStart(2, '0')}%`));
+  const setAudioLevelIn = params => send(Buffer.from(`5${params.Level.toString().padStart(2, '0')}%`));
+  const setAudioLevel = params => send(Buffer.from(`7${params.Level.toString().padStart(2, '0')}%`));
+  const setBass = params => send(Buffer.from(`8${params.Level.toString().padStart(2, '0')}%`));
+  const setTreble = params => send(Buffer.from(`9${params.Level.toString().padStart(2, '0')}%`));
 
   return {
     setup, start, stop, tick,
-    selectSource, setAudioMute, setDucking, setDuckingLevel, setAudioLevelIn, setAudioLevel, setBass, setTreble,
-    getStatus
+    selectSource, setAudioMute, setAudioMuteIn, setDucking, setDuckingLevel, setAudioLevelIn, setAudioLevel, setBass, setTreble,
+    getStatus, muteAll
   }
 }
