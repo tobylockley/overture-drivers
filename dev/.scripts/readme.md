@@ -28,7 +28,7 @@ Make your file look similar to below (you can use any binding you like):
 [
     {
         "key": "shift+alt+z",
-        "command": "toby.zip"
+        "command": "myscripts.zip"
     }
 ]
 ```
