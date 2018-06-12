@@ -1,5 +1,5 @@
 
-const DELETE_OLD_FILES = false
+const DELETE_OLD_FILES = true
 
 exports.execute = function (args) {
   // access VSCode API (s. https://code.visualstudio.com/Docs/extensionAPI/vscode-api)
@@ -74,6 +74,9 @@ exports.execute = function (args) {
       archive.glob('*.js', {cwd: mypath});
       archive.glob('*.json', {cwd: mypath});
       archive.glob('*.md', {cwd: mypath});
+      archive.glob('node_modules/**/*.*', {cwd: mypath});
+      // append files from a sub-directory and naming it `new-subdir` within the archive
+      archive.directory('node_modules/');
   
       // finalize the archive (ie we are done appending files but streams have to finish yet)
       // 'close', 'end' or 'finish' may be fired right after calling this method so register to them beforehand
