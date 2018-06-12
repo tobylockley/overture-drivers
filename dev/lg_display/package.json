@@ -1,0 +1,204 @@
+{
+  "name": "lg_display",
+  "version": "1.0.0-beta21",
+  "description": "Driver for LG display",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "AudioVisualDistributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "LG",
+    "models": [
+      "32SM5KD-BH"
+    ],
+    "type": "device",
+    "subtype": "display",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "MacAddress",
+        "type": "string",
+        "persistent": true
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "smooth": 10000,
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "perform": {
+          "action": "Set Power",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "Sources",
+        "type": "enum",
+        "enums": [
+          "RGB",
+          "HDMI1",
+          "HDMI2",
+          "DisplayPort",
+          "OPS/DVI"
+        ],
+        "perform": {
+          "action": "Select Source",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      },
+      {
+        "name": "AudioMute",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "perform": {
+          "action": "Set Audio Mute",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "AudioLevel",
+        "type": "integer",
+        "min": 0,
+        "max": 100,
+        "perform": {
+          "action": "Set Audio Level",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      },
+      {
+        "name": "Brightness",
+        "type": "integer",
+        "min": 0,
+        "max": 100,
+        "perform": {
+          "action": "Set Brightness",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      },
+      {
+        "name": "Contrast",
+        "type": "integer",
+        "min": 0,
+        "max": 100,
+        "perform": {
+          "action": "Set Contrast",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      },
+      {
+        "name": "Temperature",
+        "type": "integer"
+      }
+    ],
+
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Select Source",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Set Audio Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Set Audio Level",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Set Brightness",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Set Contrast",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        }
+      }
+    ],
+
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "LG Display IP Settings",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address:",
+          "type": "string",
+          "default": "192.168.99.176"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 9761,
+          "description": "Default: 9761"
+        }
+      },
+      "required": [
+        "host",
+        "port"
+      ]
+    }
+  },
+  "dependencies": {
+    "wakeonlan": "^0.1.0"
+  }
+}
