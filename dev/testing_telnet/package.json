@@ -1,0 +1,84 @@
+{
+  "name": "testing_telnet",
+  "version": "1.0.1-beta.11",
+  "description": "testing telnet client creation",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Adam_Toby",
+  "license": "MIT",
+  "overture": {
+    "brand": "ZeeVee",
+    "models": [
+      "Management Platform"
+    ],
+    "type": "device",
+    "subtype": "display",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": ["Disconnected", "Connected"]
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "enums": ["Off", "On"],
+        "perform": { "action": "Set Power", "params": {"Status": "$string"} }
+      },
+      {
+        "name": "JoinMode",
+        "type": "enum",
+        "enums": ["fast-switched", "genlocked", "multiview"],
+        "perform": { "action": "Set Join Mode", "params": {"Name": "$string"} }
+      }
+    ],
+
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": [
+          { "name": "Status", "type": "enum", "enums": ["Off", "On"] }
+        ]
+      },
+      {
+        "name": "Set Join Mode",
+        "params": [
+          { "name": "Name", "type": "enum", "enums": ["fast-switched", "genlocked", "multiview"] }
+        ]
+      },
+      {
+        "name": "Join Devices",
+        "params": [
+          { "name": "Input", "type": "string" },
+          { "name": "Output", "type": "string" },
+          { "name": "Mode", "type": "string" }
+        ]
+      }
+    ],
+
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Management Platform IP",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address:",
+          "type": "string",
+          "default": "192.168.99.40"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 23,
+          "description": "Telnet: 23"
+        }
+        
+      },
+      "required": [
+        "host",
+        "port"
+      ]
+    }
+  }
+}
