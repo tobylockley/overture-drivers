@@ -1,0 +1,141 @@
+{
+  "name": "tl_4x1_hd2",
+  "version": "1.0.0-beta5",
+  "description": "Driver for controlling tl-4x1-hd2 switcher with an RS232 interface",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "Techlogix",
+    "models": [
+      "tl-4x1-hd2"
+    ],
+    "type": "device",
+    "subtype": "matrix",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Sources",
+        "type": "enum",
+        "enums": [
+          "HDMI1",
+          "HDMI2",
+          "HDMI3",
+          "HDMI4"
+        ],
+        "perform": {
+          "action": "Select Source",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Select Source",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "title": "Techlogix 4x1-HD2 Switcher - RS232 Interface",
+      "oneOf": [
+        {
+          "title": "Zyper",
+          "type": "object",
+          "required": [
+            "interface",
+            "host",
+            "port",
+            "zyperDevice"
+          ],
+          "properties": {
+            "interface": {
+              "type": "string",
+              "enum": [
+                "Zyper"
+              ],
+              "options": {
+                "hidden": true
+              }
+            },
+            "host": {
+              "title": "Host name or IP Zyper management platform",
+              "type": "string",
+              "default": "192.168."
+            },
+            "port": {
+              "title": "Port:",
+              "type": "integer",
+              "enum": [
+                23
+              ],
+              "options": {
+                "hidden": true
+              }
+            },
+            "zyperDevice": {
+              "title": "Mac Address or Name of Zyper Encoder/Decoder:",
+              "type": "string",
+              "default": "00:1e:c0:"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "title": "GlobalCache RS232 Module",
+          "type": "object",
+          "required": [
+            "interface",
+            "host",
+            "port"
+          ],
+          "properties": {
+            "interface": {
+              "type": "string",
+              "enum": [
+                "GlobalCache"
+              ],
+              "options": {
+                "hidden": true
+              }
+            },
+            "host": {
+              "title": "Host name or IP of GlobalCache RS232 module",
+              "type": "string",
+              "default": "192.168."
+            },
+            "port": {
+              "title": "Port:",
+              "type": "integer",
+              "enum": [
+                4999
+              ],
+              "options": {
+                "hidden": true
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "telnet-client": "^0.15.5"
+  }
+}
