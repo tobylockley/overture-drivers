@@ -123,3 +123,17 @@ Initiates GetAudioLevelIn and GetAudioLevel for every input and output.
 
 - Added Power variable and appropriate declarations in package.json.
 - Updated readme.
+
+### 1.0.0-beta12
+
+- Fixed parseInt bug in recallPreset
+
+### 1.0.0-beta13
+
+- Removed getAllLevels() from recallPreset
+
+### 1.0.0-beta14
+
+- Added variables and functions for crosspoint gains
+- Restructured variable layout for ease of use
+- Removed all 'get' functions, as not needed

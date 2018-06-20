@@ -4,35 +4,20 @@ exports.init = _host => {
 }
 
 exports.createDevice = base => {
-  const MAX_LEVEL = 0x7E  // Max value for audio levels
   const logger = base.logger || host.logger
-  let config 
+  let config
   let tcpClient
+
   const setup = _config => {
     config = _config
-    base.setPoll('Keep Alive', 30000)
-    
 
-    let preset_names = [];  // Construct array of preset names
-    for (let i = 1; i <= 32; i++) { preset_names.push(`Preset${i}`); }
-    base.createVariable({
-      name: 'Preset',
-      type: 'enum',
-      enums: preset_names,
-      perform: {
-        action: 'Recall Preset',
-        params: {
-          Name: '$string'
-        }
-      }
-    });
-
+    // INPUT FADER GAINS
     for (let i = 1; i <= config.inputs; i++) {
       base.createVariable({
         name: `AudioLevelInput${i}`,
         type: 'integer',
         min: 0,
-        max: 100,
+        max: 126,
         perform: {
           action: 'Set Audio Level In',
           params: {
@@ -41,6 +26,47 @@ exports.createDevice = base => {
           }
         }
       });
+    }
+
+    // OUTPUT FADER GAINS
+    for (let i = 1; i <= config.outputs; i++) {
+      base.createVariable({
+        name: `AudioLevel${i}`,
+        type: 'integer',
+        min: 0,
+        max: 126,
+        perform: {
+          action: 'Set Audio Level',
+          params: {
+            Channel: i,
+            Level: '$value'
+          }
+        }
+      });
+    }
+
+    // CROSSPOINT GAINS
+    for (let i = 1; i <= config.outputs; i++) {
+      for (let j = 1; j <= config.inputs; j++) {
+        base.createVariable({
+          name: `Crosspoint_Output${i}_Input${j}`,
+          type: 'integer',
+          min: 0,
+          max: 81,
+          perform: {
+            action: 'Set Crosspoint Gain',
+            params: {
+              Output: i,
+              Input: j,
+              Level: '$value'
+            }
+          }
+        });
+      }
+    }
+
+    // AUDIO MUTE INPUT
+    for (let i = 1; i <= config.inputs; i++) {
       base.createVariable({
         name: `AudioMuteInput${i}`,
         type: 'enum',
@@ -55,28 +81,16 @@ exports.createDevice = base => {
       });
     }
 
-    for (let j = 1; j <= config.outputs; j++) {
+    // AUDIO MUTE OUTPUT
+    for (let i = 1; i <= config.outputs; i++) {
       base.createVariable({
-        name: `AudioLevel${j}`,
-        type: 'integer',
-        min: 0,
-        max: 100,
-        perform: {
-          action: 'Set Audio Level',
-          params: {
-            Channel: j,
-            Level: '$value'
-          }
-        }
-      });
-      base.createVariable({
-        name: `AudioMute${j}`,
+        name: `AudioMute${i}`,
         type: 'enum',
         enums: ['Off', 'On'],
         perform: {
           action: 'Set Audio Mute',
           params: {
-            Channel: j,
+            Channel: i,
             Status: '$string'
           }
         }
@@ -87,7 +101,6 @@ exports.createDevice = base => {
   const start = () => {
     initTcpClient()
     tcpClient.connect(config.port, config.host)
-    // getAllLevels()
     base.startPolling()
   }
 
@@ -107,9 +120,8 @@ exports.createDevice = base => {
     }
   }
 
-  const keepAlive = () => { sendDefer(Buffer.from([0xF0, 0x03, 0x40, 0x00, 0x00])); }  // Get Input1 Name
-
   function bufferToString(thebuffer) {
+    // Small helper functions to make hex buffer easier to read
     let str = "["
     thebuffer.forEach(element => {
       str += '0x' + element.toString(16) + ", "
@@ -127,7 +139,7 @@ exports.createDevice = base => {
       })
 
       tcpClient.on('data', data => {
-        //logger.silly(`TCPClient data: ${bufferToString(data)}`)
+        // logger.silly(`TCPClient data: ${bufferToString(data)}`)
         onFrame(data)
       })
 
@@ -161,31 +173,24 @@ exports.createDevice = base => {
     let valid_data
     let validated = false
 
-    valid_data = validateResponse(data, 0xC0)
-    if (valid_data) {  // Return from keepAlive() - don't really care about response
-      validated = true
-      base.commandDone()
-      //logger.silly(`keepAlive: ${data.slice(4).toString()}`)
-    }
-
     valid_data = validateResponse(data, 0xF4)
     if (valid_data) {  // Set Power
-      validated = true
       base.commandDone()
+      validated = true
       base.getVar('Power').string = valid_data[2] == 1 ? 'On' : 'Off'
     }
 
     valid_data = validateResponse(data, 0xF1)
     if (valid_data) {  // Recall Preset
-      validated = true
       base.commandDone()
-      base.getVar(`Preset`).string = `Preset${valid_data[3] + 1}`
+      validated = true
+      base.getVar(`Preset`).string = `Preset ${valid_data[3] + 1}`
     }
 
     valid_data = validateResponse(data, 0x92)
     if (valid_data) {  // Channel On/Off (Mute)
-      validated = true
       base.commandDone()
+      validated = true
       let channel = valid_data[3] + 1
       let status = valid_data[4] == 1 ? 'Off' : 'On'
       if (valid_data[2] == 0x00) base.getVar(`AudioMuteInput${channel}`).string = status
@@ -194,22 +199,22 @@ exports.createDevice = base => {
 
     valid_data = validateResponse(data, 0x91)
     if (valid_data) {  // 0x91 = Channel Gain
-      validated = true
+      // E.g. 0x91, 3, 0/1, channel, gain
       base.commandDone()
+      validated = true
       let channel = valid_data[3] + 1
-      let value = Math.round((valid_data[4] * 100) / MAX_LEVEL)  // Compress from 126 steps down to 100
-      if (valid_data[2] == 0x00) base.getVar(`AudioLevelInput${channel}`).value = value
-      else if (valid_data[2] == 0x01) base.getVar(`AudioLevel${channel}`).value = value
+      if (valid_data[2] == 0x00) base.getVar(`AudioLevelInput${channel}`).value = valid_data[4]
+      else if (valid_data[2] == 0x01) base.getVar(`AudioLevel${channel}`).value = valid_data[4]
     }
 
-    valid_data = validateResponse(data, 0x93)
-    if (valid_data) {  // 0x93 = Return from Channel "step" (the getLevel hack)
-      validated = true
+    valid_data = validateResponse(data, 0x95)
+    if (valid_data) {  // 0x95 = Crosspoint Gain
+      // Example: 0x95, 5, 0, input, 1, output, gain
       base.commandDone()
-      let channel = valid_data[3] + 1
-      let value = Math.round((valid_data[4] * 100) / MAX_LEVEL)  // Compress from 126 steps down to 100
-      if (valid_data[2] == 0x00) base.getVar(`AudioLevelInput${channel}`).value = value
-      else if (valid_data[2] == 0x01) base.getVar(`AudioLevel${channel}`).value = value
+      validated = true
+      let input = valid_data[3] + 1
+      let output = valid_data[5] + 1
+      base.getVar(`Crosspoint_Output${output}_Input${input}`).value = valid_data[6]
     }
 
     if (!validated) {
@@ -218,6 +223,7 @@ exports.createDevice = base => {
   }
   
   const validateResponse = (data, id_byte) => {
+    // Will extract valid packets even if surrounded by extraneous bytes
     if (data.includes(id_byte)) {
       let msg_start = data.indexOf(id_byte)
       if (data.length >= msg_start + 2) {  // Make sure we can read the next byte
@@ -249,19 +255,16 @@ exports.createDevice = base => {
   }
 
   const recallPreset = params => {
-    let value = params.Name.replace(/\D/g , '').parseInt() - 1;  // Must be 0 indexed
+    let value = parseInt(params.Name.replace(/\D/g , '')) - 1;  // Extract number, convert to 0 index
     sendDefer(Buffer.from([0xF1, 0x02, 0x00, value]));
-    setTimeout(getAllLevels, 3000)  // Read all levels after 3 sec delay
   }
 
   const setAudioLevel = params => {
-    let value = Math.round((MAX_LEVEL * params.Level) / 100.0)  // 126 steps, compressed to 100 for percentage
-    sendDefer(Buffer.from([0x91, 0x03, 0x01, params.Channel-1, value]));
+    sendDefer(Buffer.from([0x91, 0x03, 0x01, params.Channel-1, params.Level]));
   }
 
   const setAudioLevelIn = params => {
-    let value = Math.round((MAX_LEVEL * params.Level) / 100.0)  // 126 steps, compressed to 100 for percentage
-    sendDefer(Buffer.from([0x91, 0x03, 0x00, params.Channel-1, value]));
+    sendDefer(Buffer.from([0x91, 0x03, 0x00, params.Channel-1, params.Level]));
   }
 
   const setAudioMute = params => {
@@ -273,33 +276,13 @@ exports.createDevice = base => {
     let mute_val = params.Status == 'On' ? 0 : 1
     sendDefer(Buffer.from([0x92, 0x03, 0x00, params.Channel-1, mute_val]));
   }
-  
-  const getAudioLevel = channel => {
-    // Get command does not exist. This is a slight hack that adjusts the volume
-    // down then up, and the device will return the current level
-    sendDefer(Buffer.from([0x93, 0x03, 0x01, channel-1, 0x61]));  // Adjust down 1 step
-    sendDefer(Buffer.from([0x93, 0x03, 0x01, channel-1, 0x41]));  // Adjust up 1 step
-  }
-  
-  const getAudioLevelIn = channel => {
-    // Get command does not exist. This is a slight hack that adjusts the volume
-    // down then up, and the device will return the current level
-    sendDefer(Buffer.from([0x93, 0x03, 0x00, channel-1, 0x61]));  // Adjust down 1 step
-    sendDefer(Buffer.from([0x93, 0x03, 0x00, channel-1, 0x41]));  // Adjust up 1 step
-  }
 
-  const getAllLevels = () => {
-    for (let i = 1; i <= config.outputs; i++) {
-      getAudioLevel(i)
-    }
-    for (let i = 1; i <= config.inputs; i++) {
-      getAudioLevelIn(i)
-    }
+  const setCrosspointGain = params => {
+    sendDefer(Buffer.from([0x95, 0x05, 0x00, params.Input-1, 0x01, params.Output-1, params.Level]));
   }
 
   return {
-    setup, start, stop, tick, keepAlive,
-    setPower, recallPreset, setAudioLevel, setAudioLevelIn, setAudioMute, setAudioMuteIn,
-    getAudioLevel, getAudioLevelIn, getAllLevels
+    setup, start, stop, tick,
+    setPower, recallPreset, setAudioLevel, setAudioLevelIn, setAudioMute, setAudioMuteIn, setCrosspointGain
   }
 }
