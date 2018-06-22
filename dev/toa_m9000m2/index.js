@@ -97,7 +97,11 @@ exports.createDevice = base => {
       });
     }
     
-    base.setPoll('Keep Alive', 30000)
+    base.setPoll({
+      action: 'Keep Alive',
+      period: 30000,
+      enablePollFn: () => { return tcpClient.isConnected() }
+    })
   }
 
   const start = () => {
@@ -217,7 +221,7 @@ exports.createDevice = base => {
 
     valid_data = validateResponse(data, 0x95)
     if (valid_data) {  // Crosspoint Gain
-      // Example: 0x95, 5, 0, input, 1, output, gain
+      // E.g. 0x95, 5, 0, input, 1, output, gain
       base.commandDone()
       validated = true
       let input = valid_data[3] + 1
