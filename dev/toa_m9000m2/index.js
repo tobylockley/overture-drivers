@@ -96,6 +96,8 @@ exports.createDevice = base => {
         }
       });
     }
+    
+    base.setPoll('Keep Alive', 30000)
   }
 
   const start = () => {
@@ -110,14 +112,16 @@ exports.createDevice = base => {
 
   const disconnect = () => {
     base.getVar('Status').string = 'Disconnected'
-    tcpClient && tcpClient.end()
+    // tcpClient && tcpClient.end()
   }
 
   function tick() {
-    if (base.getVar('Status').string == 'Disconnected') {
-      initTcpClient()
-      tcpClient.connect(config.port, config.host)
-    }
+    // This is not needed as the TCP client handles it automatically
+
+    // if (base.getVar('Status').string == 'Disconnected') {
+    //   initTcpClient()
+    //   tcpClient.connect(config.port, config.host)
+    // }
   }
 
   function bufferToString(thebuffer) {
@@ -132,6 +136,10 @@ exports.createDevice = base => {
   const initTcpClient = () => {
     if (!tcpClient) {
       tcpClient = host.createTCPClient()
+      tcpClient.setOptions({
+        autoReconnectionAttemptDelay: 5000,
+        receiveTimeout: 60000
+      })
 
       tcpClient.on('connect', () => {
         logger.silly(`TCPClient connected`)
@@ -198,7 +206,7 @@ exports.createDevice = base => {
     }
 
     valid_data = validateResponse(data, 0x91)
-    if (valid_data) {  // 0x91 = Channel Gain
+    if (valid_data) {  // Channel Gain
       // E.g. 0x91, 3, 0/1, channel, gain
       base.commandDone()
       validated = true
@@ -208,13 +216,20 @@ exports.createDevice = base => {
     }
 
     valid_data = validateResponse(data, 0x95)
-    if (valid_data) {  // 0x95 = Crosspoint Gain
+    if (valid_data) {  // Crosspoint Gain
       // Example: 0x95, 5, 0, input, 1, output, gain
       base.commandDone()
       validated = true
       let input = valid_data[3] + 1
       let output = valid_data[5] + 1
       base.getVar(`Crosspoint_Output${output}_Input${input}`).value = valid_data[6]
+    }
+
+    valid_data = validateResponse(data, 0xC0)
+    if (valid_data) {  // Get Channel Name (keepAlive)
+      base.commandDone()
+      validated = true
+      logger.silly(`keepAlive response received: ${valid_data.slice(4).toString()}`)
     }
 
     if (!validated) {
@@ -249,6 +264,8 @@ exports.createDevice = base => {
     }
   }
   
+  const keepAlive = () => { sendDefer(Buffer.from([0xF0, 0x03, 0x40, 0x00, 0x00])); }  // Get Input1 Name
+  
   const setPower = params => {
     if (params.Status == 'Off') sendDefer(Buffer.from([0xF4, 0x01, 0x00]))
     else if (params.Status == 'On') sendDefer(Buffer.from([0xF4, 0x01, 0x01]))
@@ -282,7 +299,7 @@ exports.createDevice = base => {
   }
 
   return {
-    setup, start, stop, tick,
+    setup, start, stop, tick, keepAlive,
     setPower, recallPreset, setAudioLevel, setAudioLevelIn, setAudioMute, setAudioMuteIn, setCrosspointGain
   }
 }

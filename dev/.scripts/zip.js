@@ -71,12 +71,11 @@ exports.execute = function (args) {
       archive.pipe(output);
   
       // append files from a glob pattern
-      archive.glob('*.js', {cwd: mypath});
-      archive.glob('*.json', {cwd: mypath});
-      archive.glob('*.md', {cwd: mypath});
-      archive.glob('node_modules/**/*.*', {cwd: mypath});
-      // append files from a sub-directory and naming it `new-subdir` within the archive
-      archive.directory('node_modules/');
+      // archive.glob('*.js', {cwd: mypath});
+      // archive.glob('*.json', {cwd: mypath});
+      // archive.glob('*.md', {cwd: mypath});
+      archive.glob('**/*.*', {cwd: mypath});  // Get everything inside the drivers folder
+      // archive.directory(`${mypath}/node_modules`);
   
       // finalize the archive (ie we are done appending files but streams have to finish yet)
       // 'close', 'end' or 'finish' may be fired right after calling this method so register to them beforehand

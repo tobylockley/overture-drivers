@@ -137,3 +137,8 @@ Initiates GetAudioLevelIn and GetAudioLevel for every input and output.
 - Added variables and functions for crosspoint gains
 - Restructured variable layout for ease of use
 - Removed all 'get' functions, as not needed
+
+### 1.0.0-beta15
+
+- Fixed a bug with TCP timeout
+- Added TCP keepAlive function
