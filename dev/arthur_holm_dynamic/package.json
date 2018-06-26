@@ -1,7 +1,7 @@
 {
   "name": "arthur_holm_dynamic",
-  "version": "1.0.0-beta2",
-  "description": "Driver for Arthur Holm display/mic",
+  "version": "1.0.0-beta4",
+  "description": "Driver for Arthur Holm AHNet devices",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -19,67 +19,39 @@
         "name": "Status",
         "type": "enum",
         "enums": ["Disconnected", "Connected"]
-      },
-      {
-        "name": "Power",
-        "type": "enum",
-        "enums": ["Off", "On"],
-        "perform": {
-          "action": "Set Power",
-          "params": {
-            "Status": "$string"
-          }
-        }
-      },
-      {
-        "name": "Position",
-        "type": "enum",
-        "enums": ["Down", "Up"],
-        "smooth": 15000,
-        "perform": {
-          "action": "Set Position",
-          "params": {
-            "Status": "$string"
-          }
-        }
-      },
-      {
-        "name": "ButtonLock",
-        "type": "enum",
-        "enums": ["Unlocked", "Locked"],
-        "perform": {
-          "action": "Set Button Lock",
-          "params": {
-            "Status": "$string"
-          }
-        }
       }
     ],
-    
+
     "commands": [
       {
         "name": "Set Power",
         "params": {
-          "Status": { "type": "string" }
+          "Status": {
+            "type": "string"
+          }
         }
       },
       {
         "name": "Set Position",
         "params": {
-          "Status": { "type": "string" }
+          "Status": {
+            "type": "string"
+          }
         }
       },
       {
         "name": "Set Button Lock",
         "params": {
-          "Status": { "type": "string" }
+          "Status": {
+            "type": "string"
+          }
         }
       }
     ],
 
     "pointSetupSchema": {
-      "type": "object",
       "title": "Arthur Holm AHnet Settings",
+      "type": "object",
       "properties": {
         "host": {
           "title": "Host name or IP address of AHnet module:",
@@ -92,24 +64,40 @@
           "default": 2002,
           "description": "Default: 2002"
         },
-        "address": {
-          "title": "Device Address:",
-          "type": "integer",
-          "default": 1,
-          "minimum": 1,
-          "maximum": 99
-        },
-        "type": {
-          "title": "Device Type:",
-          "type": "string",
-          "enum": ["Display", "Microphone"]
+        "devices": {
+          "type": "array",
+          "format": "table",
+          "title": "Devices",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Device",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "display",
+                  "microphone"
+                ],
+                "default": "display"
+              },
+              "address": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 99
+              },
+              "name": {
+                "type": "string",
+                "description": "Human readable name"
+              }
+            }
+          }
         }
       },
       "required": [
         "host",
         "port",
-        "address",
-        "type"
+        "devices"
       ]
     }
   }

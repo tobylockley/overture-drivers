@@ -1,0 +1,121 @@
+{
+  "name": "prodvx_panel",
+  "version": "1.0.2",
+  "description": "Driver For Pro DVX panel",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "Pro DVX",
+    "models": [
+      "Unspecified"
+    ],
+    "type": "device",
+    "subtype": "display",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "enums": ["Off", "On"],
+        "perform": {
+          "action": "Set Power",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "RedLedStrip",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "perform": {
+          "action": "Set Red Led",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "GreenLedStrip",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "perform": {
+          "action": "Set Green Led",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      }
+    ],
+
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Status": { "type": "string" }
+        }
+      },
+      {
+        "name": "Set Red Led",
+        "params": {
+          "Status": { "type": "string" }
+        }
+      },
+      {
+        "name": "Set Green Led",
+        "params": {
+          "Status": { "type": "string" }
+        }
+      }
+    ],
+
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "SSH Settings for pro DVX panel",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address",
+          "type": "string",
+          "default": "192.168.1.113"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 2222
+        },
+        "password": {
+          "title": "SSH Droid Password:",
+          "type": "string"
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "password"
+      ]
+    }
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+    "ssh-exec": "^2.0.0"
+  }
+}

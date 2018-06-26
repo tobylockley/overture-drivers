@@ -1,6 +1,6 @@
 {
   "name": "toa_m9000m2",
-  "version": "1.0.0-beta.14",
+  "version": "1.0.0-beta.15",
   "description": "Driver For Toa M-9000M2 mixing amplifier",
   "main": "index.js",
   "scripts": {

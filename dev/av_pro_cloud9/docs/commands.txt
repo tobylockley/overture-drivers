@@ -1,0 +1,89 @@
+AC-MX9XHDL-HDBT
+
+Settings: Baud Rate 57600, Data Bits 8, No Parity, 1 Stop Bit
+All Commands start by Prefix System Address zz, if [01-99] If it is default (A00), no prefix is necessary
+=
+=---------------------------------------------------------------------------------------------------------------------------------------=
+= H : Help =
+= STA : Show Global System Status =
+= SET RST : Reset to Factory Defaults =
+= SET ADDR xx : Set System Address to xx {xx=[00-99](00=Single)} =
+= SET CAS EN/DIS : Set Cascade Mode Enable/Disable =
+= SET LCD DP MODEx : Set LCD Display Mode{x=[0~2](0=Always ON,1=Auto,2=Always OFF)} =
+= SET LCD ON Tx : Set LCD Remain On Time{x=[0~3](0=Always ON,1=15,2=30,3=60Sec)} =
+= SET KEY LOCK ON/OFF : Set Key Lock On/Off =
+= SET PVW INx : Set Preview Channel x{x=[1-9]} =
+= GET ADDR : Get System Address =
+= GET STA : Get System System Status =
+= GET CAS : Get Cascade Mode Status =
+= GET LCD DP MODE : Get LCD Display Mode =
+= GET LCD ON T : Get LCD Remain On Time =
+= GET KEY LOCK : Get Key Lock Status =
+= GET PVW IN : Get Preview Channel =
+=---------------------------------------------------------------------------------------------------------------------------------------=
+=Output Setup Commands: =
+= SET OUTx VS INy : Set Output x To Input y{x=[0-9](0=ALL), y=[1-10](10=Multiview)} =
+= SET OUTx EXA EN/DIS : Set Ex-Audio Output Enable/Disable{x=[0-9](0=ALL)} =
+= SET EXA MODEy : Set Ex-Audio Output Mode{y=[0-2](0=From Input,1=From output,2=Independent)} =
+= SET OUTx EAS INy : Set Ex-Audio Output x To Input y{x=[0-9](0=ALL), y=[1-9]} =
+= SET OUTx MAS INy : Set HDMI Audio Output x To Input y In Multiview Mode{x=[0-9](0=ALL), y=[1-10]
+(10=Mute)} =
+= GET OUTx VS : Get Output x Video Route{x=[0-9](0=ALL)} =
+= GET OUTx EDID DATA : Get Output x EDID DATA{x=[1-9]} =
+= GET OUTx EXA : Get Ex-Audio Output Enable/Disable Status{x=[0-9](0=ALL)} =
+= GET EXA MODE : Get Ex-Audio Output Mode =
+= GET OUTx EAS : Get Ex-Audio Output x Audio Route =
+= GET OUTx MAS : Get HDMI Audio Output x Audio Route In Multiview Mode} =
+=---------------------------------------------------------------------------------------------------------------------------------------=
+=Input Setup Commands: =
+= SET INx EDID y : Set Input x EDID{x=[0-9](0=ALL), y=[0-4]} =
+= 0:1080P_2CH 1:1080P_6CH 2:USER1_EDID 3:USER2_EDID 4:USER3_EDID =
+= SET INx EDID CY OUTy : Copy Output y EDID To Input x(USER1 BUF){x=[0-9](0=ALL), y=[1-9]} =
+= SET INx EDID Uy DATAz : Write EDID To User y Buffer of Input x{x=[0-9](0=ALL), y=[1-3],z=[EDID Data]} =
+= GET INx EDID : Get Input x EDID Index{x=[0-9](0=ALL)} =
+= GET INx EDID y DATA : Get Input x EDID y Data{x=[1-9],y=[0-4]} =
+=---------------------------------------------------------------------------------------------------------------------------------------=
+=Multiview Setup Command: =
+= SET BLW z : Set Border Line Width by z {z = [0-15](0=None, 1-15Pixels)} =
+= SET BLC rrr.ggg.bbb : Set Border Line Color by RED/GREEN/BLUE{rrr=[000-255], ggg=[000-255],bbb=[000-255]}
+= SET MVW MODEx : Set Multiview Mode x{x=[0-1](0=3x3,1=Quad)} =
+= SET QVW VS x.x.x.x : Set Quad Video Source (x1-x4 = [1-9]) (0 leaves quadrant unchanged) =
+= GET BLW : Get Border Line Width =
+= GET BLC : Get Border Line Color =
+= GET MVW MODE : Get Multiview Mode =
+= GET QVW VS : Get Quad Video Source =
+=---------------------------------------------------------------------------------------------------------------------------------------=
+=Network Setup Command: ( xxx=[000-255], zzzz=[0001-9999] =
+= SET RIP xxx.xxx.xxx.xxx : Set Route IP Address to xxx.xxx.xxx.xxx =
+= SET HIP xxx.xxx.xxx.xxx : Set Host IP Address to xxx.xxx.xxx.xxx =
+= SET NMK xxx.xxx.xxx.xxx : Set Net Mask to xxx.xxx.xxx.xxx =
+= SET TIP zzzz : Set TCP/IP Port to zzzz =
+= SET DHCP y : Set DHCP {y=[0-1](0=Dis,1=Enable)} =
+= GET RIP : Get Route IP Address =
+= GET HIP : Get Host IP Address =
+= GET NMK : Get Net Mask =
+= GET TIP : Get TCP/IP Port =
+= GET DHCP : Get DHCP Status =
+= GET MAC : Get MAC Address =
+=---------------------------------------------------------------------------------------------------------------------------------------=
+=IR Route Setup Command: =
+= SET IRC MUX x1.x2.x3.x4.x5.x6.x7.x8.x9 : Set the IR return Channel MUX{x1~x9=[0-1](0=Disable,1=Enable)}
+= SET IRT OUTx IS INy : Set Output x IR Route{x=[0-9](0=all),y=[1-4]} =
+= SET IR EXT SW x1.x2.x3.x4.x5.x6.x7.x8 : Set IR Extender Switch{x1~x9,y1~y4=[0-1](0=Disable,1=Enable)} =
+= .x9.y2.y3.y4 : =
+= GET IRC MUX : Get the IR MUX Status =
+= GET IRT OUTx IS : Get Output x IR Route{x=[0-9](0=all)} =
+= GET IR EXT SW : Get IR Extender Switch Status =
+=---------------------------------------------------------------------------------------------------------------------------------------=
+=RS232 Route Setup Command: =
+= SET RS MUX x1.x2.x3.x4.x5.x6.x7.x8.x9 : Set the RS232 MUX{x1~x9=[0-1](0=Disable,1=Enable)} =
+= SET RS PTH OUTx LENy BRz : Set RS232 Pass Through to Outputx =
+= {x=[0-9](0=ALL),y=[1~800],z=[0~5](0=9600,1=14400,2=19200,3=38400,4=57600,5=115200)} =
+= GET RS MUX : Get the RS232 MUX Status =
+=---------------------------------------------------------------------------------------------------------------------------------------=
+=IR Code Setup Command: =
+= SET IR SYS xx.yy : Set IR Custom Code{xx=[00-FFH],yy=[00-FFH]} =
+= SET IR OUTx INy CODE zz : Set IR Data Code{x=[1-9],y=[1-10],zz=[00-FFH]} =
+= GET IR SYS : Get IR Custom Code =
+= GET IR OUTx INy CODE : Get IR Data Code =
+=---------------------------------------------------------------------------------------------------------------------------------------=

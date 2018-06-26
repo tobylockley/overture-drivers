@@ -1,0 +1,94 @@
+<html>
+<head>
+<title></title>
+<style>
+</style>
+<script>
+var access = new function() {
+    this.ip ='localhost';
+    //this.ip = '192.168.1.139';
+    //this.api_base = 'http://'+this.ip+':8080/v2';
+	this.api_base = 'http://'+this.ip+':8080/';
+
+    this.token = '';
+}
+
+window.onload = function() {
+    var xhr = new XMLHttpRequest(),
+        data = {
+            grant_type: 'password',
+            username: 'admin',
+            password: ''
+        },
+        data_string = '';
+    for (var key in data) {
+        data_string += '&'+key+(data[key] ?'='+data[key] :'');
+    }
+    //xhr.open('POST', access.api_base+'/oauth2/token', true);
+	xhr.open('POST', access.api_base+'/', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4) {
+            if (this.status == 200) {
+                access.token = JSON.parse(this.responseText).access_token;
+            }
+            else {
+                alert('some errors');
+            }
+        }
+    }
+    xhr.send();
+
+    var btns = document.getElementsByTagName('input');
+    for (var i=btns.length-1; 0<=i; i--) {
+        var btn = btns[i];
+        if (!btn.hasAttribute('hex')) {
+            continue;
+        }
+
+        var hex = btn.getAttribute('hex');
+        (function(btn, hex) {
+            btn.onclick = function() {
+                changeLedColor(hex);
+            };
+        }) (btn, hex);
+    }
+};
+
+function changeLedColor(hex) {
+    var xhr = new XMLHttpRequest(),
+        data = {
+            id: 0,
+            name: 'frame',
+            brightness: 1.0,
+            color: hex
+        },
+        data_string = '';
+    for (var key in data) {
+        data_string += '&'+key+(data[key] ?'='+data[key] :'');
+    }
+    //xhr.open('POST', access.api_base+'/hardware/light?access_token='+access.token, true);
+	
+	//xhr.open('POST', access.api_base+'/hardware/light?led=test' + hex, true);
+	console.info(hex);
+	var h = hex.replace("#","");
+    xhr.open('POST', access.api_base+'/light?led=' + h, true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4) {
+            if (this.status != 200) {
+                alert('some errors');
+            }
+        }
+    }
+    xhr.send();
+}
+</script>
+</head>
+<body>
+    <input type='button' hex='#ff0000' value='red' />
+    <input type='button' hex='#00ff00' value='green' />
+    <input type='button' hex='#ffff00' value='orange' />
+    <input type='button' hex='#000000' value='off' />
+</body>
+</html>
