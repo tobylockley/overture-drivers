@@ -1,0 +1,91 @@
+{
+  "name": "zeevee_zyper_mp",
+  "version": "1.0.0-beta.2",
+  "description": "Driver for Zyper Management Platform via telnet",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "ZeeVee",
+    "models": [
+      "Management Platform"
+    ],
+    "type": "device",
+    "subtype": "display",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      }
+    ],
+    "commands": [],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Management Platform Settings",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address:",
+          "type": "string",
+          "default": "192.168.99.40"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 23,
+          "description": "Telnet: 23"
+        },
+        "encoders": {
+          "type": "array",
+          "format": "table",
+          "title": "Encoders",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Encoder",
+            "properties": {
+              "name": {
+                "type": "string",
+                "title": "Name"
+              },
+              "model": {
+                "type": "string",
+                "title": "Type",
+                "enum": [
+                  "Dimmer Switch",
+                  "Motion Sensor"
+                ]
+              },
+              "name": {
+                "type": "string",
+                "title": "Friendly Name",
+                "pattern": "[A-Za-z]+"
+              }
+            },
+            "required": [
+              "identifier",
+              "type",
+              "name"
+            ]
+          }
+        }
+      },
+      "required": [
+        "host",
+        "port"
+      ]
+    }
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+    "telnet-client": "^0.15.7"
+  }
+}
