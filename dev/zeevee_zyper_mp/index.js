@@ -1,5 +1,6 @@
 'use strict';
 
+const POLL_PERIOD = 5000
 const TELNET_TIMEOUT = 30000  // Socket will timeout after specified milliseconds of inactivity
 const SEND_TIMEOUT = 1000  // Timeout when using telnet send function
 
@@ -15,14 +16,11 @@ exports.createDevice = base => {
   let Telnet = require('telnet-client')
   let telnetClient
 
-  let encoders_uhd = []
-  let encoders_4k = []
-  let multiviews = []
-  let decoders = []
-
   let frameParser = host.createFrameParser()
   frameParser.setSeparator('Zyper$')
   frameParser.on('data', data => onFrame(data))
+
+  const isConnected = () => { return base.getVar('Status').string === 'Connected' }
 
   const setup = _config => {
     config = _config
@@ -39,9 +37,67 @@ exports.createDevice = base => {
       })
     }
 
-    base.createVariable({ name: 'Encoders_UHD', type: 'enum'})
-    base.createVariable({ name: 'Encoders_4K', type: 'enum'})
-    base.createVariable({ name: 'Multiviews', type: 'enum'})
+    let tempUHD = [], temp4K = [], tempMV = []  // Temp arrays for building the dynamic variable enums
+
+    if (config.encoders.length > 0) {
+      config.encoders.forEach(encoder => {
+        if (encoder.model === 'ZyperUHD') tempUHD.push(encoder.name)
+        else if (encoder.model === 'Zyper4K') temp4K.push(encoder.name)
+      })
+      if (tempUHD.length > 0) {
+        tempUHD.sort()
+        base.createVariable({ name: 'Encoders_UHD', type: 'enum', enums: tempUHD })
+      }
+      if (temp4K.length > 0) {
+        temp4K.sort()
+        base.createVariable({ name: 'Encoders_4K', type: 'enum', enums: temp4K })
+      }
+    }
+
+    if (config.multiviews.length > 0) {
+      config.multiviews.forEach(mv => { tempMV.push(mv.name) })
+      base.createVariable({ name: 'Multiviews', type: 'enum', enums: tempMV })
+    }
+
+    if (config.videowalls.length > 0) {
+      config.videowalls.forEach(vw => {
+        let sources = ['Idle']
+        if (vw.model === 'Zyper4K') sources = sources.concat(temp4K)
+        else if (vw.model === 'ZyperUHD') sources = sources.concat(tempUHD)
+        base.createVariable({
+          name: `VideoWall_${vw.name.replace(/[^A-Za-z0-9_]/g, '')}`,  // Ensure legal variable name
+          type: 'enum',
+          enums: sources,  // Will be populated with appropriate sources above
+          perform: {
+            action: 'startVideoWall',
+            params: { Name: vw.name, Source: '$string' }
+          }
+        })
+      });
+    }
+
+    if (config.decoders.length > 0) {
+      config.decoders.forEach(decoder => {
+        let sources = ['VideoWall']
+        if (decoder.model === 'Zyper4K') sources = sources.concat(temp4K.concat(tempMV))
+        else if (decoder.model === 'ZyperUHD') sources = sources.concat(tempUHD)
+        base.createVariable({
+          name: `Decoder_${decoder.name.replace(/[^A-Za-z0-9_]/g, '')}`,  // Ensure legal variable name
+          type: 'enum',
+          enums: sources,  // Will be populated with appropriate sources above
+          perform: {
+            action: 'setDecoder',
+            params: { Name: decoder.name, Source: '$string' }
+          }
+        })
+      });
+    }
+
+    base.setPoll({
+      action: 'getInfo',
+      period: POLL_PERIOD,
+      enablePollFn: isConnected
+    });
   }
 
   const start = () => {
@@ -51,11 +107,9 @@ exports.createDevice = base => {
       port: config.port,
       timeout: TELNET_TIMEOUT,
       initialLFCR: true,
-      sendTimeout: SEND_TIMEOUT,
-      ors: '\r\n'  // Send this with each command
+      sendTimeout: SEND_TIMEOUT
     })
-    logger.silly('Querying Zyper MP for device info....')
-    initVariables()
+    base.startPolling()
   }
 
   const stop = () => {
@@ -87,6 +141,26 @@ exports.createDevice = base => {
         telnetClient && telnetClient.end()
       })
     }
+  }
+
+  const send = data => {
+    logger.silly(`Telnet send: ${data}`)
+    telnetClient.send(`${data}\r\n`)
+  }
+
+  const sendDefer = data => {
+    logger.silly(`Telnet sendDefer: ${data}`)
+    base.commandDefer(1000)
+    telnetClient.send(`${data}\r\n`).then(result => {
+      // Handled in onFrame
+      // logger.silly(`Telnet send OK: ${data}`)
+    }, err => {
+      base.commandError(`Telnet send error: ${err}`)
+    })
+  }
+
+  const getInfo = () => {
+    sendDefer('show device config decoders')
   }
 
   const initVariables = () => {
@@ -156,22 +230,23 @@ exports.createDevice = base => {
     // Search for source name to determine join mode
     // params.Name params.Source
     let joinmode
-    if (encoders_uhd.map(x => x.name).includes(params.Source)) {
+    if (base.getVar('Encoders_UHD').enums.includes(params.Source)) {
       // UHD Encoder
       joinmode = 'fast-switched'
     }
-    else if (encoders_4k.map(x => x.name).includes(params.Source)) {
+    else if (base.getVar('Encoders_4K').enums.includes(params.Source)) {
       // 4k Encoder
       joinmode = 'fast-switched' // Could also be 'genlocked'
     }
-    if (multiviews.includes(params.Source)) {
+    if (base.getVar('Multiviews').enums.includes(params.Source)) {
       // Multiview
       joinmode = 'multiview'
     }
-    telnetClient.send(`join ${params.Source} ${params.Name} ${joinmode}`)
+    sendDefer(`join ${params.Source} ${params.Name} ${joinmode}`)
 
     // Set HDMI switcher output accordingly
-    let screenId = parseInt(params.Name.replace(/\D/g, ''))  // Hackish way to get the number from the decoder name
+    let match = params.Name.match(/dec(\d)/)
+    let screenId = parseInt(match[1])  // Hackish way to get the number from the decoder name
     if (params.Name.includes('UHD')) setScreenMode({ScreenId: screenId, Mode: 'UHD'})
     else if (params.Name.includes('4K')) setScreenMode({ScreenId: screenId, Mode: '4K'})
   }
@@ -179,21 +254,57 @@ exports.createDevice = base => {
   const setScreenMode = params => {
     // Sends command to TechLogix HDMI switcher
     // ScreenId should = 1-4, corresponding to UHD_dec[1-4]
-    if (params.Mode === 'UHD') telnetClient.send(`send UHD_dec${params.ScreenId} rs232 HDMI1%`)
-    else if (params.Mode === '4K') telnetClient.send(`send UHD_dec${params.ScreenId} rs232 HDMI2%`)
+    if (params.Mode === 'UHD') sendDefer(`send UHD_dec${params.ScreenId} rs232 HDMI1%`)
+    else if (params.Mode === '4K') sendDefer(`send UHD_dec${params.ScreenId} rs232 HDMI2%`)
     // Ignores 'Unknown' screen mode
   }
 
+  const startVideoWall = params => {
+    sendDefer(`set video-wall-encoder ${params.Source} ${params.Name}`)
+    // Set HDMI switcher output accordingly for all screens
+    for (let i = 1; i <= 4; i++) {
+      if (params.Source.includes('UHD')) setScreenMode({ScreenId: i, Mode: 'UHD'})
+      else if (params.Source.includes('4K')) setScreenMode({ScreenId: i, Mode: '4K'})
+    }
+  }
+
   const onFrame = data => {
+    let match  // Used for regex matching NOTE: [\s\S] will match any character, even newlines
     logger.silly(`onFrame: ${data}`)
 
-    if (data.includes('join')) {
+    match = data.match(/join (.+?) (.+?) [\s\S]*?Success/)
+    if (match) {
+      base.commandDone()
+      base.getVar(`Decoder_${match[2]}`).string = match[1]
+    }
+
+    match = data.match(/set video-wall-encoder[\s\S]*?Success/)
+    if (match) {
+      base.commandDone()
+    }
+
+    match = data.match(/send UHD_dec(\d) rs232 HDMI(\d)[\s\S]*?Success/)
+    if (match) {
+      base.commandDone()
+      base.getVar(`ScreenMode${match[1]}`).value = match[2]  // 1 = UHD, 2 = 4K
+    }
+
+    // Response from polling command
+    match = data.match(/show device config decoders/)
+    if (match) {
+      base.commandDone()
+      // Parse all decoders
+      let regex = /device\.gen.*?name=(.+?),[\s\S]*?connectedEncoder;.*?name=(.+?),.*?connectionMode=(.+)/g;
+      while (match = regex.exec(data)) {
+        if (match[3].includes('wall')) base.getVar(`Decoder_${match[1]}`).string = 'VideoWall'
+        else base.getVar(`Decoder_${match[1]}`).string = match[2]
+      }
     }
 
   }
 
   return {
     setup, start, stop,
-    setDecoder, setScreenMode
+    setDecoder, setScreenMode, startVideoWall, getInfo
   }
 }
