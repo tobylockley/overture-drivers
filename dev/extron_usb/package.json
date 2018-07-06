@@ -1,0 +1,68 @@
+{
+  "name": "extron_usb",
+  "version": "1.0.0-beta1",
+  "description": "Driver for controlling extron USB switcher via RS232",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "Extron",
+    "models": [
+      "SW2 USB",
+      "SW4 USB",
+      "SW4 USB Plus"
+    ],
+    "type": "device",
+    "subtype": "matrix",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "name": "Select Input",
+        "params": {
+          "Input": {
+            "type": "integer"
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Extron USB Switcher - RS232 Interface",
+      "properties": {
+        "host": {
+          "title": "Host name or IP of Global Cache RS232 module",
+          "type": "string",
+          "default": "192.168.99.100"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 4999,
+          "description": "Default: 4999"
+        },
+        "inputs": {
+          "title": "Total PC USB Inputs:",
+          "type": "integer",
+          "enum": [2, 4]
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "inputs"
+      ]
+    }
+  }
+}
