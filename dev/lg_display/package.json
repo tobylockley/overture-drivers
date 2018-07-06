@@ -1,12 +1,12 @@
 {
   "name": "lg_display",
-  "version": "1.0.0-beta21",
+  "version": "1.0.0-beta22",
   "description": "Driver for LG display",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
-  "author": "AudioVisualDistributors",
+  "author": "Audio Visual Distributors",
   "license": "MIT",
   "overture": {
     "brand": "LG",
@@ -26,8 +26,7 @@
       },
       {
         "name": "MacAddress",
-        "type": "string",
-        "persistent": true
+        "type": "string"
       },
       {
         "name": "Power",

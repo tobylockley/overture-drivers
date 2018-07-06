@@ -10,7 +10,8 @@ exports.createDevice = base => {
   let config
   let tcpClient
   let networkUtilities
-  let wol
+  let wol = require('wakeonlan')  // Used to turn display on
+  let persist = require(`./persistent_addon.js`)  // Stores MAC address
 
   const setID = '01'  // This is used for IP control, see http://www.proaudioinc.com/Dealer_Area/RS232.pdf
   const SOURCES = [
@@ -25,50 +26,34 @@ exports.createDevice = base => {
   frameParser.setSeparator('x')
   frameParser.on('data', data => onFrame(data))
 
-  // base.setTickPeriod(5000)
-
-  function isConnected() { return base.getVar('Status').string === 'Connected'; }
-
   const setup = _config => {
     config = _config
 
     let poll_functions = [
-      'Get Power', 
-      'Get Source', 
-      'Get Audio Mute', 
-      'Get Audio Level', 
-      'Get Brightness', 
-      'Get Contrast', 
+      'Get Power',
+      'Get Source',
+      'Get Audio Mute',
+      'Get Audio Level',
+      'Get Brightness',
+      'Get Contrast',
       'Get Temperature'
     ]
     poll_functions.forEach(fn => {
-      logger.debug(`Setting poll for: ${fn}`)
+      logger.debug(`Initialising polling for: ${fn}`)
       base.setPoll({
         action: fn,
         period: 5000,
-        enablePollFn: isConnected,
+        enablePollFn: () => { base.getVar('Status').string === 'Connected'; },
         startImmediately: true
       });
     });
   }
 
   const start = () => {
-    // Persistent variable hack, probably needs updating!                                                        <---------
-    let fs = require('fs');
-    let p_path = `${process.env.data}/persistent.json`
-    if (fs.existsSync(p_path)) {
-      let macVar = base.getVar('MacAddress')  // For debugging
-      let p_data = require(p_path)
-      p_data.forEach(o => {
-        logger.debug(`persistent.json ... ${o.fullName} : ${o.value}`)
-        if (o.fullName === macVar.fullName) macVar.string = o.value
-      });
-    }
-
-    wol = require('wakeonlan')  // Used to turn display on
     initTcpClient()
     tcpClient.connect(config.port, config.host)
     base.startPolling()
+    getMacAddress()
   }
 
   const stop = () => {
@@ -85,8 +70,25 @@ exports.createDevice = base => {
   const getTemperature = () => sendDefer(Buffer.from(`dn ${setID} FF\r`));
 
   const getMacAddress = () => {
-    networkUtilities.getMacAddress(config.host).then(mac => {
-      base.getVar('MacAddress').string = mac
+    // Helper function for resolving multiple promises below
+    const reflect = p => p.then(value => ({value, status: "resolved" }), error => ({error, status: "rejected" }));
+
+    let a = networkUtilities.getMacAddress(config.host);
+    let b = persist.loadPersistent('MacAddress');
+    Promise.all([a, b].map(reflect)).then(results => {
+      let actual_mac = results[0]
+      let saved_mac = results[1]
+
+      if (actual_mac.status === "resolved") {
+        base.getVar('MacAddress').string = actual_mac.value
+        persist.savePersistent('MacAddress', actual_mac.value)  // Save actual MAC address to json file
+      }
+      else if (saved_mac.status === "resolved") {
+        base.getVar('MacAddress').string = saved_mac.value
+      }
+      else {
+        logger.error(`Failed to retrieve MAC address from device AND persistent.json`)
+      }
     });
   }
 
@@ -127,23 +129,17 @@ exports.createDevice = base => {
       networkUtilities = host.createNetworkUtilities()
 
       tcpClient.setOptions({
-        autoReconnectionAttemptDelay: 2000,
-        receiveTimeout: 6000,
-        disconnectOnReceiveTimeout: true,
-        keepAlive: true,
-        keepAliveInitialDelay: 1000
+        autoReconnectionAttemptDelay: 5000,
+        receiveTimeout: 60000
       });
 
       tcpClient.on('connect', () => {
         logger.silly(`TCPClient connected`)
         base.getVar('Status').string = 'Connected'
-        getMacAddress()  // Get MAC address during initial connection                                          <---------
       })
 
       tcpClient.on('data', data => {
-        data = data.toString()
-        //logger.silly(`TCPClient data: ${data}`)
-        frameParser.push(data)
+        frameParser.push(data.toString())
       })
 
       tcpClient.on('close', () => {
@@ -154,6 +150,7 @@ exports.createDevice = base => {
       tcpClient.on('error', err => {
         logger.error(`TCPClient: ${err}`)
         disconnect()
+        tcpClient && tcpClient.end()
       })
     }
   }
@@ -161,7 +158,6 @@ exports.createDevice = base => {
   const disconnect = () => {
     base.getVar('Status').string = 'Disconnected'
     base.getVar('Power').string = 'Off'
-    //tcpClient && tcpClient.end()
   }
 
   const send = data => {
@@ -176,7 +172,7 @@ exports.createDevice = base => {
 
   const onFrame = data => {
     base.commandDone()
-    logger.debug(`onFrame: ${data}`)
+    logger.silly(`onFrame: ${data}`)
 
     let match = data.match(/(\w) \d+ OK([0-9a-fA-F]+)/)
     if (match) {
@@ -206,16 +202,8 @@ exports.createDevice = base => {
     }
   }
 
-  function tick() {
-    // if (base.getVar('Status').string == 'Disconnected') {
-    //   initTcpClient()
-    //   tcpClient.connect(config.port, config.host)
-    // }
-    //logger.debug(`Tick: ${tcpClient}`)
-  }
-
   return {
-    setup, start, stop, tick,
+    setup, start, stop,
     setPower, selectSource, setAudioLevel, setAudioMute, setBrightness, setContrast,
     getPower, getSource, getAudioLevel, getAudioMute, getBrightness, getContrast, getTemperature, getMacAddress
   }
