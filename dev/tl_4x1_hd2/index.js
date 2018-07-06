@@ -25,22 +25,42 @@ exports.createDevice = base => {
       commsType = 'telnet'
       frameParser.setSeparator('Zyper$')
     }
+
+    base.setPoll({
+      action: 'keepAlive',
+      period: 30000,
+      enablePollFn: () => { return base.getVar('Status').string === 'Connected' }
+    })
   }
 
-  const start = () => { initComms(); }
+  const start = () => {
+    initComms();
+    if (commsType === 'tcp') commsClient.connect({host: config.host, port: config.port})
+    else if (commsType === 'telnet') commsClient.connect({ host: config.host, port: config.port, timeout: 60000, initialLFCR: true })
+  }
 
-  const stop = () => { disconnect(); }
-
-  const disconnect = () => {
-    base.getVar('Status').string = 'Disconnected'
+  const stop = () => {
+    disconnect();
     commsClient && commsClient.end()
   }
 
-  const tick = () => { if (base.getVar('Status').string == 'Disconnected') initComms(); }
+  const disconnect = () => {
+    base.getVar('Status').string = 'Disconnected'
+  }
+
+  const tick = () => {
+    if (base.getVar('Status').string == 'Disconnected') initComms();
+  }
 
   const initComms = () => {
     if (!commsClient) {
-      if (commsType === 'tcp') commsClient = host.createTCPClient()
+      if (commsType === 'tcp') {
+        commsClient = host.createTCPClient()
+        commsClient.setOptions({
+          autoReconnectionAttemptDelay: 5000,
+          receiveTimeout: 60000
+        })
+      }
       else if (commsType === 'telnet') commsClient = new Telnet()
 
       commsClient.on('connect', () => {
@@ -51,7 +71,6 @@ exports.createDevice = base => {
 
       commsClient.on('data', data => {
         data = data.toString()
-        logger.silly(`commsClient (${commsType}) data: ${data}`)
         frameParser.push(data)
       })
 
@@ -63,33 +82,62 @@ exports.createDevice = base => {
       commsClient.on('error', err => {
         logger.error(`commsClient: (${commsType}) ${err}`)
         disconnect()
+        commsClient && commsClient.end()
       })
     }
-
-    if (commsType === 'tcp') commsClient.connect({host: config.host, port: config.port})
-    else if (commsType === 'telnet') commsClient.connect({ host: config.host, port: config.port, timeout: 30000, initialLFCR: true })
   }
 
-  const send = data => {
+  const send = (data) => {
     logger.silly(`commsClient (${commsType}) send: ${data}`)
-    if (config.interface === 'GlobalCache') return commsClient && commsClient.write(data)
-    else if (config.interface === 'Zyper') return commsClient && commsClient.send(`send ${config.zyperDevice} rs232 ${data}`)
+    if (commsType === 'tcp') {
+      return commsClient && commsClient.write(data)
+    }
+    else if (commsType === 'telnet') {
+      return commsClient && commsClient.send(`send ${config.zyper_device} rs232 ${data}`)
+    }
   }
 
   const sendDefer = data => {
-    if (send(data)) {
-      base.commandDefer(2500)
-    } else {
-      base.commandError(`sendDefer ... Data not sent: ${data}`)
+    logger.silly(`commsClient (${commsType}) sendDefer: ${data}`)
+    if (config.interface === 'GlobalCache') {
+      if (send(data)) {
+        base.commandDefer(3000)
+      } else {
+        base.commandError(`sendDefer ... Data not sent: ${data}`)
+      }
     }
+    else if (config.interface === 'Zyper') {
+      base.commandDefer(3000)
+      commsClient.send(`send ${config.zyper_device} rs232 ${data}\r\n`).then(result => {
+        // Handled in onFrame
+        // logger.silly(`Telnet send OK: ${data}`)
+
+        // RS232 Response data currently not functioning for zyper device, this is a workaround
+        let match = data.match(/switch to (HDMI\d)/)
+        if (match) {
+          base.commandDone()
+          base.getVar('Sources').string = match[1]
+        }
+      }, err => {
+        base.commandError(`Telnet send error: ${err}`)
+      })
+    }
+
+
   }
 
   const onFrame = data => {
     logger.silly(`onFrame: ${data}`)
-    base.commandDone()
     // Feedback Example - [CMD]: switch to HDMI1.
     let match = data.match(/switch to (HDMI\d)/)
-    match && (base.getVar('Sources').string = match[1])
+    if (match) {
+      base.getVar('Sources').string = match[1]
+      base.commandDone()
+    }
+  }
+
+  const keepAlive = () => {
+    sendDefer(`A`);  // Send rubbish to keep the connection alive
   }
 
   const selectSource = params => {
@@ -98,7 +146,7 @@ exports.createDevice = base => {
   }
 
   return {
-    setup, start, stop, tick,
-    selectSource
+    setup, start, stop,
+    keepAlive, selectSource
   }
 }
