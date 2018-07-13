@@ -25,39 +25,17 @@ exports.createDevice = base => {
   const setup = _config => {
     config = _config
 
-    for (let i = 1; i <= 4; i++) {
-      base.createVariable({
-        name: `ScreenMode${i}`,
-        type: 'enum',
-        enums: ['Unknown', 'UHD', '4K'],
-        perform: {
-          action: 'setScreenMode',
-          params: {ScreenId: i, Mode: '$string'}
-        }
-      })
-    }
+    // Possible config.devices (all boolean):
+    // .encoders_uhd
+    // .decoders_uhd
+    // .encoders_4k
+    // .decoders_4k
+    // .multiviews
+    // .videowalls
 
-    let tempUHD = [], temp4K = [], tempMV = []  // Temp arrays for building the dynamic variable enums
-
-    if (config.encoders.length > 0) {
-      config.encoders.forEach(encoder => {
-        if (encoder.model === 'ZyperUHD') tempUHD.push(encoder.name)
-        else if (encoder.model === 'Zyper4K') temp4K.push(encoder.name)
-      })
-      if (tempUHD.length > 0) {
-        tempUHD.sort()
-        base.createVariable({ name: 'Encoders_UHD', type: 'enum', enums: tempUHD })
-      }
-      if (temp4K.length > 0) {
-        temp4K.sort()
-        base.createVariable({ name: 'Encoders_4K', type: 'enum', enums: temp4K })
-      }
-    }
-
-    if (config.multiviews.length > 0) {
-      config.multiviews.forEach(mv => { tempMV.push(mv.name) })
-      base.createVariable({ name: 'Multiviews', type: 'enum', enums: tempMV })
-    }
+    if (config.devices.encoders_uhd) base.createVariable({ name: 'Encoders_UHD', type: 'enum'})
+    if (config.devices.encoders_4k) base.createVariable({ name: 'Encoders_4K', type: 'enum'})
+    if (config.devices.multiviews) base.createVariable({ name: 'Multiviews', type: 'enum'})
 
     if (config.videowalls.length > 0) {
       config.videowalls.forEach(vw => {
@@ -109,6 +87,7 @@ exports.createDevice = base => {
       initialLFCR: true,
       sendTimeout: SEND_TIMEOUT
     })
+    initVariables()
     base.startPolling()
   }
 
@@ -159,12 +138,11 @@ exports.createDevice = base => {
     })
   }
 
-  const getInfo = () => {
-    sendDefer('show device config decoders')
-  }
+  const getInfo = () => { sendDefer('show device config decoders') }
 
   const initVariables = () => {
     // ENCODERS
+    if (config.devices.encoders_uhd || config.devices.encoders_4k) sendDefer('show device config encoders')
     telnetClient.send(`show device status encoders\r\n`).then(data => {
       let match, temp = []
       logger.silly('-------------- ZYPER ENCODER INFO --------------')
@@ -294,12 +272,95 @@ exports.createDevice = base => {
     if (match) {
       base.commandDone()
       // Parse all decoders
-      let regex = /device\.gen.*?name=(.+?),[\s\S]*?connectedEncoder;.*?name=(.+?),.*?connectionMode=(.+)/g;
+      let regex = /device\.gen.*?model=(.+?),.*?name=(.+?),[\s\S]*?connectedEncoder;.*?name=(.+?),.*?connectionMode=(.+)/g;
       while (match = regex.exec(data)) {
-        if (match[3].includes('wall')) base.getVar(`Decoder_${match[1]}`).string = 'VideoWall'
-        else base.getVar(`Decoder_${match[1]}`).string = match[2]
+
+        let this_decoder = base.getVar(`Decoder_${match[2]}`)
+        if (!this_decoder) {
+          // Variable does not exist yet, so create it
+          let sources_uhd = base.getVar('Encoders_UHD').enums
+          let sources_4k = base.getVar('Encoders_4K').enums
+          let sources_mv = base.getVar('Multiviews').enums
+          let sources = ['VideoWall']
+          if (match[1] === 'ZyperUHD') sources = sources.concat(sources_uhd)
+          else if (match[1] === 'Zyper4K') sources = sources.concat(sources_uhd.concat(sources_mv))
+          this_decoder = base.createVariable({
+            name: `Decoder_${match[2]}`,  // Ensure legal variable name
+            type: 'enum',
+            enums: sources,  // Will be populated with appropriate sources above
+            perform: {
+              action: 'setDecoder',
+              params: { Name: decoder.name, Source: '$string' }
+            }
+          });
+        }
+
+        if (match[4].includes('wall')) base.getVar(`Decoder_${match[2]}`).string = 'VideoWall'
+        else base.getVar(`Decoder_${match[2]}`).string = match[3]
       }
     }
+
+    // Response from initVariables
+    match = data.match(/show device config encoders/)
+    if (match) {
+      base.commandDone()
+      logger.silly('-------------- ZYPER ENCODER INFO --------------')
+      let temp_uhd = [], temp_4k = []  // Temp arrays for building the variable enums
+      let regex = /device\.gen.*?model=(.+?),.*?name=(.+?),/g;
+      while (match = regex.exec(data)) {
+        logger.silly(`Name: ${match[2]} Model: ${match[1]}`)
+        if (match[1] === 'ZyperUHD') temp_uhd.push(match[2])
+        if (match[1] === 'Zyper4K') temp_4k.push(match[2])
+      }
+      temp_uhd.sort()
+      temp_4k.sort()
+      if (config.devices.encoders_uhd) base.getVar('Encoders_UHD').enums = temp_uhd
+      if (config.devices.encoders_4k) base.getVar('Encoders_4K').enums = temp_4k
+    }
+
+    // Response from initVariables
+    match = data.match(/show multiviews config/)
+    if (match) {
+      base.commandDone()
+      logger.silly('------------- ZYPER MULTIVIEWS INFO ------------')
+      let temp_mv = []  // Temp array for building the variable enums
+      let regex = /multiview\((.+?)\)/g;
+      while (match = regex.exec(data)) {
+        logger.silly(`Name: ${match[1]}`)
+        temp_mv.push(match[1])
+      }
+      temp_mv.sort()
+      base.getVar('Multiviews').enums = temp_mv
+    }
+
+    // Response from initVariables
+    // match = data.match(/show video-walls/)
+    // if (match) {
+    //   base.commandDone()
+    //   logger.silly('------------- ZYPER VIDEOWALLS INFO ------------')
+    //   let temp_vw = []  // Temp array for building the variable enums
+    //   let regex = /videoWall\((.+?)\)/g;
+    //   while (match = regex.exec(data)) {
+    //     logger.silly(`Name: ${match[1]}`)
+    //     temp_vw.push(match[1])
+
+
+    //     let sources = ['Idle']
+    //     if (vw.model === 'Zyper4K') sources = sources.concat(temp4K)
+    //     else if (vw.model === 'ZyperUHD') sources = sources.concat(tempUHD)
+    //     base.createVariable({
+    //       name: `VideoWall_${vw.name.replace(/[^A-Za-z0-9_]/g, '')}`,  // Ensure legal variable name
+    //       type: 'enum',
+    //       enums: sources,  // Will be populated with appropriate sources above
+    //       perform: {
+    //         action: 'startVideoWall',
+    //         params: { Name: vw.name, Source: '$string' }
+    //       }
+    //     })
+    //   }
+    //   temp_vw.sort()
+    //   base.getVar('VideoWalls').enums = temp_mv
+    // }
 
   }
 

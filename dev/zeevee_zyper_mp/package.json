@@ -1,6 +1,6 @@
 {
   "name": "zeevee_zyper_mp",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.1-beta.1",
   "description": "Driver for Zyper Management Platform via telnet",
   "main": "index.js",
   "scripts": {
@@ -33,122 +33,54 @@
         "host": {
           "title": "Host name or IP address:",
           "type": "string",
-          "default": "192.168.99.40"
+          "default": "192.168.99.40",
+          "required": true
         },
         "port": {
           "title": "Port:",
           "type": "integer",
           "default": 23,
-          "description": "Telnet: 23"
+          "description": "Telnet: 23",
+          "required": true
         },
-        "encoders": {
-          "type": "array",
-          "format": "table",
-          "title": "Encoders",
-          "uniqueItems": true,
-          "items": {
-            "type": "object",
-            "title": "Encoder",
-            "properties": {
-              "name": {
-                "type": "string",
-                "title": "Name"
-              },
-              "model": {
-                "type": "string",
-                "title": "Model",
-                "enum": [
-                  "ZyperUHD",
-                  "Zyper4K"
-                ]
-              }
+        "devices": {
+          "type": "object",
+          "title": "Connected Devices",
+          "required": true,
+          "properties": {
+            "encoders_uhd": {
+              "type": "checkbox",
+              "title": "UHD Encoders",
+              "required": true
             },
-            "required": [
-              "name",
-              "model"
-            ]
-          }
-        },
-        "decoders": {
-          "type": "array",
-          "format": "table",
-          "title": "Decoders",
-          "uniqueItems": true,
-          "items": {
-            "type": "object",
-            "title": "Decoder",
-            "properties": {
-              "name": {
-                "type": "string",
-                "title": "Name"
-              },
-              "model": {
-                "type": "string",
-                "title": "Model",
-                "enum": [
-                  "ZyperUHD",
-                  "Zyper4K"
-                ]
-              }
+            "decoders_uhd": {
+              "type": "checkbox",
+              "title": "UHD Decoders",
+              "required": true
             },
-            "required": [
-              "name",
-              "model"
-            ]
-          }
-        },
-        "multiviews": {
-          "type": "array",
-          "format": "table",
-          "title": "Multiviews",
-          "uniqueItems": true,
-          "items": {
-            "type": "object",
-            "title": "Multiview",
-            "properties": {
-              "name": {
-                "type": "string",
-                "title": "Name"
-              }
+            "encoders_4k": {
+              "type": "checkbox",
+              "title": "4K Encoders",
+              "required": true
             },
-            "required": [
-              "name"
-            ]
-          }
-        },
-        "videowalls": {
-          "type": "array",
-          "format": "table",
-          "title": "Video-Walls",
-          "uniqueItems": true,
-          "items": {
-            "type": "object",
-            "title": "Videowall",
-            "properties": {
-              "name": {
-                "type": "string",
-                "title": "Name"
-              },
-              "model": {
-                "type": "string",
-                "title": "Model",
-                "enum": [
-                  "ZyperUHD",
-                  "Zyper4K"
-                ]
-              }
+            "decoders_4k": {
+              "type": "checkbox",
+              "title": "4K Decoders",
+              "required": true
             },
-            "required": [
-              "name",
-              "model"
-            ]
+            "multiviews": {
+              "type": "checkbox",
+              "title": "Multiviews",
+              "required": true
+            },
+            "videowalls": {
+              "type": "checkbox",
+              "title": "Video-Walls",
+              "required": true
+            }
           }
         }
-      },
-      "required": [
-        "host",
-        "port"
-      ]
+      }
     }
   },
   "directories": {
