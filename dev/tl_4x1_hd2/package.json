@@ -1,6 +1,6 @@
 {
   "name": "tl_4x1_hd2",
-  "version": "1.0.0-beta6",
+  "version": "1.0.0-beta.7",
   "description": "Driver for controlling tl-4x1-hd2 switcher with an RS232 interface",
   "main": "index.js",
   "scripts": {
@@ -66,9 +66,7 @@
           "properties": {
             "interface": {
               "type": "string",
-              "enum": [
-                "Zyper"
-              ],
+              "enum": ["rs232_zyper"],
               "options": {
                 "hidden": true
               }
@@ -104,12 +102,8 @@
           "properties": {
             "interface": {
               "type": "string",
-              "enum": [
-                "GlobalCache"
-              ],
-              "options": {
-                "hidden": true
-              }
+              "enum": ["rs232_globalcache"],
+              "options": {"hidden": true}
             },
             "host": {
               "title": "Host name or IP of GlobalCache RS232 module",
