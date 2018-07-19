@@ -1,6 +1,6 @@
 {
   "name": "extron_usb",
-  "version": "1.0.0-beta1",
+  "version": "1.0.1-beta1",
   "description": "Driver for controlling extron USB switcher via RS232",
   "main": "index.js",
   "scripts": {
@@ -27,42 +27,110 @@
         ]
       }
     ],
+
     "commands": [
       {
-        "name": "Select Input",
+        "name": "Select Usb Host",
         "params": {
-          "Input": {
+          "Host": {
             "type": "integer"
           }
         }
       }
     ],
+
     "pointSetupSchema": {
       "type": "object",
       "title": "Extron USB Switcher - RS232 Interface",
-      "properties": {
-        "host": {
-          "title": "Host name or IP of Global Cache RS232 module",
-          "type": "string",
-          "default": "192.168.99.100"
+      "oneOf": [
+        {
+          "title": "Zyper Management Platform",
+          "type": "object",
+          "required": [
+            "interface",
+            "host",
+            "port",
+            "usb_hosts",
+            "zyper_device"
+          ],
+          "properties": {
+            "interface": {
+              "type": "string",
+              "enum": [
+                "Zyper"
+              ],
+              "options": {
+                "hidden": true
+              }
+            },
+            "host": {
+              "title": "Host name or IP Zyper management platform",
+              "type": "string",
+              "default": "192.168.",
+              "format": "ipv4"
+            },
+            "port": {
+              "title": "Port:",
+              "type": "integer",
+              "default": 23,
+              "description": "Default: 23"
+            },
+            "usb_hosts": {
+              "title": "Total number of attachable USB hosts:",
+              "type": "integer",
+              "enum": [2, 4]
+            },
+            "zyper_device": {
+              "title": "Mac Address or Name of Zyper Encoder/Decoder:",
+              "type": "string",
+              "default": "00:1e:c0:"
+            }
+          },
+          "additionalProperties": false
         },
-        "port": {
-          "title": "Port:",
-          "type": "integer",
-          "default": 4999,
-          "description": "Default: 4999"
-        },
-        "inputs": {
-          "title": "Total PC USB Inputs:",
-          "type": "integer",
-          "enum": [2, 4]
+        {
+          "title": "GlobalCache RS232 Module",
+          "type": "object",
+          "required": [
+            "interface",
+            "host",
+            "port",
+            "usb_hosts"
+          ],
+          "properties": {
+            "interface": {
+              "type": "string",
+              "enum": [
+                "GlobalCache"
+              ],
+              "options": {
+                "hidden": true
+              }
+            },
+            "host": {
+              "title": "Host name or IP of GlobalCache RS232 module",
+              "type": "string",
+              "default": "192.168.",
+              "format": "ipv4"
+            },
+            "port": {
+              "title": "Port:",
+              "type": "integer",
+              "default": 4999,
+              "description": "Default: 4999"
+            },
+            "usb_hosts": {
+              "title": "Total number of attachable USB hosts:",
+              "type": "integer",
+              "enum": [2, 4]
+            }
+          },
+          "additionalProperties": false
         }
-      },
-      "required": [
-        "host",
-        "port",
-        "inputs"
       ]
     }
+  },
+  "dependencies": {
+    "telnet-client": "^0.15.5"
   }
 }
