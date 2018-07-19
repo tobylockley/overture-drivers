@@ -1,17 +1,25 @@
 'use strict';
 
-const hueTimeout = 10000
+
+const BUTTON_IDLE_TIMEOUT = 3000
+const HUE_TIMEOUT = 10000
+const UPDATE_TIME = 500
+const RECONNECT_TIME = 5000
+
 
 let host
 exports.init = _host => {
   host = _host
 }
 
+
 exports.createDevice = base => {
   const logger = base.logger || host.logger
   let config
   let huejay = require('huejay')
   let hueClient
+  let initialised = false
+  let mySensors = {}  // Store config info, as well as last sensor state and update timestamp
 
   const isConnected = () => { return base.getVar('Status').string === 'Connected' }
   const isNotConnected = () => { return base.getVar('Status').string === 'Disconnected' }
@@ -20,155 +28,170 @@ exports.createDevice = base => {
     config = _config
 
     config.sensors.forEach(sensor => {
-      let varname = `${sensor.name}_${sensor.identifier}`
+      let id = sensor.identifier.toString()
+      mySensors[id] = {}  // Initialise
+      mySensors[id].type = sensor.type
+      mySensors[id].name = sensor.name
+      // Create variables dynamically
       if (sensor.type === 'Motion Sensor') {
-        base.createEnumVariable(varname, ['Off', 'On'])
-        base.setPoll({
-          action: 'getMotionSensor',
-          period: 500,
-          params: { Id: sensor.identifier, VarName: varname },
-          enablePollFn: isConnected
-        });
+        base.createEnumVariable(sensor.name, ['Off', 'On'])
       }
       else if (sensor.type === 'Dimmer Switch') {
         base.createVariable({
-          name: varname,
-          type: 'integer',
-          min: 1,
-          max: 4
+          name: sensor.name,
+          type: 'enum',
+          enums: [
+            'Idle',
+            '1_ShortPress',
+            '1_LongPress',
+            '1_Hold',
+            '2_ShortPress',
+            '2_LongPress',
+            '2_Hold',
+            '3_ShortPress',
+            '3_LongPress',
+            '3_Hold',
+            '4_ShortPress',
+            '4_LongPress',
+            '4_Hold'
+          ]
         })
-        base.setPoll({
-          action: 'getDimmerSwitch',
-          period: 500,
-          params: { Id: sensor.identifier, VarName: varname },
-          enablePollFn: isConnected
-        });
       }
     });
 
-    base.setPoll('checkConnection', 5000);
+    // Get all sensor info in one operation
+    base.setPoll({
+      action: 'getAllSensors',
+      period: UPDATE_TIME,
+      enablePollFn: isConnected
+    });
+
+    // Ping bridge periodically when disconnected
     base.setPoll({
       action: 'checkConnection',
-      period: 5000,
+      period: RECONNECT_TIME,
       enablePollFn: isNotConnected,
       startImmediately: true
     });
   }
 
+
   const start = () => {
     hueClient = new huejay.Client({
       host: config.host,
       username: config.username,
-      timeout: hueTimeout
+      timeout: HUE_TIMEOUT
     });
-    base.startPolling()
+    base.startPolling();
   }
+
 
   const stop = () => {
-    disconnect()
+    disconnect();
   }
 
-  const checkConnection = () => {
-    hueClient.bridge.ping()
-    .then(() => {
-      if (base.getVar('Status').string === 'Disconnected') {
-        base.getVar('Status').string = 'Connected';
-      }
-    })
-    .catch(error => {
-      logger.error(`checkConnection: ${error}`);
-      disconnect()
-    });
-  }
-
-  const getDimmerSwitch = params => {
-    base.commandDefer(hueTimeout + 1000)
-    hueClient.sensors.getById(params.Id)
-    .then(sensor => {
-      logger.silly(`getDimmerSwitch: [${sensor.id}] buttonevent = ${sensor.state.buttonEvent}`)
-      /*
-        Button	Action	          Dimmer Button
-        1000	  INITIAL_PRESS	    Button 1 (ON)
-        1001	  HOLD
-        1002	  SHORT_RELEASED
-        1003	  LONG_RELEASED
-        2000	  INITIAL_PRESS	    Button 2 (DIM UP)
-        2001	  HOLD
-        2002	  SHORT_RELEASED
-        2003	  LONG_RELEASED
-        3000	  INITIAL_PRESS	    Button 3 (DIM DOWN)
-        3001	  HOLD
-        3002	  SHORT_RELEASED
-        3003	  LONG_RELEASED
-        4000	  INITIAL_PRESS	    Button 4 (OFF)
-        4001	  HOLD
-        4002	  SHORT_RELEASED
-        4003	  LONG_RELEASED
-      */
-      let button = sensor.state.buttonEvent / 1000
-      base.getVar(params.VarName).value = button  // Ignore button states, focus on which button
-
-      switch (button) {  // HACK
-        case 1:
-          host.perform('toby_kogan', 'Send Command', {Name: 'Power Toggle'})
-          break;
-        case 2:
-          host.perform('toby_kogan', 'Send Command', {Name: 'Volume Up'})
-          break;
-        case 3:
-          host.perform('toby_kogan', 'Send Command', {Name: 'Volume Down'})
-          break;
-      }
-      // switch(sensor.state.buttonEvent) {
-      //   case 1000:
-      //     state = 1
-      //     break;
-      //   case 2000:
-      //     state = 2
-      //     break;
-      //   case 3000:
-      //     state = 3
-      //     break;
-      //   case 4000:
-      //     state = 4
-      //     break;
-      // }
-      base.commandDone()
-    })
-    .catch(error => {
-      logger.error(`getDimmerSwitch: Could not find sensor [${params.Id}]`);
-      base.commandError()
-      disconnect()
-      throw error;
-    });
-  }
-
-  const getMotionSensor = params => {
-    base.commandDefer(hueTimeout + 1000)
-    hueClient.sensors.getById(params.Id)
-    .then(sensor => {
-      logger.silly(`getMotionSensor: [${sensor.id}] presence = ${sensor.state.presence}`)
-      let actual_state = sensor.state.presence ? 'On' : 'Off'
-      if (base.getVar(params.VarName).string != actual_state) {
-        base.getVar(params.VarName).string = actual_state
-      }
-      if (sensor.state.presence) host.perform('toby_kogan', 'Send Command', {Name: 'Power Toggle'})  // HACK
-      base.commandDone()
-    })
-    .catch(error => {
-      logger.error(`getMotionSensor: Could not find sensor [${params.Id}]`);
-      base.commandError()
-      disconnect()
-      throw error;
-    });
-  }
 
   const disconnect = () => {
     base.getVar('Status').string = 'Disconnected'
   }
 
+
+  const checkConnection = () => {
+    hueClient.bridge.ping()
+    .then(() => {
+      base.getVar('Status').string = 'Connected';
+    })
+    .catch(error => {
+      logger.error(`checkConnection: ${error}`);
+      disconnect();
+    });
+  }
+
+
+  const getAllSensors = params => {
+    base.commandDefer(HUE_TIMEOUT + 1000)
+    hueClient.sensors.getAll()
+    .then(sensors => {
+      base.commandDone();
+      for (let sensor of sensors) {
+        // Does sensor id corresponds with a configured sensor?
+        if (mySensors.hasOwnProperty(sensor.id)) {
+          if (!initialised) {
+            logger.debug(`First run... Updating [${mySensors[sensor.id].name}] lastUpdated timestamp to: ${sensor.state.lastUpdated}`)
+            mySensors[sensor.id].state = sensor.state;  // Initialise on first run
+          }
+          else {
+            if (mySensors[sensor.id].type === 'Dimmer Switch') updateSwitch(sensor);
+            else if (mySensors[sensor.id].type === 'Motion Sensor') updateMotion(sensor);
+          }
+        }
+      }
+      initialised = true;
+    })
+    .catch(error => {
+      base.commandError(`getAllSensors: ${error.stack}`);
+      disconnect();
+      throw error;
+    });
+  }
+
+
+  const updateSwitch = data => {
+    /*Button	Action
+      1xxx    Button 1 (ON)
+      2xxx    Button 2 (DIM UP)
+      3xxx    Button 3 (DIM DOWN)
+      4xxx    Button 4 (OFF)
+
+      x000	  INITIAL_PRESS
+      x001	  HOLD
+      x002	  SHORT_RELEASED
+      x003	  LONG_RELEASED
+
+      Overture enums (repeated for buttons n = 1-4):
+        'Idle',
+        'n_ShortPress',
+        'n_LongPress',
+        'n_Hold'
+    */
+    let currState = data.state;
+    let lastState = mySensors[data.id].state;
+    if (currState.lastUpdated != lastState.lastUpdated || currState.buttonEvent != lastState.buttonEvent) {
+      let button_num = parseInt(currState.buttonEvent / 1000)  // parseInt removes decimal part
+      let event_num = currState.buttonEvent % 1000
+      let event_names = [
+        'InitialPress',  // This is ignored, only change var for other events
+        'Hold',
+        'ShortPress',
+        'LongPress'
+      ]
+      if (event_num > 0) {
+        let event = `${button_num}_${event_names[event_num]}`;
+        logger.silly(`Switch event (${mySensors[data.id].name}): ${event}`);
+        base.getVar(mySensors[data.id].name).string = event;
+        // Clear button timeout if it exists, then set a fresh timeout
+        mySensors[data.id].timeoutfn && clearTimeout(mySensors[data.id].timeoutfn)
+        mySensors[data.id].timeoutfn = setTimeout( () => {
+          base.getVar(mySensors[data.id].name).string = 'Idle';
+        }, config.button_timeout)
+      }
+      mySensors[data.id].state = currState;
+    }
+  }
+
+
+  // Update the overture variable based on recent sensor data
+  const updateMotion = data => {
+    let thisVar = base.getVar(mySensors[data.id].name)
+    if (data.state.presence != mySensors[data.id].state.presence) {
+      thisVar.value = data.state.presence ? 1 : 0  // Convert true/false to 1/0
+    }
+    mySensors[data.id].state = data.state
+  }
+
+
   return {
     setup, start, stop,
-    checkConnection, getDimmerSwitch, getMotionSensor
+    checkConnection, getAllSensors
   }
 }

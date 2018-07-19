@@ -1,6 +1,6 @@
 {
   "name": "philips_hue_sensors",
-  "version": "1.0.0-beta1",
+  "version": "1.0.0",
   "description": "Driver For Philips Hue Sensors",
   "main": "index.js",
   "scripts": {
@@ -26,7 +26,8 @@
         ]
       }
     ],
-    "commands": [],
+    "commands": [
+    ],
     "pointSetupSchema": {
       "type": "object",
       "title": "Philips Hue Sensor Configuration",
@@ -39,6 +40,12 @@
         "username": {
           "title": "API Username:",
           "type": "string"
+        },
+        "button_timeout": {
+          "title": "Button Timeout (ms):",
+          "type": "integer",
+          "minimum": 0,
+          "default": 3000
         },
         "sensors": {
           "type": "array",
@@ -65,7 +72,7 @@
               "name": {
                 "type": "string",
                 "title": "Friendly Name",
-                "pattern": "[A-Za-z]+"
+                "pattern": "[A-Za-z0-9_]+"
               }
             },
             "required": [
@@ -78,7 +85,8 @@
       },
       "required": [
         "host",
-        "username"
+        "username",
+        "button_timeout"
       ]
     }
   },
