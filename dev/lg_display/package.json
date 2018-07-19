@@ -1,6 +1,6 @@
 {
   "name": "lg_display",
-  "version": "1.0.0-beta22",
+  "version": "1.0.2",
   "description": "Driver for LG display",
   "main": "index.js",
   "scripts": {
@@ -23,10 +23,6 @@
           "Disconnected",
           "Connected"
         ]
-      },
-      {
-        "name": "MacAddress",
-        "type": "string"
       },
       {
         "name": "Power",
@@ -57,6 +53,20 @@
           "action": "Select Source",
           "params": {
             "Name": "$string"
+          }
+        }
+      },
+      {
+        "name": "ScreenMute",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "perform": {
+          "action": "Set Screen Mute",
+          "params": {
+            "Status": "$string"
           }
         }
       },
@@ -115,7 +125,6 @@
         "type": "integer"
       }
     ],
-
     "commands": [
       {
         "name": "Set Power",
@@ -134,6 +143,18 @@
         "params": {
           "Name": {
             "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Set Screen Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
           }
         }
       },
@@ -174,7 +195,6 @@
         }
       }
     ],
-
     "pointSetupSchema": {
       "type": "object",
       "title": "LG Display IP Settings",
@@ -182,7 +202,12 @@
         "host": {
           "title": "Host name or IP address:",
           "type": "string",
-          "default": "192.168.99.176"
+          "default": "192.168.1."
+        },
+        "mac": {
+          "title": "MAC Address:",
+          "type": "string",
+          "default": "38:8C:50:"
         },
         "port": {
           "title": "Port:",
@@ -193,6 +218,7 @@
       },
       "required": [
         "host",
+        "mac",
         "port"
       ]
     }
