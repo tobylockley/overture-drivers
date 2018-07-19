@@ -102,4 +102,8 @@ Get current encoder/decoder information.
 
 ### 1.0.0-beta.8
 
-- Added 'Sleep' option to ScreenMode variable
+- Added 'Sleep' option to ScreenMode variable.
+
+### 1.0.0-beta.9
+
+- Added tick function to reconnect automatically.

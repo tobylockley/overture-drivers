@@ -2,7 +2,7 @@
 
 const TICK_PERIOD = 5000
 const POLL_PERIOD = 5000
-const TELNET_TIMEOUT = 60000  // Socket will timeout after specified milliseconds of inactivity
+const TELNET_TIMEOUT = 10000  // Socket will timeout after specified milliseconds of inactivity
 const SEND_TIMEOUT = 1000  // Timeout when using telnet send function
 
 let host
@@ -25,6 +25,7 @@ exports.createDevice = base => {
 
   const setup = _config => {
     config = _config
+    base.setTickPeriod(TICK_PERIOD);
 
     for (let i = 1; i <= 4; i++) {
       base.createVariable({
@@ -125,23 +126,18 @@ exports.createDevice = base => {
       enablePollFn: isConnected,
       startImmediately: true
     });
-    base.setTickPeriod(TICK_PERIOD);
   }
 
   const start = () => {
-    initTelnetClient()
-    telnetClient.connect({
-      host: config.host,
-      port: config.port,
-      timeout: TELNET_TIMEOUT,
-      initialLFCR: true,
-      sendTimeout: SEND_TIMEOUT
-    })
+    initTelnetClient();
   }
 
   const stop = () => {
     disconnect()
-    telnetClient && telnetClient.end()
+    if (telnetClient) {
+      telnetClient && telnetClient.end();
+      telnetClient = null;
+    }
   }
 
   const tick = () => {
@@ -149,12 +145,20 @@ exports.createDevice = base => {
   }
 
   const disconnect = () => {
-    base.getVar('Status').string = 'Disconnected'
+    base.getVar('Status').string = 'Disconnected';
   }
 
   const initTelnetClient = () => {
     if (!telnetClient) {
-      telnetClient = new Telnet()
+      telnetClient = new Telnet();
+      logger.silly(`Attempting telnet connection to: ${config.host}:${config.port}`);
+      telnetClient.connect({
+        host: config.host,
+        port: config.port,
+        timeout: TELNET_TIMEOUT,
+        initialLFCR: true,
+        sendTimeout: SEND_TIMEOUT
+      });
 
       telnetClient.on('connect', function () {
         logger.silly('Telnet connected!');
@@ -168,7 +172,7 @@ exports.createDevice = base => {
 
       telnetClient.on('close', function () {
         logger.silly('telnet closed');
-        disconnect();
+        stop();
       })
 
       telnetClient.on('error', err => {
