@@ -1,6 +1,6 @@
 {
   "name": "av_pro_connect_dynamic",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0",
   "description": "Driver for AV Pro Connect Matrix",
   "main": "index.js",
   "scripts": {
