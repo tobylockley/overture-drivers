@@ -1,5 +1,5 @@
 
-const DELETE_OLD_FILES = false
+const DELETE_OLD_FILES = true;
 
 exports.execute = function (args) {
   // access VSCode API (s. https://code.visualstudio.com/Docs/extensionAPI/vscode-api)
