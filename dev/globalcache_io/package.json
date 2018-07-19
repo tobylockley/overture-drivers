@@ -1,0 +1,95 @@
+{
+  "name": "globalcache_io",
+  "version": "1.1.3",
+  "description": "Driver For Global Cache IO Devices",
+  "main": "index.js",
+    "scripts": {
+	"start": "node index.js"
+  },
+  "author": "Medialon",
+  "license": "MIT",
+  "overture": {
+    "brand": "Global Cache",
+    "model": "IO",
+    "models": ["IO","iTach", "iTach Flex", "GC-100"],
+    "type": "device",
+    "subtype": "power",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": ["Disconnected","Connected"]
+      },
+      {
+        "name": "Error",
+        "type": "string"
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Channel":{
+            "type": "integer"
+          },
+          "Status": {
+            "type": "enum",
+            "enums": ["Off","On"]
+          }
+        },
+        "optimize": ["Channel"]
+      }
+
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Driver",
+      "properties": {
+        "host": {
+          "title": "Address:",
+          "description": "Host name or IP address",
+          "type": "string",
+          "default": "127.0.0.1"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 4998
+        },
+        "modRelay": {
+          "title": "Relay Module:",
+          "description": "The Module # of the relay component. This is 1 for iTach and iTach Flex.",
+          "type": "integer",
+          "default": 1
+        },
+        "modInput": {
+          "title": "Input Module:",
+          "description": "The Module # of the relay component. This is 2 for iTach Flex.",
+          "type": "integer",
+          "default": 2
+        },
+        "relays": {
+          "title": "Relays:",
+          "description": "The number of relays the Global Cache is dealing with. 3 for iTach, 4 for iTach Flex.",
+          "type": "integer",
+          "default": 3
+        },
+        "inputs": {
+          "title": "Inputs:",
+          "description": "The number of inputs the Global Cache is dealing with. 4 for iTach Flex. 0 if input monitoring isn't needed.",
+          "type": "integer",
+          "default": 0
+        }
+
+      },
+      "required": [
+        "host",
+        "port",
+        "modRelay",
+        "modInput",
+        "relays",
+        "inputs"
+      ]
+    }
+  }
+}
