@@ -1,0 +1,96 @@
+{
+  "name": "philips_hue_sensors",
+  "version": "1.0.0",
+  "description": "Driver For Philips Hue Sensors",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "Philips",
+    "models": [
+      "philips_hue_dimmer",
+      "philips_hue_motion"
+    ],
+    "type": "device",
+    "subtype": "lighting",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      }
+    ],
+    "commands": [
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Philips Hue Sensor Configuration",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address of Philips Hue Bridge:",
+          "type": "string",
+          "default": "192.168.1.10"
+        },
+        "username": {
+          "title": "API Username:",
+          "type": "string"
+        },
+        "button_timeout": {
+          "title": "Button Timeout (ms):",
+          "type": "integer",
+          "minimum": 0,
+          "default": 3000
+        },
+        "sensors": {
+          "type": "array",
+          "format": "table",
+          "title": "Sensors",
+          "description": "Identifier is the integer assosciated with /api/<username>/sensors/ json structure",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Sensor",
+            "properties": {
+              "identifier": {
+                "type": "integer",
+                "title": "Identifier"
+              },
+              "type": {
+                "type": "string",
+                "title": "Type",
+                "enum": [
+                  "Dimmer Switch",
+                  "Motion Sensor"
+                ]
+              },
+              "name": {
+                "type": "string",
+                "title": "Friendly Name",
+                "pattern": "[A-Za-z0-9_]+"
+              }
+            },
+            "required": [
+              "identifier",
+              "type",
+              "name"
+            ]
+          }
+        }
+      },
+      "required": [
+        "host",
+        "username",
+        "button_timeout"
+      ]
+    }
+  },
+  "dependencies": {
+    "huejay": "^1.8.4"
+  }
+}

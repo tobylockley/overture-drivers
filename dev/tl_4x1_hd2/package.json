@@ -1,6 +1,6 @@
 {
   "name": "tl_4x1_hd2",
-  "version": "1.0.0-beta5",
+  "version": "1.0.0-beta.7",
   "description": "Driver for controlling tl-4x1-hd2 switcher with an RS232 interface",
   "main": "index.js",
   "scripts": {
@@ -52,23 +52,21 @@
       }
     ],
     "pointSetupSchema": {
-      "title": "Techlogix 4x1-HD2 Switcher - RS232 Interface",
+      "title": "Techlogix 4x1-HD2 Switcher RS232 Interface",
       "oneOf": [
         {
-          "title": "Zyper",
+          "title": "Zyper Management Platform",
           "type": "object",
           "required": [
             "interface",
             "host",
             "port",
-            "zyperDevice"
+            "zyper_device"
           ],
           "properties": {
             "interface": {
               "type": "string",
-              "enum": [
-                "Zyper"
-              ],
+              "enum": ["rs232_zyper"],
               "options": {
                 "hidden": true
               }
@@ -76,19 +74,16 @@
             "host": {
               "title": "Host name or IP Zyper management platform",
               "type": "string",
-              "default": "192.168."
+              "default": "192.168.",
+              "format": "ipv4"
             },
             "port": {
               "title": "Port:",
               "type": "integer",
-              "enum": [
-                23
-              ],
-              "options": {
-                "hidden": true
-              }
+              "default": 23,
+              "description": "Default: 23"
             },
-            "zyperDevice": {
+            "zyper_device": {
               "title": "Mac Address or Name of Zyper Encoder/Decoder:",
               "type": "string",
               "default": "00:1e:c0:"
@@ -107,27 +102,20 @@
           "properties": {
             "interface": {
               "type": "string",
-              "enum": [
-                "GlobalCache"
-              ],
-              "options": {
-                "hidden": true
-              }
+              "enum": ["rs232_globalcache"],
+              "options": {"hidden": true}
             },
             "host": {
               "title": "Host name or IP of GlobalCache RS232 module",
               "type": "string",
-              "default": "192.168."
+              "default": "192.168.",
+              "format": "ipv4"
             },
             "port": {
               "title": "Port:",
               "type": "integer",
-              "enum": [
-                4999
-              ],
-              "options": {
-                "hidden": true
-              }
+              "default": 4999,
+              "description": "Default: 4999"
             }
           },
           "additionalProperties": false

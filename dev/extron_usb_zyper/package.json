@@ -1,0 +1,80 @@
+{
+  "name": "extron_usb_zyper",
+  "version": "1.0.0",
+  "description": "Driver for controlling extron USB switcher via Zyper Encoder/Decoder RS232",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "Extron",
+    "models": [
+      "SW2 USB",
+      "SW4 USB",
+      "SW4 USB Plus"
+    ],
+    "type": "device",
+    "subtype": "matrix",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      }
+    ],
+
+    "commands": [
+      {
+        "name": "Select Usb Host",
+        "params": {
+          "Host": {
+            "type": "integer"
+          }
+        }
+      }
+    ],
+
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Extron USB Switcher - RS232 Interface",
+      "properties": {
+        "host": {
+          "title": "Host name or IP Zyper management platform",
+          "type": "string",
+          "default": "192.168.",
+          "format": "ipv4"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 23,
+          "description": "Default: 23"
+        },
+        "usb_hosts": {
+          "title": "Total number of attachable USB hosts:",
+          "type": "integer",
+          "enum": [2, 4]
+        },
+        "zyper_device": {
+          "title": "Mac Address or Name of Zyper Encoder/Decoder:",
+          "type": "string",
+          "default": "00:1e:c0:"
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "usb_hosts",
+        "zyper_device"
+      ]
+    }
+  },
+  "dependencies": {
+    "telnet-client": "^0.15.5"
+  }
+}
