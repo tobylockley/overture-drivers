@@ -26,10 +26,10 @@ exports.createDevice = base => {
       base.createVariable({
         name: `${thisvar.server}__${thisvar.point.replace(/\./g, '__')}`,
         type: thisvar.type,
-        // perform: {
-        //   action: 'pushRemote',
-        //   params: { Info: thisvar, Data: '$value' }
-        // }
+        perform: {
+          action: 'pushRemote',
+          params: { Info: thisvar, Value: '$value'}
+        }
       });
     });
   }
@@ -72,9 +72,13 @@ exports.createDevice = base => {
         }
       });
 
+      // Events received from remote clients
       socket.on('update', data => {
-        // Update event from remote client
         updateRemote(data);
+      });
+
+      socket.on('push', data => {
+        pullRemote(data);
       });
     }
   }
@@ -103,40 +107,11 @@ exports.createDevice = base => {
 
 
   const updateRemote = data => {
-    /*
-    INTEGER
-    {
-      server: 'tobyCS',
-      point: 'toby_test.Volume',
-      type: 'integer',
-      value: 8,
-      min: 0,
-      max: 100
-    }
-
-    ENUM
-    {
-      server: 'tobyCS',
-      point: 'toby_test.Source',
-      type: 'enum',
-      value: 2,
-      enums: [ 'Input1', 'Input2', 'Input3', 'Input4' ]
-    }
-
-    STRING
-    {
-      server: 'tobyCS',
-      point: 'toby_test.Message',
-      type: 'string',
-      value: 'testing'
-    }
-    */
-
     // Check if this driver is subscribed to the received variable
     let varname = `${data.server}__${data.point.replace(/\./g, '__')}`;
     let thisvar = base.getVar(varname);
     if (thisvar) {
-      // CHECK DATAA TYPE
+      // Check data types match
       if (thisvar.type === data.type) {
         logger.debug(`Update received: ${varname}`);
         logger.silly(JSON.stringify(data));
@@ -152,19 +127,19 @@ exports.createDevice = base => {
         logger.error(`Could not update variable from remote: data type mismatch (check config settings)`);
       }
     }
-
   }
 
 
   const pushRemote = params => {
     // Push a value to the remote server
-    if (socket && socket.connected) {
-      // socket.emit('update', {info: params.Info, data: params.Data});
-      // params.Info includes:
-      //  .server
-      //  .point
-      //  .name
-      //  .type
+    if (socket.connected) {
+      logger.debug(`Pushing variable to remote (${params.Info.server}): ${params.Info.point} = ${params.Value}`);
+      socket.emit('push', {
+        server: params.Info.server,
+        point: params.Info.point,
+        type: params.Info.type,
+        value: params.Value
+      });
     }
     else {
       logger.error('Could not push variable to remote server, socket not connected');
@@ -172,9 +147,58 @@ exports.createDevice = base => {
   }
 
 
-  // MAKE SURE THESE MATCH ABOVE ----------------------------------------------
+  const pullRemote = data => {
+    let thisvar = host.getVariable(data.point);
+    // Check if this push request was for us, and make sure the variable exists on this control server
+    if (data.server === config.reference && thisvar) {
+      // Check data types match
+      if (thisvar.type === data.type) {
+        logger.debug(`Updating local variable from remote push request: ${data.point} = ${data.value}`);
+        thisvar.value = data.value;
+      }
+      else {
+        logger.error(`Could not pull variable change from remote: data type mismatch`);
+      }
+    }
+    // If no match, reject silently
+  }
+
+
   return {
     setup, start, stop,
-    updateLocal, updateRemote, pushRemote
+    updateLocal, pushRemote
   }
 }
+
+
+
+/* EXPECTED DATA FORMATS
+
+INTEGER
+{
+  server: 'tobyCS',
+  point: 'toby_test.Volume',
+  type: 'integer',
+  value: 8,
+  min: 0,
+  max: 100
+}
+
+ENUM
+{
+  server: 'tobyCS',
+  point: 'toby_test.Source',
+  type: 'enum',
+  value: 2,
+  enums: [ 'Input1', 'Input2', 'Input3', 'Input4' ]
+}
+
+STRING
+{
+  server: 'tobyCS',
+  point: 'toby_test.Message',
+  type: 'string',
+  value: 'testing'
+}
+
+*/

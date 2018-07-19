@@ -24,9 +24,15 @@ io.on('connection', (client) => {
       client.broadcast.emit('broadcast', `New authenticated client joined! ID: ${client.id}`);
 
       client.on('update', (data) => {
-        console.log(`[${client.id}] New Update Received (will be broadcast to all authenticated clients):`);
+        console.log(`[${client.id}] Broadcasting variable:`);
         console.log(data);
         client.broadcast.emit('update', data);
+      });
+
+      client.on('push', (data) => {
+        console.log(`[${client.id}] Pushing variable to remote:`);
+        console.log(data);
+        client.broadcast.emit('push', data);
       });
     }
     else {
