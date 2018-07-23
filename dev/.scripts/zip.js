@@ -23,7 +23,7 @@ exports.execute = function (args) {
       let json = require(pkg)
       let zname = `${json.name}.${json.version}`
 
-      let files = glob.sync(`${zpath}/${json.name}*.zip`)
+      let files = glob.sync(`${zpath}/${json.name}.*.zip`)
       if (files && DELETE_OLD_FILES) {
         args.log('Deleting old zip files...')
         files.forEach(file => {

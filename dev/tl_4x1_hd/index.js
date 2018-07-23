@@ -1,139 +1,138 @@
-let host
+'use strict';
+
+const CMD_DEFER_TIME = 5000;
+const POLL_PERIOD = 5000;
+const TICK_PERIOD = 5000;
+const TCP_TIMEOUT = 30000;
+const TCP_RECONNECT_DELAY = 1000;
+
+let host;
 exports.init = _host => {
-  host = _host
+  host = _host;
 }
 
 exports.createDevice = base => {
-  const logger = base.logger || host.logger
-  let config
-  let tcpClient
-  let frameParser = host.createFrameParser()
-  //frameParser.setSeparator('\r\n')
-  frameParser.on('data', data => onFrame(data))
+  const logger = base.logger || host.logger;
+  let config;
+  let tcpClient;
 
-  base.setTickPeriod(5000)
+  let frameParser = host.createFrameParser();
+  frameParser.setSeparator('\r\n');
+  frameParser.on('data', data => onFrame(data));
+
 
   const setup = _config => {
-    config = _config
-
-    base.setPoll('Get Status', 5000)
-
+    config = _config;
+    base.setTickPeriod(TICK_PERIOD);
+    base.setPoll({
+      action: 'getStatus',
+      period: POLL_PERIOD,
+      enablePollFn: () => { return base.getVar('Status').string === 'Connected'; },
+      startImmediately: true
+    });
   }
+
 
   const start = () => {
-    initTcpClient()
-    tcpClient.connect(config.port, config.host)
+    initTcpClient();
   }
+
 
   const stop = () => {
-    disconnect()
-  }
-
-  const startPolling = () => {
-    base.perform('Get Status')
-    base.startPolling()
-  }
-
-  const setPower = params => {
-    sendDefer(`!Power ${params.Status}\r`)
-  }
-
-  const setMute = params => {
-    if (params.Status == "On"){
-      sendDefer(`0B0.`)
-    }
-    else if (params.Status == "Off"){
-      sendDefer(`0B2.`)
+    base.getVar('Status').string = 'Disconnected';
+    if (tcpClient) {
+      tcpClient.end();
+      tcpClient = null;
     }
   }
 
 
-
-  
-  const selectSource = params => {
-    var HDMI_in = params.Name.replace(/\D/g , '');
-    sendDefer(HDMI_in + `B1.`)
+  const tick = () => {
+    !tcpClient && initTcpClient();  // Attempt reconnection after an error
   }
 
-  const getStatus = () => sendDefer(`600%`)
-
-  const onFrame = data => {
-    logger.silly(`onFrame ${data}`)
-
-
-    base.commandDone()
-    if(data.startsWith("AV: ") == true){
-      logger.silly(data.substr(4,1))
-
-      base.getVar("Sources").string = "HDMI" + data.substr(4,1)
-    }
-
-    if(data == "MUTE\r\n"){
-      base.getVar("Mute").string = "On"
-    }
-    else if(data == "UNMUTE\r\n"){
-      base.getVar("Mute").string = "Off"
-    }
-
-  }
 
   const initTcpClient = () => {
     if (!tcpClient) {
-      tcpClient = host.createTCPClient()
+      tcpClient = host.createTCPClient();
+      tcpClient.setOptions({
+        receiveTimeout: TCP_TIMEOUT,
+        autoReconnectionAttemptDelay: TCP_RECONNECT_DELAY
+      })
+      tcpClient.connect(config.port, config.host);
 
       tcpClient.on('connect', () => {
-        logger.silly(`TCPClient connected`)
-        base.getVar('Status').string = 'Connected'
-        startPolling()
-      })
+        logger.silly(`TCPClient connected`);
+        base.getVar('Status').string = 'Connected';
+        base.startPolling();
+      });
 
       tcpClient.on('data', data => {
-        data = data.toString()
-        logger.silly(`TCPClient data: ${data}`)
-        frameParser.push(data)
-      })
+        frameParser.push(data.toString());
+      });
 
       tcpClient.on('close', () => {
-        logger.silly(`TCPClient closed`)
-        disconnect()
-      })
+        logger.silly(`TCPClient closed`);
+        base.getVar('Status').string = 'Disconnected';
+      });
 
       tcpClient.on('error', err => {
-        logger.error(`TCPClient: ${err}`)
-        disconnect()
-
-      })
+        logger.error(`TCPClient: ${err}`);
+        stop();  // Disconnect and also throw out the tcpClient instance
+      });
     }
   }
 
-  const sendDefer = data => {
-    if (send(data)) {
-      base.commandDefer(2500)
-    } else {
-      base.commandError(`Data not sent`)
-    }
-  }
 
   const send = data => {
-    logger.silly(`TCPClient send: ${data}`)
-    return tcpClient && tcpClient.write(data)
+    logger.silly(`TCPClient send: ${data}`);
+    return tcpClient && tcpClient.write(data);
   }
 
-  const disconnect = () => {
-    base.getVar('Status').string = 'Disconnected'
-    tcpClient && tcpClient.end()
+
+  const sendDefer = data => {
+    base.commandDefer(CMD_DEFER_TIME);
+    if (!send(data)) base.commandError(`Data not sent`);
   }
 
-  function tick() {
-    if (base.getVar('Status').string == 'Disconnected'){
-      initTcpClient()
-      tcpClient.connect(config.port, config.host)
+
+  const onFrame = data => {
+    base.commandDone();
+    logger.silly(`onFrame: ${data}`);
+    if (data.startsWith("AV: ")) {
+      logger.silly(data.substr(4,1));
+      base.getVar("Sources").string = "HDMI" + data.substr(4,1);
+    }
+    else if (data == "MUTE\r\n") {
+      base.getVar("Mute").string = "On";
+    }
+    else if (data == "UNMUTE\r\n") {
+      base.getVar("Mute").string = "Off";
     }
   }
+
+
+  const selectSource = params => {
+    var HDMI_in = params.Name.replace(/\D/g , '');
+    sendDefer(`${HDMI_in}B1.`);
+  }
+
+
+  const setMute = params => {
+    if (params.Status == "On"){
+      sendDefer(`0B0.`);
+    }
+    else if (params.Status == "Off"){
+      sendDefer(`0B2.`);
+    }
+  }
+
+
+  const getStatus = () => sendDefer(`600%`);
 
 
   return {
-    setup, start, stop,
-    setPower, selectSource, getStatus, setMute, tick
+    setup, start, stop, tick,
+    selectSource, setMute, getStatus
   }
 }
