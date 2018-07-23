@@ -1,4 +1,7 @@
-const CMD_DEFER_TIME = 10000;
+'use strict;'
+
+
+const TICK_PERIOD = 10000;
 const FORCE_RECONNECT = 30000;  // Forced reconnect delay after server-side disconnect
 
 
@@ -20,16 +23,23 @@ exports.createDevice = base => {
 
   const setup = _config => {
     config = _config
+    base.setTickPeriod(TICK_PERIOD);
 
     // Create remote variable references, with attached perform function
     config.remote.forEach(thisvar => {
+      let perform = null;
+      if (thisvar.push_enabled) {
+        perform = {
+          action: 'pushRemote',
+          params: { Info: thisvar, Value: '$value'}
+        };
+      }
       base.createVariable({
         name: `${thisvar.server}__${thisvar.point.replace(/\./g, '__')}`,
         type: thisvar.type,
-        perform: {
-          action: 'pushRemote',
-          params: { Info: thisvar, Value: '$value'}
-        }
+        perform: perform,
+        min: thisvar.min,
+        max: thisvar.max
       });
     });
   }
@@ -48,6 +58,18 @@ exports.createDevice = base => {
 
   const stop = () => {
     base.getVar('Status').string = 'Disconnected';
+    if (socket) {
+      socket.close();
+      socket = null;
+    }
+  }
+
+
+  const tick = () => {
+    if (!socket) {
+      logger.silly(`Reinitializing socket...`);
+      initSocket();
+    }
   }
 
 
@@ -58,7 +80,7 @@ exports.createDevice = base => {
       socket = io(`http://${config.host}:${config.port}`);
 
       socket.on('connect', () => {
-        socket.emit('authentication', {key: config.key});  // Send authentication to server
+        socket.emit('authentication', {key: config.key, csRef: config.reference});  // Send authentication to server
         logger.silly(`Connected with socket id: ${socket.id}`);
         base.getVar('Status').string = 'Connected';
       });
@@ -66,7 +88,7 @@ exports.createDevice = base => {
       socket.on('disconnect', (reason) => {
         logger.silly(`Disconnected from socket server: ${reason}`);
         base.getVar('Status').string = 'Disconnected';
-        if(reason === 'io server disconnect') {
+        if (reason === 'io server disconnect') {
           logger.error(`Socket server forced a disconnect, check authentication key and reload driver`);
           setTimeout(() => socket.connect(), FORCE_RECONNECT);  // Attempt reconnection after server-side disconnect
         }
@@ -85,8 +107,7 @@ exports.createDevice = base => {
 
 
   const updateLocal = variable => {
-    // let thisvar = config.local.filter(x => x.point === variable.fullName); Not keeping local references anymore
-    let val = variable.type === 'enum' ? variable.enums[variable.value] : variable.value;
+    let val = (variable.type === 'enum') ? variable.enums[variable.value] : variable.value;
     logger.silly(`Broadcasting update ... ${variable.fullName} = ${val}`);
 
     if (socket.connected) {
@@ -165,7 +186,7 @@ exports.createDevice = base => {
 
 
   return {
-    setup, start, stop,
+    setup, start, stop, tick,
     updateLocal, pushRemote
   }
 }

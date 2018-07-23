@@ -1,34 +1,38 @@
-const TICK_PERIOD = 10000
-const POLL_PERIOD = 5000
-const CMD_DEFER_TIME = 1000
-const TCP_TIMEOUT = 60000
-const TCP_RECONNECT_DELAY = 5000
+'use strict';   // Must declare variables before use
 
 
-var host
+const TICK_PERIOD = 10000;
+const POLL_PERIOD = 5000;
+const CMD_DEFER_TIME = 1000;
+const TCP_TIMEOUT = 60000;
+const TCP_RECONNECT_DELAY = 5000;
+
+
+var host;
 exports.init = _host => {
-  host = _host
+  host = _host;
 }
 
 
 exports.createDevice = base => {
-  const logger = base.logger || host.logger
-  var config
-  var tcpClient
+  const logger = base.logger || host.logger;
+  var config;
+  var tcpClient;
 
-  var frameParser = host.createFrameParser()
-  frameParser.setSeparator('\n')
-  frameParser.on('data', data => onFrame(data))
+  var frameParser = host.createFrameParser();
+  frameParser.setSeparator('\n');
+  frameParser.on('data', data => onFrame(data));
 
 
   const setup = _config => {
-    config = _config
+    config = _config;
     base.setTickPeriod(TICK_PERIOD);
 
     base.setPoll({
       action: 'getPower',
       period: POLL_PERIOD,
-      enablePollFn: () => { return base.getVar('Status').string === 'Connected'; }
+      enablePollFn: () => { return base.getVar('Status').string === 'Connected'; },
+      startImmediately: true
     });
   }
 
@@ -69,7 +73,6 @@ exports.createDevice = base => {
 
       tcpClient.on('data', data => {
         frameParser.push(data.toString());
-        // logger.silly(`TCPClient data: ${data}`)
       })
 
       tcpClient.on('close', () => {
@@ -86,8 +89,8 @@ exports.createDevice = base => {
 
 
   const send = data => {
-    logger.silly(`TCPClient send: ${data}`)
-    return tcpClient && tcpClient.write(data)
+    logger.silly(`TCPClient send: ${data}`);
+    return tcpClient && tcpClient.write(data);
   }
 
 
@@ -98,13 +101,13 @@ exports.createDevice = base => {
 
 
   const onFrame = data => {
-    let match = data.match(/POWR(\d+)/)
+    let match = data.match(/POWR(\d+)/);
     if (match) {
-      base.commandDone()  // Call this when a command response is recognised
-      base.getVar('Power').string = (parseInt(match[1]) == 1) ? 'On' : 'Off'
+      base.commandDone();  // Call this when a command response is recognised
+      base.getVar('Power').string = (parseInt(match[1]) == 1) ? 'On' : 'Off';
     }
     else {
-      base.commandError()  // Call this when something goes wrong
+      base.commandError();  // Call this when something goes wrong
     }
   }
 
@@ -115,8 +118,8 @@ exports.createDevice = base => {
 
 
   const setPower = params => {
-    if (params.Status == 'Off') sendDefer(Buffer.from(`*SCPOWR0000000000000000\n`))
-    else if (params.Status == 'On') sendDefer(Buffer.from(`*SCPOWR0000000000000001\n`))
+    if (params.Status == 'Off') sendDefer(Buffer.from(`*SCPOWR0000000000000000\n`));
+    else if (params.Status == 'On') sendDefer(Buffer.from(`*SCPOWR0000000000000001\n`));
   }
 
 

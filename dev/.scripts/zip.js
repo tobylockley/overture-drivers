@@ -10,7 +10,7 @@ exports.execute = function (args) {
   var glob = require('glob');
 
   let mypath = path.dirname(vscode.window.activeTextEditor.document.fileName);
-  let zpath = path.resolve(mypath, '../../release')
+  let zpath = path.resolve(mypath, '../../zip')
 
   args.log('---------- ./dev/scripts/ozip.js ----------');
   args.log(`input path: ${mypath}`);
