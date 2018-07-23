@@ -1,0 +1,106 @@
+{
+  "name": "tl_4x1_hd",
+  "version": "1.0.0-beta.3",
+  "description": "Driver for tl-4x1-hd switcher",
+  "main": "index.js",
+  "scripts": {
+	  "start": "node index.js"
+  },
+  "author": "Barco",
+  "license": "MIT",
+  "overture": {
+    "brand": "Techlogix",
+    "models": ["tl-4x1-hd"],
+    "type": "device",
+    "subtype": "matrix",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": ["Disconnected","Connected"]
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "enums": ["Off", "On"],
+        "perform": {
+          "action": "Set Power",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "Sources",
+        "type": "enum",
+        "enums": ["HDMI1", "HDMI2", "HDMI3", "HDMI4"],
+        "perform": {
+          "action": "Select Source",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      },
+      {
+        "name": "Mute",
+        "type": "enum",
+        "enums": ["Off", "On"],
+        "perform": {
+          "action": "Set Mute",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off","On"]
+          }
+        }
+      },
+      {
+        "name": "Set Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off","On"]
+          }
+        }
+      },
+      {
+        "name": "Select Source",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      }
+    ],    
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Techlogix 4x1-HD switcher",
+      "properties": {
+        "host": {
+          "title": "Host name or IP of Global Cache",
+          "type": "string",
+          "default": "192.168.1.70"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 4999,
+          "description": "Default: 4999"
+        }
+      },
+      "required": [
+        "host",
+        "port"
+      ]
+    }
+  }
+}
