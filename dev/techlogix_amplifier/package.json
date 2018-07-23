@@ -1,6 +1,6 @@
 {
   "name": "techlogix_amplifier",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Driver for Techlogix Power Amplifier",
   "main": "index.js",
   "scripts": {

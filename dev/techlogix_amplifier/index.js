@@ -1,41 +1,56 @@
-let host
+'use strict';
 
+const CMD_DEFER_TIME = 1000;
+const TICK_PERIOD = 5000;
+const POLL_PERIOD = 5000;
+const TCP_TIMEOUT = 30000;
+const TCP_RECONNECT_DELAY = 1000;
+
+let host;
 exports.init = _host => {
-  host = _host
+  host = _host;
 }
 
-exports.createDevice = base => {
-  const logger = base.logger || host.logger
-  let config
-  let tcpClient
 
-  let frameParser = host.createFrameParser()
-  frameParser.setSeparator('\r\n')
-  frameParser.on('data', data => onFrame(data))
+exports.createDevice = base => {
+  const logger = base.logger || host.logger;
+  let config;
+  let tcpClient;
+
+  let frameParser = host.createFrameParser();
+  frameParser.setSeparator('\r\n');
+  frameParser.on('data', data => onFrame(data));
+
 
   const setup = _config => {
-    config = _config
-    base.setPoll('Get Status', 10000)
+    config = _config;
+    base.setTickPeriod(TICK_PERIOD);
+    base.setPoll({
+      action: 'getStatus',
+      period: POLL_PERIOD,
+      enablePollFn: () => { return base.getVar('Status').string === 'Connected'; },
+      startImmediately: true
+    });
 
     // Create dynamic variables based on model
-    let sources, mic_input, ducking
+    let sources, mic_input, ducking;
     if (config.model == "TL-A70-40W") {
       // 3 inputs, mic
-      sources = ['Input1', 'Input2', 'Input3']
-      mic_input = true
-      ducking = true
+      sources = ['Input1', 'Input2', 'Input3'];
+      mic_input = true;
+      ducking = true;
     }
     else if (config.model == "TL-A8O-20W") {
       // 2 inputs, mic
-      sources = ['Input1', 'Input2']
-      mic_input = true
-      ducking = false
+      sources = ['Input1', 'Input2'];
+      mic_input = true;
+      ducking = false;
     }
     else if (config.model == "TL-A8O-50W") {
       // 3 inputs, no mic
-      sources = ['Input1', 'Input2', 'Input3']
-      mic_input = false
-      ducking = false
+      sources = ['Input1', 'Input2', 'Input3'];
+      mic_input = false;
+      ducking = false;
     }
 
     base.createVariable({
@@ -98,139 +113,149 @@ exports.createDevice = base => {
         }
       });
     }
-
   }
+
 
   const start = () => {
-    initTcpClient()
-    tcpClient.connect(config.port, config.host)
-    getStatus()
-    base.startPolling()
+    initTcpClient();
   }
+
 
   const stop = () => {
-    disconnect()
-  }
-
-  function tick() {
-    if (base.getVar('Status').string == 'Disconnected') {
-      initTcpClient()
-      tcpClient.connect(config.port, config.host)
+    base.getVar('Status').string = 'Disconnected';
+    if (tcpClient) {
+      tcpClient.end();
+      tcpClient = null;
     }
   }
+
+
+  function tick() {
+    !tcpClient && initTcpClient();  // Attempt reconnection after an error
+  }
+
 
   const initTcpClient = () => {
     if (!tcpClient) {
-      tcpClient = host.createTCPClient()
+      tcpClient = host.createTCPClient();
+      tcpClient.setOptions({
+        receiveTimeout: TCP_TIMEOUT,
+        autoReconnectionAttemptDelay: TCP_RECONNECT_DELAY
+      })
+      tcpClient.connect(config.port, config.host);
 
       tcpClient.on('connect', () => {
-        logger.silly(`TCPClient connected`)
-        base.getVar('Status').string = 'Connected'
-      })
+        logger.silly(`TCPClient connected`);
+        base.getVar('Status').string = 'Connected';
+        base.startPolling();
+      });
 
       tcpClient.on('data', data => {
-        frameParser.push(data)
-      })
+        frameParser.push(data);
+      });
 
       tcpClient.on('close', () => {
-        logger.silly(`TCPClient closed`)
-        disconnect()
-      })
+        logger.silly(`TCPClient closed`);
+        base.getVar('Status').string = 'Disconnected';
+      });
 
       tcpClient.on('error', err => {
-        logger.error(`TCPClient: ${err}`)
-        disconnect()
-      })
+        logger.error(`TCPClient: ${err}`);
+        stop();
+      });
     }
   }
 
-  const disconnect = () => {
-    base.getVar('Status').string = 'Disconnected'
-    tcpClient && tcpClient.end()
-  }
-
-  const sendDefer = data => {
-    if (send(data)) {
-      base.commandDefer(1000)
-    } else {
-      base.commandError(`Data not sent`)
-    }
-  }
 
   const send = data => {
-    logger.silly(`TCPClient send: ${data}`)
-    return tcpClient && tcpClient.write(data)
+    logger.silly(`TCPClient send: ${data}`);
+    return tcpClient && tcpClient.write(data);
   }
 
+
+  const sendDefer = data => {
+    base.commandDefer(CMD_DEFER_TIME);
+    if (!send(data)) base.commandError(`Data not sent`);
+  }
+
+
   const onFrame = data => {
-    logger.silly(`onFrame ${data}`)
+    let match;
+    base.commandDone();
+    logger.silly(`onFrame ${data}`);
 
     // EXPECTED RESULT FROM getStatus():
-    // A: 3 -> 1               (input -> output)
+    // A: 3 -> 1                                     (input -> output)
     // Volume of MIC : 8
     // Volume of LINE : 50
     // Bass of LINE : 4
     // Treble of LINE : 0
     // Ducking Off
 
-    let match
-
-    match = data.match(/(\d+) -> \d+/)
-    match && (base.getVar('Sources').string = `Input${match[1]}`)
+    match = data.match(/(\d+) -> \d+/);
+    match && (base.getVar('Sources').string = `Input${match[1]}`);
 
     // Need this logic to distinguish A70 and A8O
     if (data.match(/MIC/)) {
-      match = data.match(/Volume.*?MIC.*?(\d+)/)
-      match && (base.getVar('AudioLevelInput').value = match[1])
-      match = data.match(/Volume.*?LINE.*?(\d+)/)
-      match && (base.getVar('AudioLevel').value = match[1])
+      match = data.match(/Volume.*?MIC.*?(\d+)/);
+      match && (base.getVar('AudioLevelInput').value = match[1]);
+      match = data.match(/Volume.*?LINE.*?(\d+)/);
+      match && (base.getVar('AudioLevel').value = match[1]);
     }
     else {
-      match = data.match(/Volume.*?(\d+)/)
-      match && (base.getVar('AudioLevel').value = match[1])
+      match = data.match(/Volume.*?(\d+)/);
+      match && (base.getVar('AudioLevel').value = match[1]);
     }
 
-    match = data.match(/Bass.*?(\d+)/)
-    match && (base.getVar('Bass').string =match[1])
+    match = data.match(/Bass.*?(\d+)/);
+    match && (base.getVar('Bass').string =match[1]);
 
-    match = data.match(/Treble.*?(\d+)/)
-    match && (base.getVar('Treble').string = match[1])
+    match = data.match(/Treble.*?(\d+)/);
+    match && (base.getVar('Treble').string = match[1]);
 
-    match = data.match(/Ducking (Off|On)/)
-    match && (base.getVar('DuckingFunction').string = match[1])
+    match = data.match(/Ducking (Off|On)/);
+    match && (base.getVar('DuckingFunction').string = match[1]);
 
     // These are received only after a set function
 
-    match = data.match(/Ducking.*?LINE.*?(\d+)/)
-    match && (base.getVar('DuckingLevel').value = match[1])
+    match = data.match(/Ducking.*?LINE.*?(\d+)/);
+    match && (base.getVar('DuckingLevel').value = match[1]);
 
-    match = data.match(/Mute/)
-    match && (base.getVar('AudioMute').string = 'On')
+    match = data.match(/Mute/);
+    match && (base.getVar('AudioMute').string = 'On');
 
-    match = data.match(/UnMute/)
-    match && (base.getVar('AudioMute').string = 'Off')
-
-    base.commandDone()
+    match = data.match(/UnMute/);
+    match && (base.getVar('AudioMute').string = 'Off');
   }
 
-  const getStatus = () => sendDefer(Buffer.from('600%'))
+
+  const getStatus = () => sendDefer(Buffer.from('600%'));
+
 
   const selectSource = params => {
     let match = params.Name.match(/.*?(\d+)/i)
     match && send(Buffer.from(`${parseInt(match[1])}A1.`))
   }
 
+
   const setAudioMute = params => {
-    if (params.Status == 'Off') send(Buffer.from('0A1.'))
+    if (params.Status == 'Off') {
+      send(Buffer.from('0A1.'))
+    }
     else if (params.Status == 'On') {
-      if (config.model == 'TL-A8O-50W') send(Buffer.from('0A0.'))  // This model has no 'line only' mute
-      else send(Buffer.from('2A0.'))  // Mute line only
+      if (config.model == 'TL-A8O-50W') {
+        send(Buffer.from('0A0.'));  // This model has no 'line only' mute
+      }
+      else {
+        send(Buffer.from('2A0.'));  // Mute line only
+      }
     }
   }
 
+
   const setAudioMuteIn = params => {
-    if (params.Status == 'Off') send(Buffer.from('0A1.'))
-    else if (params.Status == 'On') send(Buffer.from('1A0.'))  // Mute mic only
+    if (params.Status == 'Off') send(Buffer.from('0A1.'));
+    else if (params.Status == 'On') send(Buffer.from('1A0.'));  // Mute mic only
   }
 
   const muteAll = () => send(Buffer.from('0A0.'));
