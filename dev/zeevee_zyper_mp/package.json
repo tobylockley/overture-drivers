@@ -68,7 +68,7 @@
               },
               "usbname": {
                 "type": "string",
-                "title": "USB Nickname"
+                "title": "USB Nickname (If blank, uses device name)"
               }
             },
             "required": [
@@ -104,7 +104,7 @@
               },
               "usbname": {
                 "type": "string",
-                "title": "USB Nickname"
+                "title": "USB Nickname (If blank, uses device name)"
               }
             },
             "required": [
@@ -135,7 +135,7 @@
         "videowalls": {
           "type": "array",
           "format": "table",
-          "title": "Video-Walls",
+          "title": "Videowalls",
           "uniqueItems": true,
           "items": {
             "type": "object",
