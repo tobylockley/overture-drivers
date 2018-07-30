@@ -1,0 +1,85 @@
+{
+  "name": "tl_4x1_hd2_zyper",
+  "version": "1.0.0-beta.2",
+  "description": "Driver for controlling tl-4x1-hd2 switcher with a Zyper RS232 interface",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "Techlogix",
+    "models": [
+      "tl-4x1-hd2"
+    ],
+    "type": "device",
+    "subtype": "matrix",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Sources",
+        "type": "enum",
+        "enums": [
+          "HDMI1",
+          "HDMI2",
+          "HDMI3",
+          "HDMI4"
+        ],
+        "perform": {
+          "action": "Select Source",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Select Source",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Techlogix 4x1-HD2 Switcher",
+      "properties": {
+        "host": {
+          "title": "Hostname or IP of Zyper Management Platform",
+          "type": "string",
+          "default": "192.168.99.40"
+        },
+        "port": {
+          "title": "Telnet Port:",
+          "type": "integer",
+          "default": 23,
+          "description": "Default: 23"
+        },
+        "zyper_device": {
+          "title": "Mac Address or Name of Zyper Encoder/Decoder:",
+          "type": "string",
+          "default": "00:1e:c0:"
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "zyper_device"
+      ]
+    }
+  },
+  "dependencies": {
+    "telnet-client": "^0.15.5"
+  }
+}
