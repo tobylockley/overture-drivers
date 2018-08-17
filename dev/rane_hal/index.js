@@ -3,6 +3,7 @@
 const TICK_PERIOD = 5000;
 const POLL_PERIOD = 5000;
 const TELNET_TIMEOUT = 30000;  // Socket will timeout after specified milliseconds of inactivity
+const END_OF_RESPONSE = '\n';  // Used to trigger end of message
 const SEND_TIMEOUT = 1000;  // Timeout when using telnet send function
 const CMD_DEFER = 1000;
 
@@ -20,7 +21,7 @@ exports.createDevice = base => {
   let telnetClient;
 
   let frameParser = host.createFrameParser();
-  frameParser.setSeparator('Zyper$');
+  frameParser.setSeparator(END_OF_RESPONSE);
   frameParser.on('data', data => onFrame(data));
 
   const isConnected = () => { return base.getVar('Status').string === 'Connected'; }
@@ -49,7 +50,7 @@ exports.createDevice = base => {
         params: { ControlNumber: level.number }
       });
 
-      controls[level.number] = level.name;
+      controls[level.number] = level.name.replace(/ /g, '');  // Remove all spaces from string
     });
 
     config.selectors.forEach(selector => {
@@ -71,7 +72,7 @@ exports.createDevice = base => {
         params: { ControlNumber: selector.number }
       });
 
-      controls[selector.number] = selector.name;
+      controls[selector.number] = selector.name.replace(/ /g, '');  // Remove all spaces from string
     });
 
     config.toggles.forEach(toggle => {
@@ -93,7 +94,21 @@ exports.createDevice = base => {
         params: { ControlNumber: toggle.number }
       });
 
-      controls[toggle.number] = toggle.name;
+      controls[toggle.number] = toggle.name.replace(/ /g, '');  // Remove all spaces from string
+    });
+
+    config.commands.forEach(command => {
+      base.createVariable({
+        name: command.name,
+        type: 'enum',
+        enums: ['Idle', 'Activate'],
+        perform: {
+          action: 'sendCommand',
+          params: { ControlNumber: command.number }
+        }
+      });
+
+      controls[command.number] = command.name.replace(/ /g, '');  // Remove all spaces from string
     });
   }
 
@@ -120,7 +135,7 @@ exports.createDevice = base => {
   const initTelnetClient = () => {
     if (!telnetClient) {
       telnetClient = new Telnet();
-      logger.silly(`Initialising telnet connection to: ${config.host}:${config.port}`);
+      logger.debug(`Initialising telnet connection to: ${config.host}:${config.port}`);
       telnetClient.connect({
         host: config.host,
         port: config.port,
@@ -130,7 +145,7 @@ exports.createDevice = base => {
       });
 
       telnetClient.on('connect', function () {
-        logger.silly('Telnet connected!');
+        logger.debug('Telnet connected!');
         base.getVar('Status').string = 'Connected';
         base.startPolling();
       });
@@ -140,7 +155,7 @@ exports.createDevice = base => {
       });
 
       telnetClient.on('close', function () {
-        logger.silly('Telnet closed');
+        logger.debug('Telnet closed');
         stop();
       });
 
@@ -159,23 +174,33 @@ exports.createDevice = base => {
   const sendDefer = data => {
     logger.silly(`Telnet sendDefer: ${data}`);
     base.commandDefer(CMD_DEFER);
-    telnetClient.send(`${data}\r\n`).then(result => {
+    telnetClient.send(`${data}\r\n`, {waitfor: END_OF_RESPONSE}).then(result => {
       // Handled in onFrame
     }, err => {
       base.commandError(`Telnet send error: ${err}`);
     });
   }
 
+  // NO RESPONSE DATA WHEN SETTING/SENDING COMMANDS
+
   const setLevel = params => {
-    sendDefer(`<L&${params.ControlNumber}&${params.Level}>`);
+    send(`<L&${params.ControlNumber}&${params.Level}0>`);  // Extra 0 added to compensate for expected format (0-1000)
   }
 
   const setSelector = params => {
-    sendDefer(`<L&${params.ControlNumber}&${params.Index}>`);
+    send(`<S&${params.ControlNumber}&${params.Index}>`);
   }
 
   const setToggle = params => {
-    sendDefer(`<L&${params.ControlNumber}&${params.Status}>`);
+    send(`<T&${params.ControlNumber}&${params.Status}>`);
+  }
+
+  const sendCommand = params => {
+    send(`<C&${params.ControlNumber}&1>`);
+    base.getVar( controls[params.ControlNumber] ).value = 1;
+    setTimeout(() => {
+      base.getVar( controls[params.ControlNumber] ).value = 0;  // Set back to idle after 1 sec
+    }, 1000);
   }
 
   const getLevel = params => {
@@ -192,21 +217,21 @@ exports.createDevice = base => {
 
   const onFrame = data => {
     let match  // Used for regex matching
-    logger.silly(`onFrame: ${data.replace('\r', '\\r').replace('\n', '\\n')}`)
+    logger.silly(`onFrame: ${data.replace(/\r/g, '\\r').replace(/\n/g, '\\n')}`)
 
-    match = data.match(/L&(\d+?)&(\d+?)/)
+    match = data.match(/<L&(\d+?)&(\d+?)>/)
     if (match) {
       base.commandDone();
       base.getVar( controls[match[1]] ).value = Math.floor( parseInt(match[2]) / 10 );
     }
 
-    match = data.match(/S&(\d+?)&(\d+?)/)
+    match = data.match(/<S&(\d+?)&(\d+?)>/)
     if (match) {
       base.commandDone();
       base.getVar( controls[match[1]] ).value = match[2];
     }
 
-    match = data.match(/T&(\d+?)&(\d+?)/)
+    match = data.match(/<T&(\d+?)&(\d+?)>/)
     if (match) {
       base.commandDone();
       base.getVar( controls[match[1]] ).value = match[2];
@@ -215,7 +240,7 @@ exports.createDevice = base => {
 
   return {
     setup, start, stop, tick,
-    setLevel, setSelector, setToggle,
+    setLevel, setSelector, setToggle, sendCommand,
     getLevel, getSelector, getToggle
   }
 }

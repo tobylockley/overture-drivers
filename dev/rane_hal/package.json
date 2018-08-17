@@ -1,6 +1,6 @@
 {
   "name": "rane_hal",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.3",
   "description": "Driver for Rane HAL/Halogen",
   "main": "index.js",
   "scripts": {
@@ -111,6 +111,31 @@
           "items": {
             "type": "object",
             "title": "Toggle",
+            "properties": {
+              "name": {
+                "type": "string",
+                "title": "Name"
+              },
+              "number": {
+                "type": "integer",
+                "title": "Control Number",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "name",
+              "number"
+            ]
+          }
+        },
+        "commands": {
+          "type": "array",
+          "format": "table",
+          "title": "Commands",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Command",
             "properties": {
               "name": {
                 "type": "string",
