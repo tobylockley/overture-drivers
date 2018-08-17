@@ -110,6 +110,7 @@
           "uniqueItems": true,
           "items": {
             "type": "object",
+            "title": "Toggle",
             "properties": {
               "name": {
                 "type": "string",
@@ -138,5 +139,6 @@
     "doc": "docs"
   },
   "dependencies": {
+    "telnet-client": "^0.15.8"
   }
 }
