@@ -41,7 +41,7 @@ exports.execute = function (args) {
       // listen for all archive data to be written
       // 'close' event is fired only when a file descriptor is involved
       output.on('close', function() {
-        args.log(`Complete: Driver files archived to ${zpath}\${zname}.zip (${archive.pointer()} bytes)`);
+        args.log(`Complete: Driver files archived to ${zpath}\\${zname}.zip (${archive.pointer()} bytes)`);
       });
 
       // This event is fired when the data source is drained no matter what was the data source.
