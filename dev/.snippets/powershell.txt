@@ -1,0 +1,2 @@
+Delete local merged branches
+git branch --merged | ?{-not ($_ -like "*master")} | %{git branch -d $_.trim()}
