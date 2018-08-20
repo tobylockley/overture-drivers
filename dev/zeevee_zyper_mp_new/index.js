@@ -289,7 +289,7 @@ exports.createDevice = base => {
       '',
       'UHD_dec1',
       'UHD_dec2',
-      'UHD_dec3',
+      'UHD_laptop',
       'UHD_dec4'
     ]
     if (params.Mode === 'UHD') sendDefer(`send ${device[params.ScreenId]} rs232 HDMI1%`)
@@ -308,10 +308,10 @@ exports.createDevice = base => {
   }
 
   const onFrame = data => {
-    let match;  // Used for regex matching NOTE: [\s\S] will match any character, even newlines
-    logger.silly(`onFrame: ${data}`);
+    let match  // Used for regex matching NOTE: [\s\S] will match any character, even newlines
+    logger.silly(`onFrame: ${data}`)
 
-    match = data.match(/join (.+?) (.+?) (\S+)[\s\S]*?Success/);
+    match = data.match(/join (.+?) (.+?) (\S+)[\s\S]*?Success/)
     if (match) {
       base.commandDone();
       if (match[3] === 'usb') base.getVar(`DecoderUSB_${match[2]}`).string = match[1]
@@ -329,7 +329,7 @@ exports.createDevice = base => {
         '',
         'UHD_dec1',
         'UHD_dec2',
-        'UHD_dec3',
+        'UHD_laptop',
         'UHD_dec4'
       ]
       base.commandDone();
