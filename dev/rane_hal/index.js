@@ -1,10 +1,8 @@
 'use strict';
 
 const TICK_PERIOD = 5000;
-const POLL_PERIOD = 5000;
+const POLL_PERIOD = 10000;
 const TELNET_TIMEOUT = 30000;  // Socket will timeout after specified milliseconds of inactivity
-const END_OF_RESPONSE = '\n';  // Used to trigger end of message
-const SEND_TIMEOUT = 1000;  // Timeout when using telnet send function
 const CMD_DEFER = 1000;
 
 let host;
@@ -17,11 +15,11 @@ exports.createDevice = base => {
   let config;
   let controls = {};  // Lookup table of control number -> variable name
 
-  let Telnet = require('telnet-client');
-  let telnetClient;
+  let net = require('net');
+  let telnetClient;  // net.Socket object, see initTelnetClient()
 
   let frameParser = host.createFrameParser();
-  frameParser.setSeparator(END_OF_RESPONSE);
+  frameParser.setSeparator('\r\n');
   frameParser.on('data', data => onFrame(data));
 
   const isConnected = () => { return base.getVar('Status').string === 'Connected'; }
@@ -117,9 +115,9 @@ exports.createDevice = base => {
   }
 
   const stop = () => {
-    disconnect();
+    base.getVar('Status').string = 'Disconnected';
     if (telnetClient) {
-      telnetClient && telnetClient.end();
+      telnetClient.destroy();
       telnetClient = null;
     }
   }
@@ -128,30 +126,23 @@ exports.createDevice = base => {
     !telnetClient && initTelnetClient();
   }
 
-  const disconnect = () => {
-    base.getVar('Status').string = 'Disconnected';
-  }
-
   const initTelnetClient = () => {
     if (!telnetClient) {
-      telnetClient = new Telnet();
       logger.debug(`Initialising telnet connection to: ${config.host}:${config.port}`);
-      telnetClient.connect({
+      telnetClient = net.createConnection({
         host: config.host,
-        port: config.port,
-        timeout: TELNET_TIMEOUT,
-        initialLFCR: true,
-        sendTimeout: SEND_TIMEOUT
+        port: config.port
       });
+      telnetClient.setTimeout(TELNET_TIMEOUT);
 
-      telnetClient.on('connect', function () {
+      telnetClient.on('connect', () => {
         logger.debug('Telnet connected!');
         base.getVar('Status').string = 'Connected';
         base.startPolling();
       });
 
-      telnetClient.on('data', (chunk) => {
-        frameParser.push(chunk);
+      telnetClient.on('data', chunk => {
+        frameParser.push(chunk.toString());
       });
 
       telnetClient.on('close', function () {
@@ -160,6 +151,7 @@ exports.createDevice = base => {
       });
 
       telnetClient.on('error', err => {
+        base.commandError(`Telnet send error: ${err}`);
         logger.error(`telnetClient: ${err}`);
         stop();
       });
@@ -168,31 +160,30 @@ exports.createDevice = base => {
 
   const send = data => {
     logger.silly(`Telnet send: ${data}`);
-    telnetClient.send(`${data}\r\n`);
+    telnetClient.write(`${data}\r\n`);
   }
 
   const sendDefer = data => {
     logger.silly(`Telnet sendDefer: ${data}`);
     base.commandDefer(CMD_DEFER);
-    telnetClient.send(`${data}\r\n`, {waitfor: END_OF_RESPONSE}).then(result => {
-      // Handled in onFrame
-    }, err => {
-      base.commandError(`Telnet send error: ${err}`);
-    });
+    telnetClient.write(`${data}\r\n`);
   }
 
   // NO RESPONSE DATA WHEN SETTING/SENDING COMMANDS
 
   const setLevel = params => {
     send(`<L&${params.ControlNumber}&${params.Level}0>`);  // Extra 0 added to compensate for expected format (0-1000)
+    setTimeout(() => { getLevel({ControlNumber: params.ControlNumber}); }, 1000);  // Verify level change after 1 sec
   }
 
   const setSelector = params => {
     send(`<S&${params.ControlNumber}&${params.Index}>`);
+    setTimeout(() => { getSelector({ControlNumber: params.ControlNumber}); }, 1000);  // Verify selector change after 1 sec
   }
 
   const setToggle = params => {
     send(`<T&${params.ControlNumber}&${params.Status}>`);
+    setTimeout(() => { getToggle({ControlNumber: params.ControlNumber}); }, 1000);  // Verify toggle change after 1 sec
   }
 
   const sendCommand = params => {
@@ -216,8 +207,8 @@ exports.createDevice = base => {
   }
 
   const onFrame = data => {
-    let match  // Used for regex matching
-    logger.silly(`onFrame: ${data.replace(/\r/g, '\\r').replace(/\n/g, '\\n')}`)
+    let match;  // Used for regex matching
+    logger.silly(`onFrame: ${data}`);
 
     match = data.match(/<L&(\d+?)&(\d+?)>/)
     if (match) {

@@ -1,6 +1,6 @@
 {
   "name": "rane_hal",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0",
   "description": "Driver for Rane HAL/Halogen",
   "main": "index.js",
   "scripts": {
@@ -159,11 +159,5 @@
         "port"
       ]
     }
-  },
-  "directories": {
-    "doc": "docs"
-  },
-  "dependencies": {
-    "telnet-client": "^0.15.8"
   }
 }
