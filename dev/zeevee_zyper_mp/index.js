@@ -1,7 +1,8 @@
 'use strict';
 
+const TICK_PERIOD = 5000
 const POLL_PERIOD = 5000
-const TELNET_TIMEOUT = 30000  // Socket will timeout after specified milliseconds of inactivity
+const TELNET_TIMEOUT = 10000  // Socket will timeout after specified milliseconds of inactivity
 const SEND_TIMEOUT = 1000  // Timeout when using telnet send function
 
 let host
@@ -24,18 +25,45 @@ exports.createDevice = base => {
 
   const setup = _config => {
     config = _config
+    base.setTickPeriod(TICK_PERIOD);
 
-    // Possible config.devices (all boolean):
-    // .encoders_uhd
-    // .decoders_uhd
-    // .encoders_4k
-    // .decoders_4k
-    // .multiviews
-    // .videowalls
+    for (let i = 1; i <= 4; i++) {
+      base.createVariable({
+        name: `ScreenMode${i}`,
+        type: 'enum',
+        enums: ['Unknown', 'UHD', '4K', 'Sleep'],
+        perform: {
+          action: 'setScreenMode',
+          params: {ScreenId: i, Mode: '$string'}
+        }
+      })
+    }
 
-    if (config.devices.encoders_uhd) base.createVariable({ name: 'Encoders_UHD', type: 'enum'})
-    if (config.devices.encoders_4k) base.createVariable({ name: 'Encoders_4K', type: 'enum'})
-    if (config.devices.multiviews) base.createVariable({ name: 'Multiviews', type: 'enum'})
+    let tempUHD = [], temp4K = [], tempMV = [], usb_sources = ['none']  // Temp arrays for building the dynamic variable enums
+
+    if (config.encoders.length > 0) {
+      config.encoders.forEach(encoder => {
+        if (encoder.model === 'ZyperUHD') {
+          tempUHD.push(encoder.name)
+          if (encoder.usb) usb_sources.push(encoder.usbname)
+          else usb_sources.push(encoder.name)
+        }
+        else if (encoder.model === 'Zyper4K') temp4K.push(encoder.name)
+      })
+      if (tempUHD.length > 0) {
+        tempUHD.sort()
+        base.createVariable({ name: 'Encoders_UHD', type: 'enum', enums: tempUHD })
+      }
+      if (temp4K.length > 0) {
+        temp4K.sort()
+        base.createVariable({ name: 'Encoders_4K', type: 'enum', enums: temp4K })
+      }
+    }
+
+    if (config.multiviews.length > 0) {
+      config.multiviews.forEach(mv => { tempMV.push(mv.name) })
+      base.createVariable({ name: 'Multiviews', type: 'enum', enums: tempMV })
+    }
 
     if (config.videowalls.length > 0) {
       config.videowalls.forEach(vw => {
@@ -67,57 +95,89 @@ exports.createDevice = base => {
             action: 'setDecoder',
             params: { Name: decoder.name, Source: '$string' }
           }
-        })
+        });
+      });
+      // Create variables for USB linking between UHD enc/dec
+      config.decoders.forEach(decoder => {
+        if (decoder.model === 'ZyperUHD') {
+          let var_name
+          if (decoder.usb) {
+            var_name = `DecoderUSB_${decoder.usbname.replace(/[^A-Za-z0-9_]/g, '')}`;  // Ensure legal variable name
+          }
+          else {
+            var_name = `DecoderUSB_${decoder.name.replace(/[^A-Za-z0-9_]/g, '')}`;  // Ensure legal variable name
+          }
+          base.createVariable({
+            name: var_name,
+            type: 'enum',
+            enums: usb_sources,  // Will be populated with appropriate sources above
+            perform: {
+              action: 'setDecoderUsb',
+              params: { Name: decoder.name, Source: '$string' }
+            }
+          });
+        }
       });
     }
 
     base.setPoll({
       action: 'getInfo',
       period: POLL_PERIOD,
-      enablePollFn: isConnected
+      enablePollFn: isConnected,
+      startImmediately: true
     });
   }
 
   const start = () => {
-    initTelnetClient()
-    telnetClient.connect({
-      host: config.host,
-      port: config.port,
-      timeout: TELNET_TIMEOUT,
-      initialLFCR: true,
-      sendTimeout: SEND_TIMEOUT
-    })
-    initVariables()
-    base.startPolling()
+    initTelnetClient();
   }
 
   const stop = () => {
     disconnect()
-    telnetClient && telnetClient.end()
+    if (telnetClient) {
+      telnetClient && telnetClient.end();
+      telnetClient = null;
+    }
+  }
+
+  const tick = () => {
+    !telnetClient && initTelnetClient();
+  }
+
+  const disconnect = () => {
+    base.getVar('Status').string = 'Disconnected';
   }
 
   const initTelnetClient = () => {
     if (!telnetClient) {
-      telnetClient = new Telnet()
+      telnetClient = new Telnet();
+      logger.silly(`Attempting telnet connection to: ${config.host}:${config.port}`);
+      telnetClient.connect({
+        host: config.host,
+        port: config.port,
+        timeout: TELNET_TIMEOUT,
+        initialLFCR: true,
+        sendTimeout: SEND_TIMEOUT
+      });
 
       telnetClient.on('connect', function () {
-        logger.silly('Telnet connected!')
-        base.getVar('Status').string = 'Connected'
+        logger.silly('Telnet connected!');
+        base.getVar('Status').string = 'Connected';
+        base.startPolling();
       })
 
       telnetClient.on('data', (chunk) => {
-        frameParser.push(chunk)
+        frameParser.push(chunk);
       })
 
       telnetClient.on('close', function () {
-        logger.silly('telnet closed')
-        disconnect()
+        logger.silly('telnet closed');
+        stop();
       })
 
       telnetClient.on('error', err => {
-        logger.error(`telnetClient: ${err}`)
-        disconnect()
-        telnetClient && telnetClient.end()
+        logger.error(`telnetClient: ${err}`);
+        stop();
       })
     }
   }
@@ -138,11 +198,8 @@ exports.createDevice = base => {
     })
   }
 
-  const getInfo = () => { sendDefer('show device config decoders') }
-
   const initVariables = () => {
     // ENCODERS
-    if (config.devices.encoders_uhd || config.devices.encoders_4k) sendDefer('show device config encoders')
     telnetClient.send(`show device status encoders\r\n`).then(data => {
       let match, temp = []
       logger.silly('-------------- ZYPER ENCODER INFO --------------')
@@ -200,24 +257,17 @@ exports.createDevice = base => {
     })
   }
 
-  const disconnect = () => {
-    base.getVar('Status').string = 'Disconnected'
-  }
-
   const setDecoder = params => {
     // Search for source name to determine join mode
     // params.Name params.Source
     let joinmode
     if (base.getVar('Encoders_UHD').enums.includes(params.Source)) {
-      // UHD Encoder
       joinmode = 'fast-switched'
     }
     else if (base.getVar('Encoders_4K').enums.includes(params.Source)) {
-      // 4k Encoder
       joinmode = 'fast-switched' // Could also be 'genlocked'
     }
     if (base.getVar('Multiviews').enums.includes(params.Source)) {
-      // Multiview
       joinmode = 'multiview'
     }
     sendDefer(`join ${params.Source} ${params.Name} ${joinmode}`)
@@ -229,12 +279,23 @@ exports.createDevice = base => {
     else if (params.Name.includes('4K')) setScreenMode({ScreenId: screenId, Mode: '4K'})
   }
 
+  const setDecoderUsb = params => {
+    sendDefer(`join ${params.Source} ${params.Name} usb`)
+  }
+
   const setScreenMode = params => {
     // Sends command to TechLogix HDMI switcher
-    // ScreenId should = 1-4, corresponding to UHD_dec[1-4]
-    if (params.Mode === 'UHD') sendDefer(`send UHD_dec${params.ScreenId} rs232 HDMI1%`)
-    else if (params.Mode === '4K') sendDefer(`send UHD_dec${params.ScreenId} rs232 HDMI2%`)
-    // Ignores 'Unknown' screen mode
+    let device = [
+      '',
+      'UHD_dec1',
+      'UHD_dec2',
+      'UHD_dec3',
+      'UHD_dec4'
+    ]
+    if (params.Mode === 'UHD') sendDefer(`send ${device[params.ScreenId]} rs232 HDMI1%`)
+    else if (params.Mode === '4K') sendDefer(`send ${device[params.ScreenId]} rs232 HDMI2%`)
+    else if (params.Mode === 'Sleep') sendDefer(`send ${device[params.ScreenId]} rs232 HDMI3%`)  // Switch to unused HDMI input so screens go to sleep
+    // 'Unknown' is ignored
   }
 
   const startVideoWall = params => {
@@ -247,13 +308,14 @@ exports.createDevice = base => {
   }
 
   const onFrame = data => {
-    let match  // Used for regex matching NOTE: [\s\S] will match any character, even newlines
-    logger.silly(`onFrame: ${data}`)
+    let match;  // Used for regex matching NOTE: [\s\S] will match any character, even newlines
+    logger.silly(`onFrame: ${data}`);
 
-    match = data.match(/join (.+?) (.+?) [\s\S]*?Success/)
+    match = data.match(/join (.+?) (.+?) (\S+)[\s\S]*?Success/);
     if (match) {
-      base.commandDone()
-      base.getVar(`Decoder_${match[2]}`).string = match[1]
+      base.commandDone();
+      if (match[3] === 'usb') base.getVar(`DecoderUSB_${match[2]}`).string = match[1]
+      else base.getVar(`Decoder_${match[2]}`).string = match[1];
     }
 
     match = data.match(/set video-wall-encoder[\s\S]*?Success/)
@@ -261,10 +323,17 @@ exports.createDevice = base => {
       base.commandDone()
     }
 
-    match = data.match(/send UHD_dec(\d) rs232 HDMI(\d)[\s\S]*?Success/)
+    match = data.match(/send (\S+?) rs232 HDMI(\d)[\s\S]*?Success/)
     if (match) {
-      base.commandDone()
-      base.getVar(`ScreenMode${match[1]}`).value = match[2]  // 1 = UHD, 2 = 4K
+      let device = [
+        '',
+        'UHD_dec1',
+        'UHD_dec2',
+        'UHD_dec3',
+        'UHD_dec4'
+      ]
+      base.commandDone();
+      base.getVar(`ScreenMode${device.indexOf(match[1])}`).value = match[2];  // 1 = UHD, 2 = 4K
     }
 
     // Response from polling command
@@ -272,100 +341,26 @@ exports.createDevice = base => {
     if (match) {
       base.commandDone()
       // Parse all decoders
-      let regex = /device\.gen.*?model=(.+?),.*?name=(.+?),[\s\S]*?connectedEncoder;.*?name=(.+?),.*?connectionMode=(.+)/g;
-      while (match = regex.exec(data)) {
+      let regex1 = /device\.gen.*?name=(.+?),[\s\S]*?connectedEncoder;.*?name=(.+?),.*?connectionMode=(.+)/g;
+      while (match = regex1.exec(data)) {
+        if (match[3].includes('wall')) base.getVar(`Decoder_${match[1]}`).string = 'VideoWall'
+        else base.getVar(`Decoder_${match[1]}`).string = match[2]
+      }
 
-        let this_decoder = base.getVar(`Decoder_${match[2]}`)
-        if (!this_decoder) {
-          // Variable does not exist yet, so create it
-          let sources_uhd = base.getVar('Encoders_UHD').enums
-          let sources_4k = base.getVar('Encoders_4K').enums
-          let sources_mv = base.getVar('Multiviews').enums
-          let sources = ['VideoWall']
-          if (match[1] === 'ZyperUHD') sources = sources.concat(sources_uhd)
-          else if (match[1] === 'Zyper4K') sources = sources.concat(sources_uhd.concat(sources_mv))
-          this_decoder = base.createVariable({
-            name: `Decoder_${match[2]}`,  // Ensure legal variable name
-            type: 'enum',
-            enums: sources,  // Will be populated with appropriate sources above
-            perform: {
-              action: 'setDecoder',
-              params: { Name: decoder.name, Source: '$string' }
-            }
-          });
-        }
-
-        if (match[4].includes('wall')) base.getVar(`Decoder_${match[2]}`).string = 'VideoWall'
-        else base.getVar(`Decoder_${match[2]}`).string = match[3]
+      let regex2 = /device\.gen.*?name=(.+?),[\s\S]*?usbUplink;.*?name=(\S+)/g;
+      while (match = regex2.exec(data)) {
+        base.getVar(`DecoderUSB_${match[1]}`).string = match[2]
       }
     }
-
-    // Response from initVariables
-    match = data.match(/show device config encoders/)
-    if (match) {
-      base.commandDone()
-      logger.silly('-------------- ZYPER ENCODER INFO --------------')
-      let temp_uhd = [], temp_4k = []  // Temp arrays for building the variable enums
-      let regex = /device\.gen.*?model=(.+?),.*?name=(.+?),/g;
-      while (match = regex.exec(data)) {
-        logger.silly(`Name: ${match[2]} Model: ${match[1]}`)
-        if (match[1] === 'ZyperUHD') temp_uhd.push(match[2])
-        if (match[1] === 'Zyper4K') temp_4k.push(match[2])
-      }
-      temp_uhd.sort()
-      temp_4k.sort()
-      if (config.devices.encoders_uhd) base.getVar('Encoders_UHD').enums = temp_uhd
-      if (config.devices.encoders_4k) base.getVar('Encoders_4K').enums = temp_4k
-    }
-
-    // Response from initVariables
-    match = data.match(/show multiviews config/)
-    if (match) {
-      base.commandDone()
-      logger.silly('------------- ZYPER MULTIVIEWS INFO ------------')
-      let temp_mv = []  // Temp array for building the variable enums
-      let regex = /multiview\((.+?)\)/g;
-      while (match = regex.exec(data)) {
-        logger.silly(`Name: ${match[1]}`)
-        temp_mv.push(match[1])
-      }
-      temp_mv.sort()
-      base.getVar('Multiviews').enums = temp_mv
-    }
-
-    // Response from initVariables
-    // match = data.match(/show video-walls/)
-    // if (match) {
-    //   base.commandDone()
-    //   logger.silly('------------- ZYPER VIDEOWALLS INFO ------------')
-    //   let temp_vw = []  // Temp array for building the variable enums
-    //   let regex = /videoWall\((.+?)\)/g;
-    //   while (match = regex.exec(data)) {
-    //     logger.silly(`Name: ${match[1]}`)
-    //     temp_vw.push(match[1])
-
-
-    //     let sources = ['Idle']
-    //     if (vw.model === 'Zyper4K') sources = sources.concat(temp4K)
-    //     else if (vw.model === 'ZyperUHD') sources = sources.concat(tempUHD)
-    //     base.createVariable({
-    //       name: `VideoWall_${vw.name.replace(/[^A-Za-z0-9_]/g, '')}`,  // Ensure legal variable name
-    //       type: 'enum',
-    //       enums: sources,  // Will be populated with appropriate sources above
-    //       perform: {
-    //         action: 'startVideoWall',
-    //         params: { Name: vw.name, Source: '$string' }
-    //       }
-    //     })
-    //   }
-    //   temp_vw.sort()
-    //   base.getVar('VideoWalls').enums = temp_mv
-    // }
 
   }
 
+  const getInfo = () => {
+    sendDefer('show device config decoders')
+  }
+
   return {
-    setup, start, stop,
-    setDecoder, setScreenMode, startVideoWall, getInfo
+    setup, start, stop, tick,
+    setDecoder, setDecoderUsb, setScreenMode, startVideoWall, getInfo
   }
 }

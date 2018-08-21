@@ -1,0 +1,16 @@
+{
+  "backupDirectory": "backups",
+  "performNewBackup": true,
+  "servers": [
+    {
+      "url": "http://192.168.1.59",
+      "folder": "Demo_NUC",
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXljbG9ha0lkIjoiMDliYmM2MTItOWU3Yy00NGUxLTkxMTMtMTYxZTJmMjFjZDRjIiwiaWQiOiI1YjcwZmY3MDU0M2FlYzAwMGVhYjYwZDgiLCJyb2xlcyI6W3siaWQiOiJzeXN0ZW0iLCJuYW1lIjoiU3lzdGVtIiwiYWx0bmFtZSI6InN5c3RlbSIsInN5c3RlbSI6dHJ1ZSwiaHJjX2FjY2Vzc19yaWdodHMiOjEwMCwiaHJjX2FsYXJtc19yaWdodHMiOjEwMCwicm9sZV9pZCI6InN5c3RlbSJ9XSwidXNlcm5hbWUiOiJhcGkifQ.qbekgYsowsA0cq5a_e2zJVHmQL9YGpvv39jtceJwMjQ"
+    },
+    {
+      "url": "http://192.168.1.50",
+      "folder": "AVD_UX",
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViNzIyN2E2N2MxNDNiMDAwZTVjNjY4MCIsInVzZXJuYW1lIjoiYXBpIiwibmFtZSI6IkFQSSIsInJvbGVzIjpbXX0.Oj5dQZu1SQ6adzRDeiONxsUjjDQZGP-tJk1X_bCf9oo"
+    }
+  ]
+}

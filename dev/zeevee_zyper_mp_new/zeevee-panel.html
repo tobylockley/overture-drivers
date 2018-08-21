@@ -1,0 +1,1086 @@
+<style>
+    .page-content {
+        background-color: rgb(180, 180, 180);
+        background-image: url("/assets/images/geometric-transparent.png");
+        background-size: 100%, 50%;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 100% 100%, 25% 25%;
+        background-repeat: no-repeat, repeat;
+        height: 100%;
+        width: 100%;
+    }
+
+    .flex-container {
+        display: flex;
+    }
+
+    .bar.bar-positive {
+        background: rgb(40, 40, 40) !important;
+    }
+
+
+    /* r0 buttons + container */
+
+    .res-container {
+        border-bottom: solid rgb(100, 100, 100) 3px;
+        background: rgb(50, 50, 50);
+        background-image: url("/assets/images/brushed-alum.png");
+        padding: 10px;
+        width: 100%;
+        position: fixed;
+        top: 44px;
+        left: 0;
+    }
+
+    .resolution-select button.content {
+        height: 50px;
+        font-size: 18px;
+        background-color: rgb(50, 50, 50);
+    }
+
+
+    .resolution-select:nth-child(1) button.content {
+        border-radius: 20px 0px 0px 20px;
+    }
+
+    .resolution-select:nth-last-child(1) button.content {
+        border-radius: 0px 20px 20px 0px;
+    }
+
+    .resolution-select button.button.content.med-on {
+        background: rgb(109, 82, 179) !important;
+        background-image: url("/assets/images/brushed-alum.png") !important;
+        color: white;
+    }
+
+
+    /* r1 buttons + container */
+
+    @media only screen and (max-width: 600px) {
+        .r1-container {
+            width: 100% !important;
+        }
+        .r1-btn button.content {
+            width: 160px !important;
+            height: 100px !important;
+        }
+        .r1-btn-on button.content {
+            width: 160px !important;
+            height: 100px !important;
+        }
+    }
+
+    .inline {
+        display: inline-block;
+    }
+
+    .r1-container {
+        width: 724px;
+        margin: auto;
+        text-align: center;
+        padding: 25px;
+    }
+
+    .r1-btn button.content {
+        height: 200px;
+        width: 320px;
+        border: solid rgba(255, 255, 255, .5) 2px;
+        border-radius: 5px;
+        box-shadow: none;
+        background: -webkit-radial-gradient(rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0.4) 150%);
+        color: black;
+        margin: 1px 0px;
+    }
+
+    .r1-btn-on button.content {
+        height: 200px;
+        width: 320px;
+        border: solid rgba(255, 255, 255, .5) 2px;
+        border-radius: 5px;
+        box-shadow: none;
+        background: -webkit-radial-gradient(rgba(255, 255, 255, .1), rgba(0, 0, 0, 0.7) 150%) !important;
+        color: black;
+        margin: 1px 0px;
+    }
+
+    .r1-btn button.content.activated {
+        box-shadow: none;
+        color: black !important;
+        background: -webkit-radial-gradient(rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0.4) 150%) !important;
+        border: solid rgba(255, 255, 255, .5) 2px;
+    }
+
+    .r1-btn-on button.content.activated {
+        box-shadow: none;
+        color: black !important;
+        background: -webkit-radial-gradient(rgba(255, 255, 255, .1), rgba(0, 0, 0, 0.7) 150%) !important;
+        border: solid rgba(255, 255, 255, .5) 2px;
+    }
+
+    .r1-btn med-button .button .med-button-label,
+    .r1-btn med-button .button .med-button-label {
+        position: relative;
+        text-align: center;
+        left: 0%;
+        right: 0%;
+    }
+
+    .r1-btn med-button .button:active,
+    .r1-btn med-button .button.activated,
+    .r1-btn med-button .button.activated:active,
+    .r1-btn .page-content med-button .button:active,
+    .r1-btn .page-content med-button .button.activated,
+    .r1-btn .page-content med-button .button.activated:active {
+        background: -webkit-radial-gradient(rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0.4) 150%);
+    }
+
+    .r1-correction {
+        padding: none !important;
+    }
+
+
+    /* r2 btns + container */
+
+    .r2-btn button.content {
+        border-radius: 12px;
+        height: 75px;
+        background: rgb(50, 50, 50);
+        border: solid white 2px;
+    }
+
+    .r2-btn button.content.activated {
+        background-color: rgb(50, 50, 50);
+    }
+
+    .r2-contain {
+        display: block;
+        max-width: 800px;
+        margin: auto;
+    }
+
+    .r2-btn button.button.content.med-on {
+        background: rgb(173, 209, 54) !important;
+        background-image: url("/assets/images/brushed-alum.png") !important;
+        color: black;
+    }
+
+    .r4-container {
+        border-top: solid white 2px;
+        background: -webkit-linear-gradient(rgba(50, 50, 50, .5) 70%, rgba(0, 0, 0, 0));
+        padding: 30px;
+        height: 250px;
+        width: 100%;
+        position: absolute;
+        left: 0;
+    }
+
+    .r4-select button.content {
+        height: 50px;
+        font-size: 18px;
+        background: rgb(50, 50, 50);
+    }
+
+    .r4-select:nth-child(1) button.content {
+        border-radius: 20px 0px 0px 20px;
+    }
+
+    .r4-select:nth-last-child(1) button.content {
+        border-radius: 0px 20px 20px 0px;
+    }
+
+    .r4-select button.button.content.med-on {
+        background: rgb(109, 82, 179) !important;
+        background-image: url("/assets/images/brushed-alum.png") !important;
+    }
+
+    .b-glyph {
+        color: rgb(80, 80, 80);
+        font-size: 28px;
+        text-align: center;
+        width: 100%;
+        margin: auto;
+    }
+
+    .g-space {
+        width: 320px;
+    }
+
+    .outline {
+        border: solid black 1px;
+    }
+</style>
+
+
+
+
+<div ng-init="mode = findPoint({parent: point,variable_name:'.mode',  depth: 2})"></div>
+<div ng-init="resolution_select = findPoint({parent: point,variable_name:'.resolution_select',  depth: 2})"></div>
+<div ng-init="config_4k = findPoint({parent: point,variable_name:'.config_4K',  depth: 2})"></div>
+<div ng-init="options = findPoint({parent: point,variable_name:'.options',  depth: 2})"></div>
+<div ng-init="config_UHD = findPoint({parent: point,variable_name:'.config_UHD',  depth: 2})"></div>
+
+<div ng-init="screen1_mode = findPoint({parent: point,variable_name:'zeevee_ZyperMP.ScreenMode1',  depth: 2})"></div>
+<div ng-init="screen2_mode = findPoint({parent: point,variable_name:'zeevee_ZyperMP.ScreenMode2',  depth: 2})"></div>
+<div ng-init="screen3_mode = findPoint({parent: point,variable_name:'zeevee_ZyperMP.ScreenMode3',  depth: 2})"></div>
+<div ng-init="screen4_mode = findPoint({parent: point,variable_name:'zeevee_ZyperMP.ScreenMode1',  depth: 2})"></div>
+
+<div ng-init="display_select = findPoint({parent: point,variable_name:'zeevee.display_select',  depth: 2})"></div>
+
+<div ng-init="fourk_dec1_current = findPoint({parent: point,variable_name:'zeevee_ZyperMP.Decoder_4K_dec1',  depth: 2})"></div>
+<div ng-init="fourk_dec2_current = findPoint({parent: point,variable_name:'zeevee_ZyperMP.Decoder_4K_dec2',  depth: 2})"></div>
+<div ng-init="fourk_dec3_current = findPoint({parent: point,variable_name:'zeevee_ZyperMP.Decoder_4K_dec3',  depth: 2})"></div>
+<div ng-init="fourk_dec4_current = findPoint({parent: point,variable_name:'zeevee_ZyperMP.Decoder_4K_dec4',  depth: 2})"></div>
+
+<div ng-init="uhd_dec1_current = findPoint({parent: point,variable_name:'zeevee_ZyperMP.Decoder_UHD_dec1',  depth: 2})"></div>
+<div ng-init="uhd_dec2_current = findPoint({parent: point,variable_name:'zeevee_ZyperMP.Decoder_UHD_dec2',  depth: 2})"></div>
+<div ng-init="uhd_dec3_current = findPoint({parent: point,variable_name:'zeevee_ZyperMP.Decoder_UHD_dec3',  depth: 2})"></div>
+<div ng-init="uhd_dec4_current = findPoint({parent: point,variable_name:'zeevee_ZyperMP.Decoder_UHD_dec4',  depth: 2})"></div>
+
+<div ng-init="wall_4k = findPoint({parent: point,variable_name:'zeevee_ZyperMP.VideoWall_fourK',  depth: 2})"></div>
+<div ng-init="wall_uhd = findPoint({parent: point,variable_name:'zeevee_ZyperMP.VideoWall_1',  depth: 2})"></div>
+
+
+<med-header med-title="ZeeVee"></med-header>
+
+<!-- Shows the selection button up the top of page to allow for 4K and UHD selection -->
+
+<med-button-bar class="res-container">
+    <med-button class="resolution-select" med-label="4K" med-point=".resolution_select" med-on-state="0"></med-button>
+    <med-button class="resolution-select" med-label="UHD" med-point=".resolution_select" med-on-state="1"></med-button>
+</med-button-bar>
+
+<br>
+<br>
+<br>
+
+<div class="4-screens">
+    <div class="r1-container">
+        <div class="flex-container">
+
+            <div class="margin:auto;" ng-if="screen1_mode.value==2">
+                <p style="color:black; margin:auto; width:335px;">{{screen1_mode.string}} ({{fourk_dec1_current.string}}) </p>
+            </div>
+
+            <div class="margin:auto;" ng-if="screen1_mode.value==1" class="margin:auto; width:40%">
+                <p style="color:black; margin:auto; width:335px;">{{screen1_mode.string}} ({{uhd_dec1_current.string}}) </p>
+            </div>
+
+            <div class="margin:auto;" class="margin:auto;" ng-if="screen2_mode.value==2">
+                <p style="color:black; margin:auto; width:320px;">{{screen2_mode.string}} ({{fourk_dec2_current.string}})</p>
+            </div>
+
+            <div class="margin:auto;" ng-if="screen2_mode.value==1">
+                <p style="color:black; margin:auto; width:320px;">{{screen2_mode.string}} ({{uhd_dec2_current.string}}) </p>
+            </div>
+
+        </div>
+
+        <br>
+
+        <med-button class="r1-btn inline" med-label="Top Left" med-point="zeevee.display_select" med-on-state="1"></med-button>
+        <med-button class="r1-btn inline" med-label="Top Right" med-point="zeevee.display_select" med-on-state="2"></med-button>
+        <med-button class="r1-btn inline" med-label="Bottom Left" med-point="zeevee.display_select" med-on-state="3"></med-button>
+        <med-button class="r1-btn inline" med-label="Bottom Right" med-point="zeevee.display_select" med-on-state="4"></med-button>
+
+
+        <div ng-if=" resolution_select.string === 'null' ">
+            <med-button class="r1-btn inline " med-label="Top Left" med-repeat="" med-point="zeevee.display_select" med-on-state="5"></med-button>
+            <med-button class="r1-btn inline " med-label="Top Right" med-repeat="" med-point="zeevee.display_select" med-on-state="6"></med-button>
+            <med-button class="r1-btn inline " med-label="Bottom Left" med-repeat="" med-point="zeevee.display_select" med-on-state="7"></med-button>
+            <med-button class="r1-btn inline " med-label="Bottom Right" med-repeat="" med-point="zeevee.display_select" med-on-state="8"></med-button>
+        </div>
+
+        <br>
+
+        <div class="flex-container">
+            <div class="margin:auto;" ng-if="screen3_mode.value==2 || screen3_mode.value==0">
+                <p style="color:black; margin:auto; width:335px;">{{screen3_mode.string}} ({{fourk_dec3_current.string}})</p>
+            </div>
+
+            <div class="margin:auto;" ng-if="screen3_mode.value==1" class="margin:auto; width:40%">
+                <p style="color:black; margin:auto; width:335px;">{{screen3_mode.string}} ({{uhd_dec3_current.string}}) </p>
+            </div>
+
+            <div class="margin:auto;" ng-if="screen4_mode.value==2">
+                <p style="color:black; margin:auto; width:320px;">{{screen4_mode.string}} ({{fourk_dec4_current.string}})</p>
+            </div>
+
+            <div class="margin:auto;" ng-if="screen4_mode.value==1">
+                <p style="color:black; margin:auto; width:320px;">{{screen4_mode.string}} ({{uhd_dec4_current.string}}) </p>
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <!--########################   ENCODER 1 IS SELECTED FROM VIDEO WALL   ##################################  -->
+
+        <med-button-bar class="r2-contain">
+            <med-button class="r2-btn" med-label="Single" med-click="" med-point="zeevee.config_4K" med-on-state="0"></med-button>
+            <med-button class="r2-btn" med-label="Multi-Tile" med-click="" med-point="zeevee.config_4K" med-on-state="1"></med-button>
+            <med-button class="r2-btn" med-label="Video Wall" med-click="" med-point="zeevee.config_4K" med-on-state="2"></med-button>
+        </med-button-bar>
+        <br>
+
+
+
+
+
+
+        <div ng-if="config_4k.value===0" class="r4-container">
+            <!-- ###### SINGLE MODE SELECTED ###### -->
+            <h4>Single Source (4K)</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="Airshow" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec1" med-on-state="1"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Laptop" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec1" med-on-state="2"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Myanmar" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec1" med-on-state="3"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Raptors" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec1" med-on-state="4"
+                    med-repeat="" med-icon=""></med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+        </div>
+
+
+
+        <div ng-if="config_4k.value===1" class="r4-container">
+            <!-- ###### MULTI TILE MODE SELECTED ###### -->
+            <h4>Multi-tile Layouts</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="L-Shape" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec1" med-on-state="5"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="2x2" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec1" med-on-state="6" med-repeat=""
+                    med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="3x3" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec1" med-on-state="7" med-repeat=""
+                    med-icon=""></med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+
+        </div>
+
+        <div ng-if="config_4k.value===2" class="r4-container">
+            <!-- ###### VIDEOWALL MODE SELECTED ###### -->
+            <h4>Video Wall Source (UHD)</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="Airshow" med-click="" med-point="zeevee_ZyperMP.VideoWall_fourK" med-on-state="1"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Laptop" med-click="" med-point="zeevee_ZyperMP.VideoWall_fourK" med-on-state="2"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Myanmar" med-click="" med-point="zeevee_ZyperMP.VideoWall_fourK" med-on-state="3"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Raptors" med-click="" med-point="zeevee_ZyperMP.VideoWall_fourK" med-on-state="4"
+                    med-repeat="" med-icon=""></med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+        </div>
+
+
+
+
+    <!--########################   ENCODER 2 IS SELECTED FROM VIDEO WALL   ##################################  -->
+    <div ng-if="resolution_select.value===0 && display_select.value==2">
+
+        <med-button-bar class="r2-contain">
+            <med-button class="r2-btn" med-label="Single" med-click="" med-point="zeevee.config_4K" med-on-state="0"></med-button>
+            <med-button class="r2-btn" med-label="Multi-Tile" med-click="" med-point="zeevee.config_4K" med-on-state="1"></med-button>
+            <med-button class="r2-btn" med-label="Video Wall" med-click="" med-point="zeevee.config_4K" med-on-state="2"></med-button>
+        </med-button-bar>
+        <br>
+
+
+        <div ng-if="config_4k.value===0" class="r4-container">
+            <!-- ###### SINGLE MODE SELECTED ###### -->
+            <h4>Single Source (4K)</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="Airshow" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec2" med-on-state="1"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Laptop" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec2" med-on-state="2"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Myanmar" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec2" med-on-state="3"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Raptors" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec2" med-on-state="4"
+                    med-repeat="" med-icon=""></med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+        </div>
+
+
+        <div ng-if="config_4k.value===1" class="r4-container">
+            <!-- ###### MULTI TILE MODE SELECTED ###### -->
+            <h4>Multi-tile Layouts</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="L-Shape" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec2" med-on-state="5"
+                    med-repeat="" med-icon="">
+                </med-button>
+
+                <med-button class="r4-select" med-label="2x2" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec2" med-on-state="6" med-repeat=""
+                    med-icon=""></med-button>
+
+                <med-butto class="r4-select" med-label="3x3" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec2" med-on-state="7" med-repeat=""
+                    med-icon="">
+                    </med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+        </div>
+
+
+        <div ng-if="config_4k.value===2" class="r4-container">
+            <!-- ###### VIDEOWALL MODE SELECTED ###### -->
+            <h4>Video Wall Source (UHD)</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="Airshow" med-click="" med-point="zeevee_ZyperMP.VideoWall_fourK" med-on-state="1"
+                    med-repeat="" med-icon="">
+                </med-button>
+
+                <med-button class="r4-select" med-label="Laptop" med-click="" med-point="zeevee_ZyperMP.VideoWall_fourK" med-on-state="2"
+                    med-repeat="" med-icon="">
+                </med-button>
+
+                <med-button class="r4-select" med-label="Myanmar" med-click="" med-point="zeevee_ZyperMP.VideoWall_fourK" med-on-state="3"
+                    med-repeat="" med-icon="">
+                </med-button>
+
+                <med-button class="r4-select" med-label="Raptors" med-click="" med-point="zeevee_ZyperMP.VideoWall_fourK" med-on-state="4"
+                    med-repeat="" med-icon="">
+                </med-button>
+            </med-button-bar>
+            <br>
+
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+        </div>
+
+    </div>
+
+    <!--########################   ENCODER 3 IS SELECTED FROM VIDEO WALL   ##################################  -->
+    <div ng-if="resolution_select.value===0 && display_select.value==3">
+
+        <med-button-bar class="r2-contain">
+            <med-button class="r2-btn" med-label="Single" med-click="" med-point="zeevee.config_4K" med-on-state="0"></med-button>
+            <med-button class="r2-btn" med-label="Multi-Tile" med-click="" med-point="zeevee.config_4K" med-on-state="1"></med-button>
+            <med-button class="r2-btn" med-label="Video Wall" med-click="" med-point="zeevee.config_4K" med-on-state="2"></med-button>
+        </med-button-bar>
+        <br>
+
+        <div ng-if="config_4k.value===0" class="r4-container">
+            <!-- ###### SINGLE MODE SELECTED ###### -->
+            <h4>Single Source (4K)</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="Airshow" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec3" med-on-state="1"
+                    med-repeat="" med-icon="">
+                </med-button>
+
+                <med-button class="r4-select" med-label="Laptop" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec3" med-on-state="2"
+                    med-repeat="" med-icon="">
+                </med-button>
+
+                <med-button class="r4-select" med-label="Myanmar" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec3" med-on-state="3"
+                    med-repeat="" med-icon="">
+                </med-button>
+
+                <med-button class="r4-select" med-label="Raptors" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec3" med-on-state="4"
+                    med-repeat="" med-icon="">
+                </med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+        </div>
+
+
+
+        <div ng-if="config_4k.value===1" class="r4-container">
+            <!-- ###### MULTI TILE MODE SELECTED ###### -->
+            <h4>Multi-tile Layouts</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="L-Shape" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec3" med-on-state="5"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="2x2" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec3" med-on-state="6" med-repeat=""
+                    med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="3x3" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec3" med-on-state="7" med-repeat=""
+                    med-icon=""></med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+
+        </div>
+
+        <div ng-if="config_4k.value===2" class="r4-container">
+            <!-- ###### VIDEOWALL MODE SELECTED ###### -->
+            <h4>Video Wall Source (UHD)</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="Airshow" med-click="" med-point="zeevee_ZyperMP.VideoWall_fourK" med-on-state="1"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Laptop" med-click="" med-point="zeevee_ZyperMP.VideoWall_fourK" med-on-state="2"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Myanmar" med-click="" med-point="zeevee_ZyperMP.VideoWall_fourK" med-on-state="3"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Raptors" med-click="" med-point="zeevee_ZyperMP.VideoWall_fourK" med-on-state="4"
+                    med-repeat="" med-icon=""></med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+        </div>
+
+    </div>
+
+
+
+
+    <!--########################   ENCODER 4 IS SELECTED FROM VIDEO WALL   ##################################  -->
+    <div ng-if="resolution_select.value===0 && display_select.value==4">
+
+        <med-button-bar class="r2-contain">
+            <med-button class="r2-btn" med-label="Single" med-click="" med-point="zeevee.config_4K" med-on-state="0"></med-button>
+            <med-button class="r2-btn" med-label="Multi-Tile" med-click="" med-point="zeevee.config_4K" med-on-state="1"></med-button>
+            <med-button class="r2-btn" med-label="Video Wall" med-click="" med-point="zeevee.config_4K" med-on-state="2"></med-button>
+        </med-button-bar>
+        <br>
+
+
+
+
+
+        <div ng-if="config_4k.value===0" class="r4-container">
+            <!-- ###### SINGLE MODE SELECTED ###### -->
+            <h4>Single Source (4K)</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="Airshow" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec4" med-on-state="1"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Laptop" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec4" med-on-state="2"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Myanmar" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec4" med-on-state="3"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Raptors" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec4" med-on-state="4"
+                    med-repeat="" med-icon=""></med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+        </div>
+
+
+
+        <div ng-if="config_4k.value===1" class="r4-container">
+            <!-- ###### MULTI TILE MODE SELECTED ###### -->
+            <h4>Multi-tile Layouts</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="L-Shape" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec4" med-on-state="5"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="2x2" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec4" med-on-state="6" med-repeat=""
+                    med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="3x3" med-click="" med-point="zeevee_ZyperMP.Decoder_4K_dec4" med-on-state="7" med-repeat=""
+                    med-icon=""></med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+
+        </div>
+
+        <div ng-if="config_4k.value===2" class="r4-container">
+            <!-- ###### VIDEOWALL MODE SELECTED ###### -->
+            <h4>Video Wall Source (UHD)</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="Airshow" med-click="" med-point="zeevee_ZyperMP.VideoWall_fourK" med-on-state="1"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Laptop" med-click="" med-point="zeevee_ZyperMP.VideoWall_fourK" med-on-state="2"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Myanmar" med-click="" med-point="zeevee_ZyperMP.VideoWall_fourK" med-on-state="3"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Raptors" med-click="" med-point="zeevee_ZyperMP.VideoWall_fourK" med-on-state="4"
+                    med-repeat="" med-icon=""></med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+        </div>
+
+    </div>
+
+
+
+
+
+    <!--########################   ENCODER 5 IS SELECTED FROM VIDEO WALL   ##################################  -->
+
+    <div ng-if="resolution_select.value===1 && display_select.value==5">
+
+        <med-button-bar class="r2-contain">
+            <med-button class="r2-btn" med-label="Single" med-click="" med-point="zeevee.config_4K" med-on-state="0"></med-button>
+            <med-button class="r2-btn" med-label="Video Wall" med-click="" med-point="zeevee.config_4K" med-on-state="2"></med-button>
+        </med-button-bar>
+        <br>
+
+
+
+
+
+        <div ng-if="config_4k.value===0" class="r4-container">
+            <!-- ###### SINGLE MODE SELECTED ###### -->
+            <h4>Single Source (UHD)</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="Airshow" med-click="" med-point="zeevee_ZyperMP.Decoder_UHD_dec1" med-on-state="1"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Laptop" med-click="" med-point="zeevee_ZyperMP.Decoder_UHD_dec1" med-on-state="2"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Myanmar" med-click="" med-point="zeevee_ZyperMP.Decoder_UHD_dec1" med-on-state="3"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Raptors" med-click="" med-point="zeevee_ZyperMP.Decoder_UHD_dec1" med-on-state="4"
+                    med-repeat="" med-icon=""></med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+        </div>
+
+
+
+        <div ng-if="config_4k.value===2" class="r4-container">
+            <!-- ###### VIDEOWALL MODE SELECTED ###### -->
+            <h4>Video Wall Source (UHD)</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="Airshow" med-click="" med-point="zeevee_ZyperMP.VideoWall_1" med-on-state="1" med-repeat=""
+                    med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Laptop" med-click="" med-point="zeevee_ZyperMP.VideoWall_1" med-on-state="2" med-repeat=""
+                    med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Myanmar" med-click="" med-point="zeevee_ZyperMP.VideoWall_1" med-on-state="3" med-repeat=""
+                    med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Raptors" med-click="" med-point="zeevee_ZyperMP.VideoWall_1" med-on-state="4" med-repeat=""
+                    med-icon=""></med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+        </div>
+
+    </div>
+
+
+
+
+
+    <!--########################   ENCODER 6 IS SELECTED FROM VIDEO WALL   ##################################  -->
+
+    <div ng-if="resolution_select.value===1 && display_select.value==6">
+
+        <med-button-bar class="r2-contain">
+            <med-button class="r2-btn" med-label="Single" med-click="" med-point="zeevee.config_4K" med-on-state="0"></med-button>
+            <med-button class="r2-btn" med-label="Video Wall" med-click="" med-point="zeevee.config_4K" med-on-state="2"></med-button>
+        </med-button-bar>
+        <br>
+
+
+
+
+
+        <div ng-if="config_4k.value===0" class="r4-container">
+            <!-- ###### SINGLE MODE SELECTED ###### -->
+            <h4>Single Source (UHD)</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="Airshow" med-click="" med-point="zeevee_ZyperMP.Decoder_UHD_dec2" med-on-state="1"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Laptop" med-click="" med-point="zeevee_ZyperMP.Decoder_UHD_dec2" med-on-state="2"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Myanmar" med-click="" med-point="zeevee_ZyperMP.Decoder_UHD_dec2" med-on-state="3"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Raptors" med-click="" med-point="zeevee_ZyperMP.Decoder_UHD_dec2" med-on-state="4"
+                    med-repeat="" med-icon=""></med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+        </div>
+
+
+
+        <div ng-if="config_4k.value===2" class="r4-container">
+            <!-- ###### VIDEOWALL MODE SELECTED ###### -->
+            <h4>Video Wall Source (UHD)</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="Airshow" med-click="" med-point="zeevee_ZyperMP.VideoWall_1" med-on-state="1" med-repeat=""
+                    med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Laptop" med-click="" med-point="zeevee_ZyperMP.VideoWall_1" med-on-state="2" med-repeat=""
+                    med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Myanmar" med-click="" med-point="zeevee_ZyperMP.VideoWall_1" med-on-state="3" med-repeat=""
+                    med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Raptors" med-click="" med-point="zeevee_ZyperMP.VideoWall_1" med-on-state="4" med-repeat=""
+                    med-icon=""></med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+
+    <!--########################   ENCODER 7 IS SELECTED FROM VIDEO WALL   ##################################  -->
+
+    <div ng-if="resolution_select.value===1 && display_select.value==7">
+
+        <med-button-bar class="r2-contain">
+            <med-button class="r2-btn" med-label="Single" med-click="" med-point="zeevee.config_4K" med-on-state="0"></med-button>
+            <med-button class="r2-btn" med-label="Video Wall" med-click="" med-point="zeevee.config_4K" med-on-state="2"></med-button>
+        </med-button-bar>
+        <br>
+
+
+
+
+
+        <div ng-if="config_4k.value===0" class="r4-container">
+            <!-- ###### SINGLE MODE SELECTED ###### -->
+            <h4>Single Source (UHD)</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="Airshow" med-click="" med-point="zeevee_ZyperMP.Decoder_UHD_dec3" med-on-state="1"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Laptop" med-click="" med-point="zeevee_ZyperMP.Decoder_UHD_dec3" med-on-state="2"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Myanmar" med-click="" med-point="zeevee_ZyperMP.Decoder_UHD_dec3" med-on-state="3"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Raptors" med-click="" med-point="zeevee_ZyperMP.Decoder_UHD_dec3" med-on-state="4"
+                    med-repeat="" med-icon=""></med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+        </div>
+
+
+
+        <div ng-if="config_4k.value===2" class="r4-container">
+            <!-- ###### VIDEOWALL MODE SELECTED ###### -->
+            <h4>Video Wall Source (UHD)</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="Airshow" med-click="" med-point="zeevee_ZyperMP.VideoWall_1" med-on-state="1" med-repeat=""
+                    med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Laptop" med-click="" med-point="zeevee_ZyperMP.VideoWall_1" med-on-state="2" med-repeat=""
+                    med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Myanmar" med-click="" med-point="zeevee_ZyperMP.VideoWall_1" med-on-state="3" med-repeat=""
+                    med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Raptors" med-click="" med-point="zeevee_ZyperMP.VideoWall_1" med-on-state="4" med-repeat=""
+                    med-icon=""></med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+
+
+    <!--########################   ENCODER 8 IS SELECTED FROM VIDEO WALL   ##################################  -->
+
+    <div ng-if="resolution_select.value===1 && display_select.value==8">
+
+        <med-button-bar class="r2-contain">
+            <med-button class="r2-btn" med-label="Single" med-click="" med-point="zeevee.config_4K" med-on-state="0"></med-button>
+            <med-button class="r2-btn" med-label="Video Wall" med-click="" med-point="zeevee.config_4K" med-on-state="2"></med-button>
+        </med-button-bar>
+        <br>
+
+
+
+
+
+        <div ng-if="config_4k.value===0" class="r4-container">
+            <!-- ###### SINGLE MODE SELECTED ###### -->
+            <h4>Single Source (UHD)</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="Airshow" med-click="" med-point="zeevee_ZyperMP.Decoder_UHD_dec4" med-on-state="1"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Laptop" med-click="" med-point="zeevee_ZyperMP.Decoder_UHD_dec4" med-on-state="2"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Myanmar" med-click="" med-point="zeevee_ZyperMP.Decoder_UHD_dec4" med-on-state="3"
+                    med-repeat="" med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Raptors" med-click="" med-point="zeevee_ZyperMP.Decoder_UHD_dec4" med-on-state="4"
+                    med-repeat="" med-icon=""></med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+        </div>
+
+
+
+        <div ng-if="config_4k.value===2" class="r4-container">
+            <!-- ###### VIDEOWALL MODE SELECTED ###### -->
+            <h4>Video Wall Source (UHD)</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="Airshow" med-click="" med-point="zeevee_ZyperMP.VideoWall_1" med-on-state="1" med-repeat=""
+                    med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Laptop" med-click="" med-point="zeevee_ZyperMP.VideoWall_1" med-on-state="2" med-repeat=""
+                    med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Myanmar" med-click="" med-point="zeevee_ZyperMP.VideoWall_1" med-on-state="3" med-repeat=""
+                    med-icon=""></med-button>
+
+                <med-button class="r4-select" med-label="Raptors" med-click="" med-point="zeevee_ZyperMP.VideoWall_1" med-on-state="4" med-repeat=""
+                    med-icon=""></med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div ng-if="resolution_select.value===1 && display_select.value==3">
+
+
+        <div style="height:87px;"></div>
+        <br>
+
+        <div class="adjust r4-container">
+            <h4>Source (UHD)</h4>
+            <med-button-bar>
+                <med-button class="r4-select" med-label="Airshow" med-click="perform('switch_airshow_task_UHD', 'starttask')" med-point=".options"
+                    med-on-state="1" med-repeat="" med-icon=""></med-button>
+                <med-button class="r4-select" med-label="Laptop" med-click="perform('switch_laptop_task_UHD', 'starttask')" med-point=".options"
+                    med-on-state="2" med-repeat="" med-icon=""></med-button>
+                <med-button class="r4-select" med-label="Myanmar" med-click="perform('switch_myanmar_task_UHD', 'starttask')" med-point=".options"
+                    med-on-state="3" med-repeat="" med-icon=""></med-button>
+                <med-button class="r4-select" med-label="Raptors" med-click="perform('switch_raptors_task_UHD', 'starttask')" med-point=".options"
+                    med-on-state="4" med-repeat="" med-icon=""></med-button>
+
+            </med-button-bar>
+            <br>
+            <med-toggle med-label="Decoder" med-point="zyper_mp.DecName" med-change-on="" med-change-off=""></med-toggle>
+        </div>
+    </div>
+    <br>
+
+
+
+
+
+
+    <!-- <div ng-if="screen_mode.value===0">
+   <med-button-bar class="r4-container">
+       <med-button
+       class="r4-select"
+       med-label="1"
+       med-click=""
+       med-point=""
+       med-on-state="1"
+       med-repeat=""
+       med-icon=""
+   ></med-button>
+       <med-button
+       class="r4-select"
+       med-label="2"
+       med-click=""
+       med-point="ControlServer.projector.Contrast"
+       med-on-state="2"
+       med-repeat=""
+       med-icon=""></med-button>
+       <med-button
+       class="r4-select"
+       med-label="3"
+       med-click=""
+       med-point="ControlServer.projector.Contrast"
+       med-on-state="3"
+       med-repeat=""
+       med-icon=""
+   ></med-button>
+       <med-button
+       class="r4-select"
+       med-label="4"
+       med-click=""
+       med-point="ControlServer.projector.Contrast"
+       med-on-state="4"
+       med-repeat=""
+       med-icon=""></med-button>
+
+   </med-button-bar>
+   </div>
+
+   <div ng-if="resolution_select.value===1">
+   <med-button-bar class="r4-container">
+       <med-button
+       class="r4-select"
+       med-label="4"
+       med-click=""
+       med-point="ControlServer.projector.Contrast"
+       med-on-state="1"
+       med-repeat=""
+       med-icon=""
+   ></med-button>
+       <med-button
+       class="r4-select"
+       med-label="5"
+       med-click=""
+       med-point="ControlServer.projector.Contrast"
+       med-on-state="2"
+       med-repeat=""
+       med-icon=""></med-button>
+       <med-button
+       class="r4-select"
+       med-label="6"
+       med-click=""
+       med-point="ControlServer.projector.Contrast"
+       med-on-state="3"
+       med-repeat=""
+       med-icon=""
+   ></med-button>
+       <med-button
+       class="r4-select"
+       med-label="7"
+       med-click=""
+       med-point="ControlServer.projector.Contrast"
+       med-on-state="4"
+       med-repeat=""
+       med-icon=""></med-button>
+
+   </med-button-bar>
+   </div>
+
+   <div ng-if="resolution_select.value===2">
+   <med-button-bar class="r4-container">
+       <med-button
+       class="r4-select"
+       med-label="8"
+       med-click=""
+       med-point="ControlServer.projector.Contrast"
+       med-on-state="8"
+       med-repeat=""
+       med-icon=""
+   ></med-button>
+       <med-button
+       class="r4-select"
+       med-label="9"
+       med-click=""
+       med-point="ControlServer.projector.Contrast"
+       med-on-state="2"
+       med-repeat=""
+       med-icon=""></med-button>
+       <med-button
+       class="r4-select"
+       med-label="10"
+       med-click=""
+       med-point="ControlServer.projector.Contrast"
+       med-on-state="3"
+       med-repeat=""
+       med-icon=""
+   ></med-button>
+       <med-button
+       class="r4-select"
+       med-label="11"
+       med-click=""
+       med-point="ControlServer.projector.Contrast"
+       med-on-state="4"
+       med-repeat=""
+       med-icon=""></med-button>
+
+   </med-button-bar>
+   </div> -->

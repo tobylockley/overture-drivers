@@ -1,28 +1,34 @@
 {
   "name": "sony_bravia",
-  "version": "1.0.1",
+  "version": "1.0.2.beta.1",
   "description": "Driver for Sony Bravia TCP Connection",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "author": "AudioVisualDistributors",
-  "license": "Unlicensed",
+  "license": "MIT",
   "overture": {
     "brand": "Sony",
     "model": "KD55X7000D",
     "type": "device",
     "subtype": "display",
-        "variables": [
+    "variables": [
       {
         "name": "Status",
         "type": "enum",
-        "enums": ["Disconnected","Connected"]
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
       },
       {
         "name": "Power",
         "type": "enum",
-        "enums": ["Off", "On"],
+        "enums": [
+          "Off",
+          "On"
+        ],
         "perform": {
           "action": "Set Power",
           "params": {
@@ -33,7 +39,13 @@
       {
         "name": "Sources",
         "type": "enum",
-        "enums": ["DTV", "HDMI1", "HDMI2", "HDMI3", "HDMI4"],
+        "enums": [
+          "DTV",
+          "HDMI1",
+          "HDMI2",
+          "HDMI3",
+          "HDMI4"
+        ],
         "perform": {
           "action": "Select Source",
           "params": {
@@ -56,7 +68,10 @@
       {
         "name": "AudioMute",
         "type": "enum",
-        "enums": ["Off", "On"],
+        "enums": [
+          "Off",
+          "On"
+        ],
         "perform": {
           "action": "Set Audio Mute",
           "params": {
@@ -79,7 +94,11 @@
       {
         "name": "ChannelShift",
         "type": "enum",
-        "enums": ["", "Up", "Down"],
+        "enums": [
+          "",
+          "Up",
+          "Down"
+        ],
         "perform": {
           "action": "Shift Channel",
           "params": {
@@ -88,7 +107,6 @@
         }
       }
     ],
-    
     "commands": [
       {
         "name": "Set Power",
@@ -105,29 +123,19 @@
       {
         "name": "Select Source",
         "params": {
-          "Name": {
-            "type": "string"
-          }
+          "Name": { "type": "string" }
         }
       },
       {
         "name": "Set Audio Level",
         "params": {
-          "Level": {
-            "type": "integer"
-          }
+          "Level": { "type": "integer" }
         }
       },
       {
         "name": "Set Audio Mute",
         "params": {
-          "Status": {
-            "type": "enum",
-            "enums": [
-              "Off",
-              "On"
-            ]
-          }
+          "Status": { "type": "enum", "enums": [ "Off", "On" ] }
         }
       },
       {
@@ -152,7 +160,6 @@
         }
       }
     ],
-
     "pointSetupSchema": {
       "type": "object",
       "title": "Sony Bravia IP Settings",

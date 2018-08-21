@@ -1,5 +1,6 @@
 .vscode/
 _*/
 **/node_modules/
+**/overture_macros/
 toby_test/
 toby_test*.zip

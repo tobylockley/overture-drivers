@@ -1,6 +1,6 @@
 {
   "name": "intercs_client",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.1",
   "description": "Allows data transmission between control servers",
   "main": "index.js",
   "scripts": {
@@ -54,7 +54,6 @@
           "uniqueItems": true,
           "items": {
             "type": "object",
-            "title": "Variable",
             "properties": {
               "point": {
                 "type": "string",
@@ -73,108 +72,43 @@
           "uniqueItems": true,
           "items": {
             "type": "object",
-            "title": "Variable",
-            "oneOf": [
-              {
-                "title": "String",
-                "type": "object",
-                "required": [
-                  "type",
-                  "server",
-                  "point"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "string"
-                    ],
-                    "options": {
-                      "hidden": true
-                    }
-                  },
-                  "server": {
-                    "type": "string",
-                    "title": "Control Server Reference (Reference, above, from this servers own config):",
-                    "pattern": "[A-Za-z0-9_]+"
-                  },
-                  "point": {
-                    "type": "string",
-                    "title": "Point Reference (as seen by remote server)"
-                  }
-                },
-                "additionalProperties": false
+            "properties": {
+              "server": {
+                "type": "string",
+                "title": "Control Server Reference:",
+                "pattern": "[A-Za-z0-9_]+"
               },
-              {
-                "title": "Enum",
-                "type": "object",
-                "required": [
-                  "type",
-                  "server",
-                  "point"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "enum"
-                    ],
-                    "options": {
-                      "hidden": true
-                    }
-                  },
-                  "server": {
-                    "type": "string",
-                    "title": "Control Server Reference (Reference, above, from this servers own config):",
-                    "pattern": "[A-Za-z0-9_]+"
-                  },
-                  "point": {
-                    "type": "string",
-                    "title": "Point Reference (as seen by remote server)"
-                  }
-                },
-                "additionalProperties": false
+              "point": {
+                "type": "string",
+                "title": "Point Reference (as seen by remote server)"
               },
-              {
-                "title": "Integer",
-                "type": "object",
-                "required": [
-                  "type",
-                  "server",
-                  "point",
-                  "min",
-                  "max"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "integer"
-                    ],
-                    "options": {
-                      "hidden": true
-                    }
-                  },
-                  "server": {
-                    "type": "string",
-                    "title": "Control Server Reference (Reference, above, from this servers own config):",
-                    "pattern": "[A-Za-z0-9_]+"
-                  },
-                  "point": {
-                    "type": "string",
-                    "title": "Point Reference (as seen by remote server)"
-                  },
-                  "min": {
-                    "type": "integer",
-                    "title": "Minimum"
-                  },
-                  "max": {
-                    "type": "integer",
-                    "title": "Maximum"
-                  }
-                },
-                "additionalProperties": false
+              "type": {
+                "type": "string",
+                "title": "Variable Type:",
+                "enum": [
+                  "string",
+                  "enum",
+                  "integer"
+                ]
+              },
+              "min": {
+                "type": "integer",
+                "title": "Minimum (integer only)"
+              },
+              "max": {
+                "type": "integer",
+                "title": "Maximum (integer only)"
+              },
+              "push_enabled": {
+                "type": "checkbox",
+                "title": "Controllable (changes will be pushed to remote server)"
               }
+            },
+            "required": [
+              "server",
+              "point",
+              "type",
+              "push_enabled"
             ]
           }
         }

@@ -1,0 +1,94 @@
+{
+  "name": "zeevee_zvmxe",
+  "version": "1.0.0-beta.2",
+  "description": "Driver for controlling ZeeVee ZvMXE IP decoder",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "ZeeVee",
+    "models": [
+      "ZvMXE"
+    ],
+    "type": "device",
+    "subtype": "player",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Channel",
+        "type": "enum",
+        "enums": [],
+        "perform": {
+          "action": "Set Channel",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Channel",
+        "params": {
+          "Name": { "type": "string" }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "ZeeVee ZvMXE Setup",
+      "properties": {
+        "host": {
+          "title": "Host name or IP of ZeeVee decoder",
+          "type": "string",
+          "default": "192.168.0.0"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 8080,
+          "description": "Default: 8080"
+        },
+        "channels": {
+          "type": "array",
+          "format": "table",
+          "title": "Channels",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Channel",
+            "properties": {
+              "number": {
+                "type": "integer",
+                "title": "Channel Number",
+                "minimum": 1
+              },
+              "name": {
+                "type": "string",
+                "title": "Friendly Name"
+              }
+            },
+            "required": [
+              "number",
+              "name"
+            ]
+          }
+        }
+      },
+      "required": [
+        "host",
+        "port"
+      ]
+    }
+  }
+}

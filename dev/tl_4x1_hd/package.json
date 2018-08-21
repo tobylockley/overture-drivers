@@ -1,0 +1,86 @@
+{
+  "name": "tl_4x1_hd",
+  "version": "1.0.1",
+  "description": "Driver for tl-4x1-hd switcher",
+  "main": "index.js",
+  "scripts": {
+	  "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "Techlogix",
+    "models": ["tl-4x1-hd"],
+    "type": "device",
+    "subtype": "matrix",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": ["Disconnected", "Connected"]
+      },
+      {
+        "name": "Sources",
+        "type": "enum",
+        "enums": ["HDMI1", "HDMI2", "HDMI3", "HDMI4"],
+        "perform": {
+          "action": "Select Source",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      },
+      {
+        "name": "Mute",
+        "type": "enum",
+        "enums": ["Off", "On"],
+        "perform": {
+          "action": "Set Mute",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Select Source",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Set Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off", "On"]
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Techlogix 4x1-HD switcher",
+      "properties": {
+        "host": {
+          "title": "Host name or IP of Global Cache",
+          "type": "string",
+          "default": "192.168.1.70"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 4999,
+          "description": "Default: 4999"
+        }
+      },
+      "required": [
+        "host",
+        "port"
+      ]
+    }
+  }
+}

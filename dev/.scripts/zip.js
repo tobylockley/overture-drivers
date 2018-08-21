@@ -1,5 +1,5 @@
 
-const DELETE_OLD_FILES = true;
+const DELETE_OLD_FILES = false;
 
 exports.execute = function (args) {
   // access VSCode API (s. https://code.visualstudio.com/Docs/extensionAPI/vscode-api)
@@ -10,7 +10,7 @@ exports.execute = function (args) {
   var glob = require('glob');
 
   let mypath = path.dirname(vscode.window.activeTextEditor.document.fileName);
-  let zpath = path.resolve(mypath, '../../release')
+  let zpath = path.resolve(mypath, '../../zip')
 
   args.log('---------- ./dev/scripts/ozip.js ----------');
   args.log(`input path: ${mypath}`);
@@ -23,7 +23,7 @@ exports.execute = function (args) {
       let json = require(pkg)
       let zname = `${json.name}.${json.version}`
 
-      let files = glob.sync(`${zpath}/${json.name}*.zip`)
+      let files = glob.sync(`${zpath}/${json.name}.*.zip`)
       if (files && DELETE_OLD_FILES) {
         args.log('Deleting old zip files...')
         files.forEach(file => {
@@ -41,7 +41,7 @@ exports.execute = function (args) {
       // listen for all archive data to be written
       // 'close' event is fired only when a file descriptor is involved
       output.on('close', function() {
-        args.log(`Complete: Driver files archived to ./release/${zname}.zip (${archive.pointer()} bytes)`);
+        args.log(`Complete: Driver files archived to ${zpath}\\${zname}.zip (${archive.pointer()} bytes)`);
       });
 
       // This event is fired when the data source is drained no matter what was the data source.

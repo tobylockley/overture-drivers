@@ -1,0 +1,176 @@
+{
+  "name": "zeevee_zyper_mp_tl",
+  "version": "1.0.0-beta.9",
+  "description": "Driver for Zyper Management Platform via telnet",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "ZeeVee",
+    "models": [
+      "Management Platform"
+    ],
+    "type": "device",
+    "subtype": "display",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      }
+    ],
+    "commands": [],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Management Platform Settings",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address:",
+          "type": "string",
+          "default": "192.168.99.40"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 23,
+          "description": "Telnet: 23"
+        },
+        "encoders": {
+          "type": "array",
+          "format": "table",
+          "title": "Encoders",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Encoder",
+            "properties": {
+              "name": {
+                "type": "string",
+                "title": "Name"
+              },
+              "model": {
+                "type": "string",
+                "title": "Model",
+                "enum": [
+                  "ZyperUHD",
+                  "Zyper4K"
+                ]
+              },
+              "usb": {
+                "type": "checkbox",
+                "title": "USB Attached?"
+              },
+              "usbname": {
+                "type": "string",
+                "title": "USB Nickname"
+              }
+            },
+            "required": [
+              "name",
+              "model"
+            ]
+          }
+        },
+        "decoders": {
+          "type": "array",
+          "format": "table",
+          "title": "Decoders",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Decoder",
+            "properties": {
+              "name": {
+                "type": "string",
+                "title": "Name"
+              },
+              "model": {
+                "type": "string",
+                "title": "Model",
+                "enum": [
+                  "ZyperUHD",
+                  "Zyper4K"
+                ]
+              },
+              "usb": {
+                "type": "checkbox",
+                "title": "USB Attached?"
+              },
+              "usbname": {
+                "type": "string",
+                "title": "USB Nickname"
+              }
+            },
+            "required": [
+              "name",
+              "model"
+            ]
+          }
+        },
+        "multiviews": {
+          "type": "array",
+          "format": "table",
+          "title": "Multiviews",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Multiview",
+            "properties": {
+              "name": {
+                "type": "string",
+                "title": "Name"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        },
+        "videowalls": {
+          "type": "array",
+          "format": "table",
+          "title": "Video-Walls",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Videowall",
+            "properties": {
+              "name": {
+                "type": "string",
+                "title": "Name"
+              },
+              "model": {
+                "type": "string",
+                "title": "Model",
+                "enum": [
+                  "ZyperUHD",
+                  "Zyper4K"
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "model"
+            ]
+          }
+        }
+      },
+      "required": [
+        "host",
+        "port"
+      ]
+    }
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+    "telnet-client": "^0.15.7"
+  }
+}
