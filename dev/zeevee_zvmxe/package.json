@@ -1,6 +1,6 @@
 {
   "name": "zeevee_zvmxe",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0",
   "description": "Driver for controlling ZeeVee ZvMXE IP decoder",
   "main": "index.js",
   "scripts": {
@@ -58,6 +58,11 @@
           "type": "integer",
           "default": 8080,
           "description": "Default: 8080"
+        },
+        "simulation": {
+          "title": "Simulation Mode",
+          "type": "checkbox",
+          "description": "Simulate device, mainly for use with UI development"
         },
         "channels": {
           "type": "array",
