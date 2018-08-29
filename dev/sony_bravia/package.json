@@ -1,6 +1,6 @@
 {
   "name": "sony_bravia",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Driver for Sony Bravia TCP Connection",
   "main": "index.js",
   "scripts": {
@@ -166,6 +166,22 @@
           "title": "Simulation Mode",
           "type": "checkbox",
           "description": "Simulate device, mainly for use with UI development"
+        },
+        "nickname_hdmi1": {
+          "title": "HDMI 1 Nickname (Optional):",
+          "type": "string"
+        },
+        "nickname_hdmi2": {
+          "title": "HDMI 2 Nickname (Optional):",
+          "type": "string"
+        },
+        "nickname_hdmi3": {
+          "title": "HDMI 3 Nickname (Optional):",
+          "type": "string"
+        },
+        "nickname_hdmi4": {
+          "title": "HDMI 4 Nickname (Optional):",
+          "type": "string"
         }
       },
       "required": [

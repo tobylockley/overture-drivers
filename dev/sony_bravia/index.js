@@ -38,6 +38,14 @@ exports.createDevice = base => {
     base.setPoll('getAudioLevel', POLL_PERIOD, {}, isConnected, true);
     base.setPoll('getAudioMute', POLL_PERIOD, {}, isConnected, true);
     base.setPoll('getChannel', POLL_PERIOD, {}, isConnected, true);
+
+    // Replace source names with nicknames (if configured)
+    let sources = base.getVar('Sources').enums;
+    sources.forEach( (source_name, i) => {
+      const nickname = config[`nickname_${source_name.toLowerCase()}`];
+      if (nickname) sources[i] = nickname;
+    });
+    base.getVar('Sources').enums = sources;
   }
 
   function start() {
@@ -240,7 +248,7 @@ exports.createDevice = base => {
     }
 
     let vol = params.Level.toString().padStart(3, '0');  // Formats the integer with leading zeroes, e.g. 53 = '053'
-    sendDefer(Buffer.from(`*SCVOLU0000000000000${vol}\n`));
+    sendDefer(`*SCVOLU0000000000000${vol}\n`);
   }
 
   function setAudioMute(params) {
