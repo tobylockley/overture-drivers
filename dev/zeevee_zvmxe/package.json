@@ -39,6 +39,7 @@
         "name": "ChannelShift",
         "type": "enum",
         "enums": [ "Idle", "Down",  "Up" ],
+        "smooth": 50,
         "perform": {
           "action": "Shift Channel",
           "params": {

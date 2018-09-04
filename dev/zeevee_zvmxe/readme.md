@@ -48,4 +48,3 @@ Shift the channel of the decoder up or down.
 ### 1.0.1
   - Added 'Shift Channel' functionality.
   - Device now stops polling when "stop()" is called.
-

@@ -70,7 +70,7 @@ exports.createDevice = base => {
       channel_value = 0;
     }
 
-    // Finally, set the channel
+    // Finally, set the channel. Variable is defined with smooth = 50ms, which will set back to idle straight away
     setChannel({Name: channels[channel_value]});
   }
 
