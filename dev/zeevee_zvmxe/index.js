@@ -32,6 +32,7 @@ exports.createDevice = base => {
 
   function stop() {
     base.getVar('Status').string = 'Disconnected';
+    base.stopPolling();
   }
 
   function getChannel() {
@@ -49,6 +50,28 @@ exports.createDevice = base => {
     if (result.length > 1) logger.error('setChannel: WARNING! Multiple channels are configured with the same channel name!');
     base.commandDefer(HTTP_TIMEOUT);
     sendRequest(`/channel=${result[0].number}`);
+  }
+
+  function shiftChannel(params) {
+    let channels = base.getVar('Channel').enums;
+    let channel_value = base.getVar('Channel').value;
+
+    // Convert direction string into positive/negative integer
+    let direction;
+    if (params.Direction == 'Down') direction = -1;
+    else if (params.Direction == 'Up') direction = 1;
+
+    // Adjust channel, then check for overflow
+    channel_value = channel_value + direction;
+    if (channel_value < 0) {
+      channel_value = channels.length - 1;
+    }
+    else if (channel_value >= channels.length) {
+      channel_value = 0;
+    }
+
+    // Finally, set the channel
+    setChannel({Name: channels[channel_value]});
   }
 
   function sendRequest(path) {
@@ -92,6 +115,6 @@ exports.createDevice = base => {
 
   return {
     setup, start, stop,
-    setChannel, getChannel
+    setChannel, getChannel, shiftChannel
   };
 };

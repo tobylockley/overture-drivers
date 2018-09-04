@@ -1,6 +1,6 @@
 {
   "name": "zeevee_zvmxe",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Driver for controlling ZeeVee ZvMXE IP decoder",
   "main": "index.js",
   "scripts": {
@@ -34,6 +34,17 @@
             "Name": "$string"
           }
         }
+      },
+      {
+        "name": "ChannelShift",
+        "type": "enum",
+        "enums": [ "Idle", "Down",  "Up" ],
+        "perform": {
+          "action": "Shift Channel",
+          "params": {
+            "Direction": "$string"
+          }
+        }
       }
     ],
     "commands": [
@@ -41,6 +52,12 @@
         "name": "Set Channel",
         "params": {
           "Name": { "type": "string" }
+        }
+      },
+      {
+        "name": "Shift Channel",
+        "params": {
+          "Direction": { "type": "enum", "enums": [ "Down", "Up" ] }
         }
       }
     ],
