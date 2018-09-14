@@ -99,3 +99,11 @@ Only available in DTV mode. Shift the DTV channel of the display up or down.
 ### 1.0.3
   - Added ability to rename sources during setup.
 
+### 1.0.4
+  - Bug fixes for source nicknames.
+
+### 1.0.5
+  - Improved "Channe Shift" response speed.
+  - Firing "getChannel" when put in DTV mode to increase UI response speed.
+  - Updated onFrame to also accept "notify" frames.
+  - Fixed a bug that prevented polling functions from firing immediately on connection.

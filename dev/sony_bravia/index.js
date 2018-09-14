@@ -2,7 +2,7 @@
 
 const CMD_DEFER_TIME = 1000;        // Timeout when using commandDefer
 const TICK_PERIOD = 5000;           // In-built tick interval
-const POLL_PERIOD = 10000;           // Continuous polling function interval
+const POLL_PERIOD = 5000;           // Continuous polling function interval
 const TCP_TIMEOUT = 30000;          // Will timeout after this length of inactivity
 const TCP_RECONNECT_DELAY = 3000;   // How long to wait before attempting to reconnect
 
@@ -15,6 +15,12 @@ exports.createDevice = base => {
   const logger = base.logger || host.logger;
   let config;
   let tcpClient;
+  let source_nicknames = {
+    'HDMI1': '',
+    'HDMI2': '',
+    'HDMI3': '',
+    'HDMI4': ''
+  };  // Will be populated with nicknames (if configured)
 
   let frameParser = host.createFrameParser();
   frameParser.setSeparator('\n');
@@ -24,28 +30,29 @@ exports.createDevice = base => {
   // ------------------------------ SETUP FUNCTIONS ------------------------------
 
   function isConnected() { return base.getVar('Status').string === 'Connected'; }
-  function isOn() { return base.getVar('Power').string === 'On'; }
-  function isDTVMode() { return base.getVar('Sources').string === 'DTV'; }
+  function isPoweredOn() { return isConnected() && base.getVar('Power').string === 'On'; }
+  function isDTVMode() { return isConnected() && isPoweredOn() && base.getVar('Sources').string === 'DTV'; }
 
   function setup(_config) {
     config = _config;
     base.setTickPeriod(TICK_PERIOD);
 
     // Register polling functions
-    // arguments = (action, interval, params, enablePollFn, startImmediately)
-    base.setPoll('getPower', POLL_PERIOD, {}, isConnected, true);
-    base.setPoll('getSource', POLL_PERIOD, {}, isConnected, true);
-    base.setPoll('getAudioLevel', POLL_PERIOD, {}, isConnected, true);
-    base.setPoll('getAudioMute', POLL_PERIOD, {}, isConnected, true);
-    base.setPoll('getChannel', POLL_PERIOD, {}, isConnected, true);
+    base.setPoll({ action: 'getPower', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true });
+    base.setPoll({ action: 'getSource', period: POLL_PERIOD, enablePollFn: isPoweredOn, startImmediately: true });
+    base.setPoll({ action: 'getAudioLevel', period: POLL_PERIOD, enablePollFn: isPoweredOn, startImmediately: true });
+    base.setPoll({ action: 'getAudioMute', period: POLL_PERIOD, enablePollFn: isPoweredOn, startImmediately: true });
+    base.setPoll({ action: 'getChannel', period: POLL_PERIOD, enablePollFn: isDTVMode, startImmediately: true });
 
-    // Replace source names with nicknames (if configured)
-    let sources = base.getVar('Sources').enums;
-    sources.forEach( (source_name, i) => {
-      const nickname = config[`nickname_${source_name.toLowerCase()}`];
-      if (nickname) sources[i] = nickname;
-    });
-    base.getVar('Sources').enums = sources;
+    // Build a list of source nicknames, and create the sources enum
+    let source_list = ['DTV'];  // Build an array for the sources enum
+    for (const sourcename in source_nicknames) {
+      const nickname = config[`nickname_${sourcename.toLowerCase()}`];
+      if (nickname) source_nicknames[sourcename] = nickname;
+      else source_nicknames[sourcename] = sourcename;  // If not configured, use the source name
+      source_list.push( source_nicknames[sourcename] );
+    }
+    base.getVar('Sources').enums = source_list;  // Replace source names with nicknames (if configured)
   }
 
   function start() {
@@ -111,56 +118,15 @@ exports.createDevice = base => {
     let match;  // Used for regex matching below
     const pendingCommand = base.getPendingCommand();
 
-    let test = base.getVar('AudioLevel');
-    logger.info(test);
-
     logger.info(`onFrame: ${data}`);
     pendingCommand && logger.info(`pendingCommand: ${pendingCommand.action}`);
 
-    // Parse response after issueing a GET function
-    const getFns = [ 'getPower', 'getSource', 'getAudioLevel', 'getAudioMute', 'getChannel' ];
-    if ( pendingCommand && getFns.includes(pendingCommand.action) ) {
-      match = data.match(/POWR(\d+)/);
-      if (match) {
-        base.getVar('Power').value = parseInt(match[1]);  // 0 = off, 1 = on
-        base.commandDone();
-      }
-
-      match = data.match(/INPT0{16}/);
-      if (match) {
-        base.getVar('Sources').string = 'DTV';
-        base.commandDone();
-      }
-
-      match = data.match(/INPT0{7}1(\d+)/);
-      if (match) {
-        base.getVar('Sources').string = `HDMI${parseInt(match[1])}`;
-        base.commandDone();
-      }
-
-      match = data.match(/VOLU(\d+)/);
-      if (match) {
-        base.getVar('AudioLevel').value = parseInt(match[1]);
-        base.commandDone();
-      }
-
-      match = data.match(/AMUT(\d+)/);
-      if (match) {
-        base.getVar('AudioMute').value = parseInt(match[1]);  // 0 = unmute, 1 = mute
-        base.commandDone();
-      }
-
-      match = data.match(/CHNN(\d+)\./);  // Ignores values after decimal point
-      if (match) {
-        base.getVar('Channel').value = parseInt(match[1]);
-        base.commandDone();
-      }
-    }
-
-
-    // Parse response after issueing a SET function
+    // Use arrays to match pending command action to expected response
     const setFns = [ 'setPower', 'selectSource', 'setAudioLevel', 'setAudioMute', 'setChannel', 'shiftChannel' ];
+
     if ( pendingCommand && setFns.includes(pendingCommand.action) ) {
+      // Parse response after issueing a SET function
+
       match = data.match(/POWR0{16}/);
       if (match) {
         base.getVar('Power').string = pendingCommand.params.Status;
@@ -171,6 +137,7 @@ exports.createDevice = base => {
       if (match) {
         base.getVar('Sources').string = pendingCommand.params.Name;
         base.commandDone();
+        if (pendingCommand.params.Name === 'DTV') getChannel();  // Get channel when set to DTV mode
       }
 
       match = data.match(/VOLU0{16}/);
@@ -190,6 +157,54 @@ exports.createDevice = base => {
         base.getVar('Channel').value = parseInt(pendingCommand.params.Name);
         base.commandDone();
       }
+
+      match = data.match(/IRCC0{16}/);
+      if (match) {
+        base.getVar('ChannelShift').value = 0;  // Reset to 'idle'
+        base.commandDone();
+      }
+
+    }
+    else {
+      // Parse response after issueing a GET function, OR after a "notify" frame
+      // Notify frames are received after changing something, either from the CS or an IR remote
+
+      match = data.match(/POWR(\d+)/);
+      if (match) {
+        base.getVar('Power').value = parseInt(match[1]);  // 0 = off, 1 = on
+        pendingCommand && base.commandDone();
+      }
+
+      match = data.match(/INPT0{16}/);
+      if (match) {
+        base.getVar('Sources').string = 'DTV';
+        pendingCommand && base.commandDone();
+      }
+
+      match = data.match(/INPT0{7}1(\d+)/);
+      if (match) {
+        base.getVar('Sources').string = source_nicknames[`HDMI${parseInt(match[1])}`];
+        pendingCommand && base.commandDone();
+      }
+
+      match = data.match(/VOLU(\d+)/);
+      if (match) {
+        base.getVar('AudioLevel').value = parseInt(match[1]);
+        pendingCommand && base.commandDone();
+      }
+
+      match = data.match(/AMUT(\d+)/);
+      if (match) {
+        base.getVar('AudioMute').value = parseInt(match[1]);  // 0 = unmute, 1 = mute
+        pendingCommand && base.commandDone();
+      }
+
+      match = data.match(/CHNN(\d+)\./);  // Ignores values after decimal point
+      if (match) {
+        base.getVar('Channel').value = parseInt(match[1]);
+        pendingCommand && base.commandDone();
+      }
+
     }
   }
 
@@ -201,19 +216,19 @@ exports.createDevice = base => {
   }
 
   function getSource() {
-    isOn() && sendDefer('*SEINPT################\n');
+    sendDefer('*SEINPT################\n');
   }
 
   function getAudioLevel() {
-    isOn() && sendDefer('*SEVOLU################\n');
+    sendDefer('*SEVOLU################\n');
   }
 
   function getAudioMute() {
-    isOn() && sendDefer('*SEAMUT################\n');
+    sendDefer('*SEAMUT################\n');
   }
 
   function getChannel() {
-    isOn() && isDTVMode() && sendDefer('*SECHNN################\n');
+    sendDefer('*SECHNN################\n');
   }
 
 
@@ -236,7 +251,9 @@ exports.createDevice = base => {
 
     if (params.Name == 'DTV') sendDefer('*SCINPT0000000000000000\n');
     else {
-      let match = params.Name.match(/HDMI(\d)/);
+      // Get the sourcename from the nickname
+      let sourcename = Object.keys(source_nicknames).find(key => source_nicknames[key] === params.Name);
+      let match = sourcename.match(/HDMI(\d)/);
       match && sendDefer(`*SCINPT000000010000000${match[1]}\n`);
     }
   }
@@ -262,13 +279,11 @@ exports.createDevice = base => {
   }
 
   function setChannel(params) {
-    if (config.simulation) {
-      if (isDTVMode()) base.getVar('Channel').value = params.Name;
-      else logger.error('Cannot change channel unless set to DTV mode');
-      return;
-    }
-
     if (isDTVMode()) {
+      if (config.simulation) {
+        base.getVar('Channel').value = params.Name;
+        return;
+      }
       let channel = params.Name.toString().padStart(8, '0');
       sendDefer(`*SCCHNN${channel}.0000000\n`);
     }
@@ -278,16 +293,15 @@ exports.createDevice = base => {
   }
 
   function shiftChannel(params) {
-    if (config.simulation) {
-      let delta = params.Name === 'Up' ? 1 : params.Name === 'Down' ? -1 : 0;
-      if (isDTVMode()) base.getVar('Channel').value += delta;
-      else logger.error('Cannot change channel unless set to DTV mode');
-      return;
-    }
-
     if (isDTVMode()) {
+      if (config.simulation) {
+        let delta = { 'Up': 1, 'Down': -1 };
+        base.getVar('Channel').value += delta[params.Name];
+        return;
+      }
       if (params.Name == 'Up') sendDefer('*SCIRCC0000000000000033\n');
       else if (params.Name == 'Down') sendDefer('*SCIRCC0000000000000034\n');
+      base.getVar('ChannelShift').string = params.Name;
     }
     else {
       logger.error('Cannot change channel unless set to DTV mode');
