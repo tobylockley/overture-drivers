@@ -1,6 +1,6 @@
 {
   "name": "philips_hue_sensors",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Driver For Philips Hue Sensors",
   "main": "index.js",
   "scripts": {
@@ -72,7 +72,7 @@
               "name": {
                 "type": "string",
                 "title": "Friendly Name",
-                "pattern": "[A-Za-z0-9_]+"
+                "pattern": "^[A-Za-z0-9_]+$"
               }
             },
             "required": [

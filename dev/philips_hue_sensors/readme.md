@@ -47,3 +47,7 @@ No user commands available.
 ### 1.0.0
 
 - Final stable version for demo room. Button event updates working, and reverting to idle. Motion working.
+
+### 1.0.1
+
+- Fixed a bug in setup schema validation for sensor friendly name.
