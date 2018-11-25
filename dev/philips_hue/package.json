@@ -1,11 +1,97 @@
 {
   "name": "philips_hue",
-  "version": "1.0.0",
-  "description": "Overture driver for Philips Hue using Huejay",
+  "version": "1.0.0-beta.2",
+  "description": "Overture driver for Philips Hue using Huejay, focusing on room control",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
   "author": "Audio Visual Distributors",
-  "license": "MIT"
+  "license": "MIT",
+  "overture": {
+    "brand": "Philips",
+    "models": [
+      "Hue"
+    ],
+    "type": "device",
+    "subtype": "lighting",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Presets",
+        "type": "enum"
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Channel": {
+            "type": "integer"
+          },
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Set Level",
+        "params": {
+          "Channel": {
+            "type": "integer"
+          },
+          "Level": {
+            "type": "integer"
+          }
+        },
+        "optimize": true
+      },
+      {
+        "name": "Set Color Temperature",
+        "params": {
+          "Channel": {
+            "type": "integer"
+          },
+          "Level": {
+            "type": "integer"
+          }
+        },
+        "optimize": true
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Philips Hue Setup",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address of Hue Bridge:",
+          "type": "string",
+          "default": "192.168.1.10"
+        },
+        "username": {
+          "title": "Username:",
+          "type": "string",
+          "description": "Enter Username as provided by the Hue Bridge"
+        }
+      },
+      "required": [
+        "host",
+        "username"
+      ]
+    }
+  },
+  "dependencies": {
+    "huejay": "^1.8.5"
+  }
 }
