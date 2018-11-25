@@ -1,0 +1,91 @@
+{
+  "plugins": [
+    {
+      "setup": {
+        "host": "192.168.1.20",
+        "port": 4996,
+        "levels": [
+          {
+            "name": "Podium Mic Level",
+            "number": 0
+          },
+          {
+            "name": "Wireless Mic Level",
+            "number": 5
+          },
+          {
+            "name": "Mics to Mains",
+            "number": 6
+          },
+          {
+            "name": "Mics to Lobby",
+            "number": 7
+          },
+          {
+            "name": "Mics to Overflow",
+            "number": 8
+          },
+          {
+            "name": "Podium High EQ",
+            "number": 9
+          },
+          {
+            "name": "Podium Low EQ",
+            "number": 10
+          },
+          {
+            "name": "Wireless High EQ",
+            "number": 11
+          },
+          {
+            "name": "Wireless Low EQ",
+            "number": 12
+          }
+        ],
+        "selectors": [
+          {
+            "name": "AV Selector",
+            "number": 23,
+            "options": [
+              "AV Input 1",
+              "AV Input 2",
+              "AV Input 3"
+            ]
+          }
+        ],
+        "toggles": [
+          {
+            "name": "Podium Mute",
+            "number": 3
+          },
+          {
+            "name": "Wireless Mute",
+            "number": 4
+          },
+          {
+            "name": "AV Mute",
+            "number": 13
+          },
+          {
+            "name": "Aux Mute",
+            "number": 14
+          }
+        ],
+        "commands": [
+          {
+            "name": "Flatten Podium EQ",
+            "number": 1
+          },
+          {
+            "name": "Flatten Wireless EQ",
+            "number": 2
+          }
+        ]
+      },
+      "plugin": "5b7623c05e6d4c000edf4b4e",
+      "version": "1.0.0",
+      "pluginName": "rane_hal",
+      "type": "device"
+    }
+  ]
+}

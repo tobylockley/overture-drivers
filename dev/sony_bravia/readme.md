@@ -107,3 +107,6 @@ Only available in DTV mode. Shift the DTV channel of the display up or down.
   - Firing "getChannel" when put in DTV mode to increase UI response speed.
   - Updated onFrame to also accept "notify" frames.
   - Fixed a bug that prevented polling functions from firing immediately on connection.
+
+### 1.0.6
+  - Removed nickname feature. Can use overtures in-built enum labels instead.

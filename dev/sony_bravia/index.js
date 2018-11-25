@@ -15,12 +15,6 @@ exports.createDevice = base => {
   const logger = base.logger || host.logger;
   let config;
   let tcpClient;
-  let source_nicknames = {
-    'HDMI1': '',
-    'HDMI2': '',
-    'HDMI3': '',
-    'HDMI4': ''
-  };  // Will be populated with nicknames (if configured)
 
   let frameParser = host.createFrameParser();
   frameParser.setSeparator('\n');
@@ -43,16 +37,6 @@ exports.createDevice = base => {
     base.setPoll({ action: 'getAudioLevel', period: POLL_PERIOD, enablePollFn: isPoweredOn, startImmediately: true });
     base.setPoll({ action: 'getAudioMute', period: POLL_PERIOD, enablePollFn: isPoweredOn, startImmediately: true });
     base.setPoll({ action: 'getChannel', period: POLL_PERIOD, enablePollFn: isDTVMode, startImmediately: true });
-
-    // Build a list of source nicknames, and create the sources enum
-    let source_list = ['DTV'];  // Build an array for the sources enum
-    for (const sourcename in source_nicknames) {
-      const nickname = config[`nickname_${sourcename.toLowerCase()}`];
-      if (nickname) source_nicknames[sourcename] = nickname;
-      else source_nicknames[sourcename] = sourcename;  // If not configured, use the source name
-      source_list.push( source_nicknames[sourcename] );
-    }
-    base.getVar('Sources').enums = source_list;  // Replace source names with nicknames (if configured)
   }
 
   function start() {
@@ -183,7 +167,7 @@ exports.createDevice = base => {
 
       match = data.match(/INPT0{7}1(\d+)/);
       if (match) {
-        base.getVar('Sources').string = source_nicknames[`HDMI${parseInt(match[1])}`];
+        base.getVar('Sources').string = `HDMI${parseInt(match[1])}`;
         pendingCommand && base.commandDone();
       }
 
@@ -251,9 +235,7 @@ exports.createDevice = base => {
 
     if (params.Name == 'DTV') sendDefer('*SCINPT0000000000000000\n');
     else {
-      // Get the sourcename from the nickname
-      let sourcename = Object.keys(source_nicknames).find(key => source_nicknames[key] === params.Name);
-      let match = sourcename.match(/HDMI(\d)/);
+      let match = params.Name.match(/HDMI(\d)/);
       match && sendDefer(`*SCINPT000000010000000${match[1]}\n`);
     }
   }
