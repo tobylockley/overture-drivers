@@ -1,6 +1,5 @@
 # TechLogix HDMI Switcher TL-4x1-HD2
 
-
 ## Overview
 
 Driver for a TechLogix TL-4x1-HD2 HDMI switcher using RS232 via a ZeeVee Zyper Management Platform.

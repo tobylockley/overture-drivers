@@ -1,0 +1,81 @@
+{
+  "name": "lumens_dc192",
+  "version": "1.0.0-beta.1",
+  "description": "Driver for Lumens DC192 Document Camera via Global Cache RS232",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "Lumens",
+    "models": ["DC192"],
+    "type": "device",
+    "subtype": "generic",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [ "Disconnected", "Connected" ]
+      },
+      {
+        "name": "Lamp",
+        "type": "enum",
+        "enums": [ "Off", "Arm", "Head", "Both" ],
+        "perform": {
+          "action": "setLamp",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "Freeze",
+        "type": "enum",
+        "enums": [ "Off", "On" ],
+        "perform": {
+          "action": "setFreeze",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "setLamp",
+        "params": {
+          "Status": { "type": "enum", "enums": [ "Off", "Arm", "Head", "Both" ] }
+        }
+      },
+      {
+        "name": "setFreeze",
+        "params": {
+          "Status": { "type": "enum", "enums": [ "Off", "On" ] }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Setup for Lumens DC192 Document Camera via Global Cache RS232",
+      "properties": {
+        "host": {
+          "title": "GC RS232 IP/Hostname",
+          "type": "string",
+          "default": "192.168."
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 4999,
+          "description": "Default: 4999"
+        }
+      },
+      "required": [
+        "host",
+        "port"
+      ]
+    }
+  }
+}

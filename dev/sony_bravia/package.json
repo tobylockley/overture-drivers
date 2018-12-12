@@ -1,6 +1,6 @@
 {
   "name": "sony_bravia",
-  "version": "1.0.2.beta.1",
+  "version": "1.0.6",
   "description": "Driver for Sony Bravia TCP Connection",
   "main": "index.js",
   "scripts": {
@@ -111,13 +111,7 @@
       {
         "name": "Set Power",
         "params": {
-          "Status": {
-            "type": "enum",
-            "enums": [
-              "Off",
-              "On"
-            ]
-          }
+          "Status": { "type": "enum", "enums": [ "Off", "On" ] }
         }
       },
       {
@@ -130,7 +124,8 @@
         "name": "Set Audio Level",
         "params": {
           "Level": { "type": "integer" }
-        }
+        },
+        "optimize": true
       },
       {
         "name": "Set Audio Mute",
@@ -141,22 +136,14 @@
       {
         "name": "Set Channel",
         "params": {
-          "Name": {
-            "type": "integer"
-          }
-        }
+          "Name": { "type": "integer" }
+        },
+        "optimize": true
       },
       {
         "name": "Shift Channel",
         "params": {
-          "Name": {
-            "type": "enum",
-            "enums": [
-              "",
-              "Up",
-              "Down"
-            ]
-          }
+          "Name": { "type": "enum", "enums": [ "", "Up", "Down" ] }
         }
       }
     ],
@@ -174,6 +161,11 @@
           "type": "integer",
           "default": 20060,
           "description": "Default: 20060"
+        },
+        "simulation": {
+          "title": "Simulation Mode",
+          "type": "checkbox",
+          "description": "Simulate device, mainly for use with UI development"
         }
       },
       "required": [

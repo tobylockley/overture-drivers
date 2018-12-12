@@ -1,0 +1,27 @@
+{
+  "name": "template_barebones",
+  "version": "1.0.0",
+  "description": "Driver",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "BRAND",
+    "models": [
+      "MODEL"
+    ],
+    "type": "device",
+    "subtype": "generic",
+    "variables": [
+    ],
+
+    "commands": [
+    ],
+
+    "pointSetupSchema": {
+    }
+  }
+}

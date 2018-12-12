@@ -1,6 +1,6 @@
 {
   "name": "tl_4x1_hd2_zyper",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "description": "Driver for controlling tl-4x1-hd2 switcher with a Zyper RS232 interface",
   "main": "index.js",
   "scripts": {
@@ -10,44 +10,22 @@
   "license": "MIT",
   "overture": {
     "brand": "Techlogix",
-    "models": [
-      "tl-4x1-hd2"
-    ],
+    "models": [ "tl-4x1-hd2" ],
     "type": "device",
     "subtype": "matrix",
     "variables": [
       {
         "name": "Status",
         "type": "enum",
-        "enums": [
-          "Disconnected",
-          "Connected"
-        ]
-      },
-      {
-        "name": "Sources",
-        "type": "enum",
-        "enums": [
-          "HDMI1",
-          "HDMI2",
-          "HDMI3",
-          "HDMI4"
-        ],
-        "perform": {
-          "action": "Select Source",
-          "params": {
-            "Name": "$string"
-          }
-        }
+        "enums": [ "Disconnected", "Connected" ]
       }
     ],
     "commands": [
       {
         "name": "Select Source",
         "params": {
-          "Name": {
-            "type": "string"
-          }
+          "Channel": { "type": "string" },
+          "Name": { "type": "enum", "enums": ["HDMI1", "HDMI2", "HDMI3", "HDMI4"] }
         }
       }
     ],
@@ -66,16 +44,37 @@
           "default": 23,
           "description": "Default: 23"
         },
-        "zyper_device": {
-          "title": "Mac Address or Name of Zyper Encoder/Decoder:",
-          "type": "string",
-          "default": "00:1e:c0:"
+        "switchers": {
+          "type": "array",
+          "format": "table",
+          "title": "Switchers",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Switcher",
+            "properties": {
+              "name": {
+                "type": "string",
+                "title": "Switcher Nickname",
+                "pattern": "^[A-Za-z0-9_]+$"
+              },
+              "zyper_device": {
+                "title": "Mac Address or Name of Zyper Encoder/Decoder:",
+                "type": "string",
+                "default": "00:1e:c0:"
+              }
+            },
+            "required": [
+              "name",
+              "zyper_device"
+            ]
+          }
         }
       },
       "required": [
         "host",
         "port",
-        "zyper_device"
+        "switchers"
       ]
     }
   },

@@ -1,0 +1,10 @@
+set device <deviceMac|deviceName> rs232 9600|2400|19200|38400|57600|115200 7-bits|8-bits 1-stop|2-stop even|odd|none
+
+set device uhd_enc4 rs232 9600 8-bits 1-stop none
+
+switch uhd_enc4 server rs232
+
+send uhd_enc4 rs232 HDMI1%
+send uhd_enc4 rs232 HDMI2%
+
+show responses uhd_enc4 rs232 since 0
