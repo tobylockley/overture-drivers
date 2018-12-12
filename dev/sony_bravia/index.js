@@ -102,8 +102,8 @@ exports.createDevice = base => {
     let match;  // Used for regex matching below
     const pendingCommand = base.getPendingCommand();
 
-    logger.info(`onFrame: ${data}`);
-    pendingCommand && logger.info(`pendingCommand: ${pendingCommand.action}`);
+    logger.silly(`onFrame: ${data}`);
+    pendingCommand && logger.debug(`pendingCommand: ${pendingCommand.action}`);
 
     // Use arrays to match pending command action to expected response
     const setFns = [ 'setPower', 'selectSource', 'setAudioLevel', 'setAudioMute', 'setChannel', 'shiftChannel' ];
