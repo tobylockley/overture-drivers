@@ -1,7 +1,7 @@
 {
-  "name": "philips_hue",
-  "version": "1.0.0-beta.2",
-  "description": "Overture driver for Philips Hue using Huejay, focusing on room control",
+  "name": "philips_hue_groups",
+  "version": "1.0.0",
+  "description": "Overture driver for Philips Hue using Huejay, focusing on group control",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -23,18 +23,14 @@
           "Disconnected",
           "Connected"
         ]
-      },
-      {
-        "name": "Presets",
-        "type": "enum"
       }
     ],
     "commands": [
       {
-        "name": "Set Power",
+        "name": "setPower",
         "params": {
-          "Channel": {
-            "type": "integer"
+          "Group": {
+            "type": "string"
           },
           "Status": {
             "type": "enum",
@@ -46,10 +42,10 @@
         }
       },
       {
-        "name": "Set Level",
+        "name": "setLevel",
         "params": {
-          "Channel": {
-            "type": "integer"
+          "Group": {
+            "type": "string"
           },
           "Level": {
             "type": "integer"
@@ -58,10 +54,10 @@
         "optimize": true
       },
       {
-        "name": "Set Color Temperature",
+        "name": "setColorTemperature",
         "params": {
-          "Channel": {
-            "type": "integer"
+          "Group": {
+            "type": "string"
           },
           "Level": {
             "type": "integer"
@@ -83,11 +79,23 @@
           "title": "Username:",
           "type": "string",
           "description": "Enter Username as provided by the Hue Bridge"
+        },
+        "groups": {
+          "title": "Groups",
+          "description": "Must match configured group name exactly",
+          "type": "array",
+          "format": "table",
+          "uniqueItems": true,
+          "items": {
+            "title": "Group",
+            "type": "string"
+          }
         }
       },
       "required": [
         "host",
-        "username"
+        "username",
+        "groups"
       ]
     }
   },
