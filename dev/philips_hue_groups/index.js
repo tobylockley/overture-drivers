@@ -1,7 +1,7 @@
 'use strict';   // Must declare variables before use
 
 const CMD_DEFER_TIME = 1000;        // Timeout when using commandDefer
-const TICK_PERIOD = 5000;           // In-built tick interval
+const TICK_PERIOD = 1000;           // In-built tick interval
 const POLL_PERIOD = 5000;           // Continuous polling function interval
 const HUE_TIMEOUT = 5000;           // Timeout for hue bridge communication
 
@@ -116,26 +116,25 @@ exports.createDevice = base => {
     hueClient.groups.getAll()
       .then(groups => {
         for (let group of groups) {
-          logger.silly(`Group [${group.id}]: ${group.name}`);
-          logger.silly(`..Type: ${group.type}`);
-          logger.silly(`..Class: ${group.class}`);
-          logger.silly('..Light Ids: ' + group.lightIds.join(', '));
-          logger.silly('..State:');
-          logger.silly(`....Any on:     ${group.anyOn}`);
-          logger.silly(`....All on:     ${group.allOn}`);
-          logger.silly('..Action:');
-          logger.silly(`....On:         ${group.on}`);
-          logger.silly(`....Brightness: ${group.brightness}`);
-          logger.silly(`....Color mode: ${group.colorMode}`);
-          logger.silly(`....Hue:        ${group.hue}`);
-          logger.silly(`....Saturation: ${group.saturation}`);
-          group.xy && logger.silly(`....X/Y:        ${group.xy[0]}, ${group.xy[1]}`);
-          logger.silly(`....Color Temp: ${group.colorTemp}`);
-          logger.silly(`....Alert:      ${group.alert}`);
-          logger.silly(`....Effect:     ${group.effect}`);
+          // logger.silly(`Group [${group.id}]: ${group.name}`);
+          // logger.silly(`..Type: ${group.type}`);
+          // logger.silly(`..Class: ${group.class}`);
+          // logger.silly('..Light Ids: ' + group.lightIds.join(', '));
+          // logger.silly('..State:');
+          // logger.silly(`....Any on:     ${group.anyOn}`);
+          // logger.silly(`....All on:     ${group.allOn}`);
+          // logger.silly('..Action:');
+          // logger.silly(`....On:         ${group.on}`);
+          // logger.silly(`....Brightness: ${group.brightness}`);
+          // logger.silly(`....Color mode: ${group.colorMode}`);
+          // logger.silly(`....Hue:        ${group.hue}`);
+          // logger.silly(`....Saturation: ${group.saturation}`);
+          // group.xy && logger.silly(`....X/Y:        ${group.xy[0]}, ${group.xy[1]}`);
+          // logger.silly(`....Color Temp: ${group.colorTemp}`);
+          // logger.silly(`....Alert:      ${group.alert}`);
+          // logger.silly(`....Effect:     ${group.effect}`);
 
           if (config.groups.includes(group.name)) {
-            logger.silly('UPDATING OVERTURE');
             let groupname = group.name.replace(/\W/g, '');  // Remove any illegal characters
             saved_groups[groupname] = group;  // Save group info
 
@@ -147,6 +146,8 @@ exports.createDevice = base => {
             let kelvin = Math.round(1000000 / group.colorTemp);  // Convert from Mired to Kelvin
             if (kelvin > 6500) kelvin = 6500;  // Cap value
             base.getVar(`${groupname}_ColorTemperature`).value = kelvin;
+
+            logger.silly(`${group.name}: [Power] ${group.anyOn ? 'On' : 'Off'}, [Level] ${group.brightness}, [ColorTemp] ${kelvin}`);
           }
         }
         base.commandDone();
