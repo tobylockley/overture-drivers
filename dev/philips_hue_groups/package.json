@@ -1,6 +1,6 @@
 {
   "name": "philips_hue_groups",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Overture driver for Philips Hue using Huejay, focusing on group control",
   "main": "index.js",
   "scripts": {

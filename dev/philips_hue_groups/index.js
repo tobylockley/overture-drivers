@@ -170,6 +170,7 @@ exports.createDevice = base => {
     hueClient.groups.save(group)
       .then(res => {
         logger.silly(`setPower(): success, [${res.id}] ${res.name} = ${params.Status}`);
+        base.getVar(`${params.Group}_Power`).string = params.Status;
         base.commandDone();
       })
       .catch(error => {
@@ -189,6 +190,8 @@ exports.createDevice = base => {
     hueClient.groups.save(group)
       .then(res => {
         logger.silly(`setLevel(): success, [${res.id}] ${res.name} = ${params.Level}`);
+        base.getVar(`${params.Group}_Level`).value = params.Level;
+        base.commandDone();
       })
       .catch(error => {
         base.commandError(`setLevel(): ${error.message}`);
@@ -208,6 +211,8 @@ exports.createDevice = base => {
     hueClient.groups.save(group)
       .then(res => {
         logger.silly(`setColorTemperature(): success, [${res.id}] ${res.name} = ${params.Level}`);
+        base.getVar(`${params.Group}_ColorTemperature`).value = params.Level;
+        base.commandDone();
       })
       .catch(error => {
         base.commandError(`setColorTemperature(): ${error.message}`);
