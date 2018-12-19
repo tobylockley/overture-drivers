@@ -1,7 +1,7 @@
 {
-  "name": "zeevee_zyper_mgmt_platform",
-  "version": "1.0.1-beta.3",
-  "description": "Driver for Zyper Management Platform via telnet",
+  "name": "zyper_tcp",
+  "version": "1.0.1-beta.1",
+  "description": "Driver for Zyper Management Platform over a TCP Connection",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -20,9 +20,10 @@
         "enums": [ "Disconnected", "Connected" ]
       }
     ],
-    "commands": [],
+    "commands": [
+    ],
     "pointSetupSchema": {
-      "title": "Management Platform Settings",
+      "title": "Zyper Management Platform Settings",
       "type": "object",
       "properties": {
         "host": {
@@ -34,7 +35,7 @@
           "title": "Port:",
           "type": "integer",
           "default": 23,
-          "description": "Telnet: 23"
+          "description": "Default: 23"
         },
         "encoders": {
           "title": "Encoders",
@@ -152,11 +153,5 @@
         "videowalls"
       ]
     }
-  },
-  "directories": {
-    "doc": "docs"
-  },
-  "dependencies": {
-    "telnet-client": "^0.15.7"
   }
 }
