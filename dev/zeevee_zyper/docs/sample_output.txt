@@ -1,0 +1,218 @@
+Zyper$ show device status all
+device(34:1b:22:80:56:d4);
+  device.gen; model=ZyperUHD, type=encoder, name=UHD_laptop, state=Up, uptime=0d:1h:49m:9s, lastChangeId=124
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiInput; cableConnected=connected, hdcp=inactive, hdcp-version=none, hdmi-2.0=no, horizontalSize=1920, verticalSize=1080, fps=60.00, interlaced=no
+  device.hdmiInput; active-color-mapping=RGB, active-colorDepth=8
+  device.hdmiInput; activePixelClockMhz=124
+  device.edid; edid-status=valid, edid-monitor-name=LG SIGNAGE
+  device.autoEdid; decoder-name=4K_dec8
+  device.videoStream; input-fps=60.00, input-datarate=2985Mbps, compression-factor= 0.13, stream-fps=60.00, stream-datarate=399Mbps
+device(34:1b:22:80:56:ef);
+  device.gen; model=ZyperUHD, type=encoder, name=UHD_myanmar, state=Up, uptime=0d:1h:49m:14s, lastChangeId=40
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiInput; cableConnected=connected, hdcp=inactive, hdcp-version=none, hdmi-2.0=no, horizontalSize=1920, verticalSize=1080, fps=60.00, interlaced=no
+  device.hdmiInput; active-color-mapping=RGB, active-colorDepth=8
+  device.hdmiInput; activePixelClockMhz=124
+  device.edid; edid-status=valid, edid-monitor-name=LG IPS FULLHD
+  device.autoEdid; decoder-name=4K_dec6
+  device.videoStream; input-fps=60.00, input-datarate=2985Mbps, compression-factor= 0.13, stream-fps=60.00, stream-datarate=399Mbps
+device(34:1b:22:80:56:ff);
+  device.gen; model=ZyperUHD, type=encoder, name=UHD_airshow, state=Up, uptime=0d:1h:49m:14s, lastChangeId=42
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiInput; cableConnected=connected, hdcp=inactive, hdcp-version=none, hdmi-2.0=no, horizontalSize=1920, verticalSize=1080, fps=60.00, interlaced=no
+  device.hdmiInput; active-color-mapping=RGB, active-colorDepth=8
+  device.hdmiInput; activePixelClockMhz=124
+  device.edid; edid-status=valid, edid-monitor-name=LG IPS FULLHD
+  device.autoEdid; decoder-name=4K_dec6
+  device.videoStream; input-fps=60.00, input-datarate=2985Mbps, compression-factor= 0.13, stream-fps=60.00, stream-datarate=399Mbps
+device(34:1b:22:80:57:28);
+  device.gen; model=ZyperUHD, type=encoder, name=UHD_raptors, state=Up, uptime=0d:1h:49m:14s, lastChangeId=38
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiInput; cableConnected=connected, hdcp=inactive, hdcp-version=none, hdmi-2.0=no, horizontalSize=1920, verticalSize=1080, fps=60.00, interlaced=no
+  device.hdmiInput; active-color-mapping=RGB, active-colorDepth=8
+  device.hdmiInput; activePixelClockMhz=124
+  device.edid; edid-status=valid, edid-monitor-name=LG IPS FULLHD
+  device.autoEdid; decoder-name=4K_dec6
+  device.videoStream; input-fps=60.00, input-datarate=2985Mbps, compression-factor= 0.13, stream-fps=60.00, stream-datarate=399Mbps
+device(34:1b:22:80:57:84);
+  device.gen; model=ZyperUHD, type=decoder, name=UHD_dec4, state=Up, uptime=0d:1h:49m:4s, lastChangeId=54
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiOutput; cableConnected=disconnected, hdcp=NA, hdcp-version=NA, hdmi-2.0=NA, horizontalSize=0, verticalSize=0, fps=0, interlaced=NA
+  device.hdmiOutput; active-color-mapping=NA, active-colorDepth=NA
+  device.hdmiOutput; preferred-horizontalSize=NA, preferred-verticalSize=NA, preferred-fps=NA
+  device.hdmiOutput; maxPixelClockMhz=NA, supported-color-mappings=NA, max-colorDepth=NA
+  device.hdmiOutput; activePixelClockMhz=NA
+  device.edid; edid-status=NA, edid-monitor-name=NA
+  device.hdmiOutput; streamDatarate=399Mbps
+  device.connectedEncoder; mac=34:1b:22:80:56:ef, name=UHD_myanmar, receivingVideoFromEncoder=no, reason=decoder hdmi down
+  device.connectedEncoderAudio; mac=none, name=N/A, receivingAudioFromEncoder=no
+  device.activeVideoWall; name=none
+  device.inactiveVideoWall_1; name=1, positionRow 2, positionCol 1
+device(34:1b:22:80:57:98);
+  device.gen; model=ZyperUHD, type=decoder, name=UHD_dec1, state=Up, uptime=0d:1h:49m:3s, lastChangeId=53
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiOutput; cableConnected=disconnected, hdcp=NA, hdcp-version=NA, hdmi-2.0=NA, horizontalSize=0, verticalSize=0, fps=0, interlaced=NA
+  device.hdmiOutput; active-color-mapping=NA, active-colorDepth=NA
+  device.hdmiOutput; preferred-horizontalSize=NA, preferred-verticalSize=NA, preferred-fps=NA
+  device.hdmiOutput; maxPixelClockMhz=NA, supported-color-mappings=NA, max-colorDepth=NA
+  device.hdmiOutput; activePixelClockMhz=NA
+  device.edid; edid-status=NA, edid-monitor-name=NA
+  device.hdmiOutput; streamDatarate=399Mbps
+  device.connectedEncoder; mac=34:1b:22:80:56:ff, name=UHD_airshow, receivingVideoFromEncoder=no, reason=decoder hdmi down
+  device.connectedEncoderAudio; mac=none, name=N/A, receivingAudioFromEncoder=no
+  device.activeVideoWall; name=none
+  device.inactiveVideoWall_1; name=1, positionRow 1, positionCol 1
+device(34:1b:22:80:57:ec);
+  device.gen; model=ZyperUHD, type=decoder, name=UHD_dec2, state=Up, uptime=0d:1h:49m:3s, lastChangeId=55
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiOutput; cableConnected=disconnected, hdcp=NA, hdcp-version=NA, hdmi-2.0=NA, horizontalSize=0, verticalSize=0, fps=0, interlaced=NA
+  device.hdmiOutput; active-color-mapping=NA, active-colorDepth=NA
+  device.hdmiOutput; preferred-horizontalSize=NA, preferred-verticalSize=NA, preferred-fps=NA
+  device.hdmiOutput; maxPixelClockMhz=NA, supported-color-mappings=NA, max-colorDepth=NA
+  device.hdmiOutput; activePixelClockMhz=NA
+  device.edid; edid-status=NA, edid-monitor-name=NA
+  device.hdmiOutput; streamDatarate=399Mbps
+  device.connectedEncoder; mac=34:1b:22:80:57:28, name=UHD_raptors, receivingVideoFromEncoder=no, reason=decoder hdmi down
+  device.connectedEncoderAudio; mac=none, name=N/A, receivingAudioFromEncoder=no
+  device.activeVideoWall; name=none
+  device.inactiveVideoWall_1; name=1, positionRow 1, positionCol 2
+device(d8:80:39:5a:64:65);
+  device.gen; model=Zyper4K, type=encoder, name=4K_airshow, state=Up, uptime=0d:1h:49m:9s, lastChangeId=237
+  device.temperature; main=69C
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiInput; cableConnected=connected, hdcp=inactive, hdcp-version=NONE, hdmi-2.0=yes, horizontalSize=1920, verticalSize=1080, fps=60.00, interlaced=no
+  device.hdmiInput; active-color-mapping=RGB, active-colorDepth=8
+  device.hdmiInput; activePixelClockMhz=124
+  device.edid; edid-status=valid, edid-monitor-name=Zyer4K
+  device.autoEdid; decoder-name=video-wall-internal-edid
+  device.videoStream; input-fps=60.00, input-datarate=3265Mbps, compression-factor= 1.00, stream-fps=60.00, stream-datarate=3265Mbps
+  device.videoScaledStream; input-fps=60.00, input-datarate=3265Mbps, stream-fps=30.00, stream-datarate=1632Mbps
+device(d8:80:39:ea:ac:72);
+  device.gen; model=Zyper4K, type=decoder, name=4K_dec6, state=Up, uptime=0d:1h:49m:7s, lastChangeId=243
+  device.temperature; main=73C
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiOutput; cableConnected=connected, hdcp=inactive, hdcp-version=NONE, hdmi-2.0=yes, horizontalSize=1920, verticalSize=1080, fps=60.00, interlaced=no
+  device.hdmiInput; active-color-mapping=RGB, active-colorDepth=8
+  device.hdmiOutput; preferred-horizontalSize=1920, preferred-verticalSize=1080, preferred-fps=60.00
+  device.hdmiOutput; maxPixelClockMhz=150, supported-color-mappings=RGB:YUV444, max-colorDepth=8
+  device.hdmiOutput; activePixelClockMhz=124
+  device.edid; edid-status=valid, edid-monitor-name=LG IPS FULLHD
+  device.hdmiOutput; streamDatarate=3265Mbps
+  device.connectedEncoder; mac=d8:80:39:5a:64:65, name=4K_airshow, receivingVideoFromEncoder=yes
+  device.connectedEncoderAnalogAudio; mac=none, name=N/A, receivingAudioFromEncoder=no
+  device.connectedEncoderHdmiDownmixAudio; mac=none, name=N/A, receivingAudioFromEncoder=no
+  device.activeVideoWall; name=fourK, positionRow 1, positionCol 2
+device(d8:80:39:ea:fe:94);
+  device.gen; model=Zyper4K, type=encoder, name=4K_laptop, state=Up, uptime=0d:1h:49m:9s, lastChangeId=236
+  device.temperature; main=69C
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiInput; cableConnected=connected, hdcp=inactive, hdcp-version=NONE, hdmi-2.0=yes, horizontalSize=1920, verticalSize=1080, fps=60.00, interlaced=no
+  device.hdmiInput; active-color-mapping=RGB, active-colorDepth=8
+  device.hdmiInput; activePixelClockMhz=124
+  device.edid; edid-status=valid, edid-monitor-name=LG IPS FULLHD
+  device.autoEdid; decoder-name=4K_dec6
+  device.videoStream; input-fps=60.00, input-datarate=3265Mbps, compression-factor= 1.00, stream-fps=60.00, stream-datarate=0Mbps
+  device.videoScaledStream; input-fps=60.00, input-datarate=3265Mbps, stream-fps=30.00, stream-datarate=1632Mbps
+device(d8:80:39:eb:1:b4);
+  device.gen; model=Zyper4K, type=encoder, name=4K_raptors, state=Up, uptime=0d:1h:49m:9s, lastChangeId=238
+  device.temperature; main=70C
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiInput; cableConnected=connected, hdcp=inactive, hdcp-version=NONE, hdmi-2.0=yes, horizontalSize=1920, verticalSize=1080, fps=60.00, interlaced=no
+  device.hdmiInput; active-color-mapping=YUV444, active-colorDepth=8
+  device.hdmiInput; activePixelClockMhz=124
+  device.edid; edid-status=valid, edid-monitor-name=LG IPS FULLHD
+  device.autoEdid; decoder-name=4K_dec6
+  device.videoStream; input-fps=60.00, input-datarate=3265Mbps, compression-factor= 1.00, stream-fps=60.00, stream-datarate=0Mbps
+  device.videoScaledStream; input-fps=60.00, input-datarate=3265Mbps, stream-fps=30.00, stream-datarate=1632Mbps
+device(d8:80:39:eb:6:96);
+  device.gen; model=Zyper4K, type=decoder, name=4K_dec5, state=Up, uptime=0d:1h:49m:9s, lastChangeId=239
+  device.temperature; main=69C
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiOutput; cableConnected=connected, hdcp=inactive, hdcp-version=NONE, hdmi-2.0=yes, horizontalSize=1920, verticalSize=1080, fps=60.00, interlaced=no
+  device.hdmiInput; active-color-mapping=RGB, active-colorDepth=8
+  device.hdmiOutput; preferred-horizontalSize=1920, preferred-verticalSize=1080, preferred-fps=60.00
+  device.hdmiOutput; maxPixelClockMhz=150, supported-color-mappings=RGB:YUV444, max-colorDepth=8
+  device.hdmiOutput; activePixelClockMhz=124
+  device.edid; edid-status=valid, edid-monitor-name=LG IPS FULLHD
+  device.hdmiOutput; streamDatarate=3265Mbps
+  device.connectedEncoder; mac=d8:80:39:5a:64:65, name=4K_airshow, receivingVideoFromEncoder=yes
+  device.connectedEncoderAnalogAudio; mac=none, name=N/A, receivingAudioFromEncoder=no
+  device.connectedEncoderHdmiDownmixAudio; mac=none, name=N/A, receivingAudioFromEncoder=no
+  device.activeVideoWall; name=fourK, positionRow 1, positionCol 1
+device(d8:80:39:eb:1d:7d);
+  device.gen; model=Zyper4K, type=encoder, name=4K_myanmar, state=Up, uptime=0d:1h:49m:8s, lastChangeId=242
+  device.temperature; main=71C
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiInput; cableConnected=connected, hdcp=inactive, hdcp-version=NONE, hdmi-2.0=yes, horizontalSize=1920, verticalSize=1080, fps=60.00, interlaced=no
+  device.hdmiInput; active-color-mapping=YUV444, active-colorDepth=8
+  device.hdmiInput; activePixelClockMhz=124
+  device.edid; edid-status=valid, edid-monitor-name=LG IPS FULLHD
+  device.autoEdid; decoder-name=4K_dec6
+  device.videoStream; input-fps=60.00, input-datarate=3265Mbps, compression-factor= 1.00, stream-fps=60.00, stream-datarate=0Mbps
+  device.videoScaledStream; input-fps=60.00, input-datarate=3265Mbps, stream-fps=30.00, stream-datarate=1632Mbps
+device(d8:80:39:eb:52:42);
+  device.gen; model=Zyper4K, type=decoder, name=4K_dec8, state=Up, uptime=0d:1h:49m:7s, lastChangeId=240
+  device.temperature; main=78C
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiOutput; cableConnected=connected, hdcp=inactive, hdcp-version=NONE, hdmi-2.0=yes, horizontalSize=1920, verticalSize=1080, fps=60.00, interlaced=no
+  device.hdmiInput; active-color-mapping=RGB, active-colorDepth=8
+  device.hdmiOutput; preferred-horizontalSize=1920, preferred-verticalSize=1080, preferred-fps=60.00
+  device.hdmiOutput; maxPixelClockMhz=150, supported-color-mappings=RGB:YUV444, max-colorDepth=8
+  device.hdmiOutput; activePixelClockMhz=124
+  device.edid; edid-status=valid, edid-monitor-name=LG IPS FULLHD
+  device.hdmiOutput; streamDatarate=6528Mbps
+  device.connectedEncoder; mac=multiview, name=two_all_sources, receivingVideoFromEncoder=yes
+  device.multiviewUpEntries; [entry=1, encoder=4K_airshow], [entry=2, encoder=4K_laptop], [entry=3, encoder=4K_raptors], [entry=4, encoder=4K_myanmar]
+  device.multiviewDownEntries; [none]
+  device.connectedEncoderAnalogAudio; mac=none, name=N/A, receivingAudioFromEncoder=no
+  device.connectedEncoderHdmiDownmixAudio; mac=none, name=N/A, receivingAudioFromEncoder=no
+  device.activeVideoWall; name=fourK, positionRow 2, positionCol 2
+device(d8:80:39:eb:5b:3c);
+  device.gen; model=Zyper4K, type=decoder, name=4K_dec7, state=Up, uptime=0d:1h:49m:7s, lastChangeId=241
+  device.temperature; main=75C
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiOutput; cableConnected=connected, hdcp=inactive, hdcp-version=NONE, hdmi-2.0=yes, horizontalSize=1920, verticalSize=1080, fps=60.00, interlaced=no
+  device.hdmiInput; active-color-mapping=RGB, active-colorDepth=8
+  device.hdmiOutput; preferred-horizontalSize=1920, preferred-verticalSize=1080, preferred-fps=60.00
+  device.hdmiOutput; maxPixelClockMhz=150, supported-color-mappings=RGB:YUV444, max-colorDepth=8
+  device.hdmiOutput; activePixelClockMhz=124
+  device.edid; edid-status=valid, edid-monitor-name=LG IPS FULLHD
+  device.hdmiOutput; streamDatarate=3265Mbps
+  device.connectedEncoder; mac=d8:80:39:5a:64:65, name=4K_airshow, receivingVideoFromEncoder=yes
+  device.connectedEncoderAnalogAudio; mac=none, name=N/A, receivingAudioFromEncoder=no
+  device.connectedEncoderHdmiDownmixAudio; mac=none, name=N/A, receivingAudioFromEncoder=no
+  device.activeVideoWall; name=fourK, positionRow 2, positionCol 1
+lastChangeIdMax(243);
+Success
+Zyper$
+
+
+Zyper$ show multiviews status
+multiview(two_all_sources);
+  multiview.gen; totalDatarate=6528
+  multiview.window1; encoder-name=4K_airshow, streamType=video-scaled, datarate=1632, multicast=224.1.1.14, status=active
+  multiview.window2; encoder-name=4K_laptop, streamType=video-scaled, datarate=1632, multicast=224.1.1.6, status=active
+  multiview.window3; encoder-name=4K_raptors, streamType=video-scaled, datarate=1632, multicast=224.1.1.7, status=active
+  multiview.window4; encoder-name=4K_myanmar, streamType=video-scaled, datarate=1632, multicast=224.1.1.1, status=active
+multiview(two_by_two);
+  multiview.gen; totalDatarate=0
+  multiview.window1; encoder-name=4K_airshow, streamType=video-scaled, datarate=1632, multicast=224.1.1.14, status=inactive
+  multiview.window2; encoder-name=4K_raptors, streamType=video-scaled, datarate=1632, multicast=224.1.1.7, status=inactive
+  multiview.window3; encoder-name=4K_raptors, streamType=video-scaled, datarate=1632, multicast=224.1.1.7, status=inactive
+  multiview.window4; encoder-name=4K_airshow, streamType=video-scaled, datarate=1632, multicast=224.1.1.14, status=inactive
+Success
+
+
+// VIDEO WALL
+
+videoWall(1x4);
+  videoWall.gen; videoSourceMac=00:00:00:00:00:00, numDisplayRows=1, numDisplayCols=4
+  videoWall.bezel; top=0, bottom=0, left=0, right=0
+  videoWall.decodersRow1; col1=uhd_dec1, col2=uhd_dec2, col3=uhd_dec3, col4=uhd_dec4;
+videoWall(wall_uhd);
+  videoWall.gen; videoSourceMac=34:1b:22:80:56:ff, numDisplayRows=2, numDisplayCols=2
+  videoWall.bezel; top=0, bottom=0, left=0, right=0
+  videoWall.decodersRow1; col1=uhd_dec4, col2=uhd_dec3;
+  videoWall.decodersRow2; col1=uhd_dec2, col2=uhd_dec1;
+

@@ -1,0 +1,239 @@
+device(34:1b:22:80:56:d4);
+  device.gen; model=ZyperUHD, type=encoder, name=uhd_enc1, state=Up, uptime=0d:1h:58m:13s, lastChangeId=19
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiInput; cableConnected=disconnected, hdcp=NA, hdcp-version=NA, hdmi-2.0=NA, horizontalSize=0, verticalSize=0, fps=0, interlaced=NA
+  device.hdmiInput; active-color-mapping=NA, active-colorDepth=NA
+  device.hdmiInput; activePixelClockMhz=0
+  device.edid; edid-status=NA, edid-monitor-name=NA
+  device.autoEdid; decoder-name=auto-edid-disabled
+  device.edid; filename=4k
+  device.videoStream; input-fps=30.00, input-datarate=5971Mbps, compression-factor= 0.07, stream-fps=30.00, stream-datarate=0Mbps
+
+
+device(34:1b:22:80:56:ef);
+  device.gen; model=ZyperUHD, type=encoder, name=uhd_enc2, state=Up, uptime=0d:1h:58m:6s, lastChangeId=27
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiInput; cableConnected=connected, hdcp=inactive, hdcp-version=none, hdmi-2.0=no, horizontalSize=3840, verticalSize=2160, fps=30.00, interlaced=no
+  device.hdmiInput; active-color-mapping=RGB, active-colorDepth=8
+  device.hdmiInput; activePixelClockMhz=248
+  device.edid; edid-status=valid, edid-monitor-name=MXX-M-2
+  device.autoEdid; decoder-name=auto-edid-disabled
+  device.edid; filename=4k
+  device.videoStream; input-fps=30.00, input-datarate=5971Mbps, compression-factor= 0.07, stream-fps=30.00, stream-datarate=400Mbps
+
+
+device(34:1b:22:80:56:ff);
+  device.gen; model=ZyperUHD, type=encoder, name=uhd_enc4, state=Up, uptime=0d:1h:58m:7s, lastChangeId=1565
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiInput; cableConnected=connected, hdcp=inactive, hdcp-version=none, hdmi-2.0=no, horizontalSize=3840, verticalSize=2160, fps=30.00, interlaced=no
+  device.hdmiInput; active-color-mapping=RGB, active-colorDepth=8
+  device.hdmiInput; activePixelClockMhz=248
+  device.edid; edid-status=valid, edid-monitor-name=Unknown
+  device.autoEdid; decoder-name=auto-edid-disabled
+  device.edid; filename=4k
+  device.videoStream; input-fps=30.00, input-datarate=5971Mbps, compression-factor= 0.07, stream-fps=30.00, stream-datarate=400Mbps
+
+
+device(34:1b:22:80:57:28);
+  device.gen; model=ZyperUHD, type=encoder, name=uhd_enc3, state=Up, uptime=0d:1h:58m:13s, lastChangeId=2568
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiInput; cableConnected=connected, hdcp=inactive, hdcp-version=none, hdmi-2.0=no, horizontalSize=3840, verticalSize=2160, fps=30.00, interlaced=no
+  device.hdmiInput; active-color-mapping=RGB, active-colorDepth=8
+  device.hdmiInput; activePixelClockMhz=248
+  device.edid; edid-status=valid, edid-monitor-name=MXX-M-2
+  device.autoEdid; decoder-name=auto-edid-disabled
+  device.edid; filename=4k
+  device.videoStream; input-fps=30.00, input-datarate=5971Mbps, compression-factor= 0.07, stream-fps=30.00, stream-datarate=400Mbps
+
+
+device(34:1b:22:80:57:f3);
+  device.gen; model=ZyperUHD, type=decoder, name=uhd_dec3, state=Up, uptime=0d:1h:58m:1s, lastChangeId=3455
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiOutput; cableConnected=connected, hdcp=active, hdcp-version=1.4, hdmi-2.0=no, horizontalSize=1920, verticalSize=1080, fps=60.00, interlaced=no
+  device.hdmiInput; active-color-mapping=RGB, active-colorDepth=8
+  device.hdmiOutput; preferred-horizontalSize=1920, preferred-verticalSize=1080, preferred-fps=60.00
+  device.hdmiOutput; maxPixelClockMhz=150, supported-color-mappings=RGB:YUV444, max-colorDepth=8
+  device.hdmiOutput; activePixelClockMhz=124
+  device.edid; edid-status=valid, edid-monitor-name=1080P_2D_2.0
+  device.hdmiOutput; streamDatarate=400Mbps
+  device.connectedEncoder; mac=34:1b:22:80:57:28, name=uhd_enc3, receivingVideoFromEncoder=yes
+  device.connectedEncoderAudio; mac=34:1b:22:80:57:28, name=uhd_enc3, receivingAudioFromEncoder=yes
+  device.activeVideoWall; name=none
+  device.inactiveVideoWall_1; name=kjhgkj, positionRow 2, positionCol 1
+
+
+device(34:1b:22:80:74:e8);
+  device.gen; model=ZyperUHD, type=decoder, name=uhd_dec1, state=Up, uptime=0d:1h:58m:2s, lastChangeId=2570
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiOutput; cableConnected=connected, hdcp=active, hdcp-version=1.4, hdmi-2.0=no, horizontalSize=1920, verticalSize=1080, fps=60.00, interlaced=no
+  device.hdmiInput; active-color-mapping=RGB, active-colorDepth=8
+  device.hdmiOutput; preferred-horizontalSize=1920, preferred-verticalSize=1080, preferred-fps=60.00
+  device.hdmiOutput; maxPixelClockMhz=150, supported-color-mappings=RGB:YUV444, max-colorDepth=8
+  device.hdmiOutput; activePixelClockMhz=124
+  device.edid; edid-status=valid, edid-monitor-name=1080P_2D_2.0
+  device.hdmiOutput; streamDatarate=400Mbps
+  device.connectedEncoder; mac=34:1b:22:80:57:28, name=uhd_enc3, receivingVideoFromEncoder=yes
+  device.connectedEncoderAudio; mac=34:1b:22:80:57:28, name=uhd_enc3, receivingAudioFromEncoder=yes
+  device.activeVideoWall; name=none
+  device.inactiveVideoWall_1; name=kjhgkj, positionRow 1, positionCol 1
+
+
+device(34:1b:22:80:75:1b);
+  device.gen; model=ZyperUHD, type=decoder, name=uhd_dec4, state=Up, uptime=0d:1h:58m:2s, lastChangeId=3456
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiOutput; cableConnected=connected, hdcp=inactive, hdcp-version=none, hdmi-2.0=no, horizontalSize=1920, verticalSize=1080, fps=60.00, interlaced=no
+  device.hdmiInput; active-color-mapping=RGB, active-colorDepth=8
+  device.hdmiOutput; preferred-horizontalSize=1920, preferred-verticalSize=1080, preferred-fps=60.00
+  device.hdmiOutput; maxPixelClockMhz=150, supported-color-mappings=RGB:YUV444, max-colorDepth=8
+  device.hdmiOutput; activePixelClockMhz=124
+  device.edid; edid-status=valid, edid-monitor-name=1080P_2D_2.0
+  device.hdmiOutput; streamDatarate=400Mbps
+  device.connectedEncoder; mac=34:1b:22:80:56:ff, name=uhd_enc4, receivingVideoFromEncoder=yes
+  device.connectedEncoderAudio; mac=34:1b:22:80:56:ff, name=uhd_enc4, receivingAudioFromEncoder=yes
+  device.activeVideoWall; name=none
+  device.inactiveVideoWall_1; name=kjhgkj, positionRow 2, positionCol 2
+
+
+device(34:1b:22:80:75:2f);
+  device.gen; model=ZyperUHD, type=decoder, name=uhd_dec2, state=Up, uptime=0d:0h:49m:13s, lastChangeId=2369
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiOutput; cableConnected=connected, hdcp=active, hdcp-version=1.4, hdmi-2.0=no, horizontalSize=1920, verticalSize=1080, fps=60.00, interlaced=no
+  device.hdmiInput; active-color-mapping=RGB, active-colorDepth=8
+  device.hdmiOutput; preferred-horizontalSize=1920, preferred-verticalSize=1080, preferred-fps=60.00
+  device.hdmiOutput; maxPixelClockMhz=150, supported-color-mappings=RGB:YUV444, max-colorDepth=8
+  device.hdmiOutput; activePixelClockMhz=124
+  device.edid; edid-status=valid, edid-monitor-name=1080P_2D_2.0
+  device.hdmiOutput; streamDatarate=400Mbps
+  device.connectedEncoder; mac=34:1b:22:80:56:ef, name=uhd_enc2, receivingVideoFromEncoder=yes
+  device.connectedEncoderAudio; mac=34:1b:22:80:56:ef, name=uhd_enc2, receivingAudioFromEncoder=yes
+  device.activeVideoWall; name=none
+  device.inactiveVideoWall_1; name=kjhgkj, positionRow 1, positionCol 2
+
+
+device(80:1f:12:4b:ab:8a);
+  device.gen; model=Zyper4K, type=encoder, name=4k_enc3, state=Down, uptime=0d:0h:0m:0s, lastChangeId=6
+  device.temperature; main=0C
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiInput; cableConnected=disconnected, hdcp=NA, hdcp-version=NA, hdmi-2.0=NA, horizontalSize=0, verticalSize=0, fps=0, interlaced=NA
+  device.hdmiInput; active-color-mapping=NA, active-colorDepth=NA
+  device.hdmiInput; activePixelClockMhz=0
+  device.edid; edid-status=NA, edid-monitor-name=NA
+  device.autoEdid; decoder-name=auto-edid-disabled
+  device.edid; filename=4k
+  device.videoStream; input-fps=30.00, input-datarate=0Mbps, compression-factor= 1.00, stream-fps=30.00, stream-datarate=0Mbps
+  device.videoScaledStream; input-fps=30.00, input-datarate=0Mbps, stream-fps=30.00, stream-datarate=0Mbps
+
+
+device(d8:80:39:ea:fe:54);
+  device.gen; model=Zyper4K, type=encoder, name=4k_enc4, state=Down, uptime=0d:0h:0m:0s, lastChangeId=7
+  device.temperature; main=0C
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiInput; cableConnected=disconnected, hdcp=NA, hdcp-version=NA, hdmi-2.0=NA, horizontalSize=0, verticalSize=0, fps=0, interlaced=NA
+  device.hdmiInput; active-color-mapping=NA, active-colorDepth=NA
+  device.hdmiInput; activePixelClockMhz=0
+  device.edid; edid-status=NA, edid-monitor-name=NA
+  device.autoEdid; decoder-name=auto-edid-disabled
+  device.edid; filename=4k
+  device.videoStream; input-fps=30.00, input-datarate=0Mbps, compression-factor= 1.00, stream-fps=30.00, stream-datarate=0Mbps
+  device.videoScaledStream; input-fps=30.00, input-datarate=0Mbps, stream-fps=30.00, stream-datarate=0Mbps
+
+
+device(d8:80:39:ea:fe:94);
+  device.gen; model=Zyper4K, type=encoder, name=4k_enc1, state=Down, uptime=0d:0h:0m:0s, lastChangeId=8
+  device.temperature; main=0C
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiInput; cableConnected=disconnected, hdcp=NA, hdcp-version=NA, hdmi-2.0=NA, horizontalSize=0, verticalSize=0, fps=0, interlaced=NA
+  device.hdmiInput; active-color-mapping=NA, active-colorDepth=NA
+  device.hdmiInput; activePixelClockMhz=0
+  device.edid; edid-status=NA, edid-monitor-name=NA
+  device.autoEdid; decoder-name=auto-edid-disabled
+  device.edid; filename=4k
+  device.videoStream; input-fps=29.96, input-datarate=0Mbps, compression-factor= 1.00, stream-fps=29.96, stream-datarate=0Mbps
+  device.videoScaledStream; input-fps=29.96, input-datarate=0Mbps, stream-fps=14.98, stream-datarate=0Mbps
+
+
+device(d8:80:39:eb:1d:7d);
+  device.gen; model=Zyper4K, type=encoder, name=4k_enc2, state=Down, uptime=0d:0h:0m:0s, lastChangeId=9
+  device.temperature; main=0C
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiInput; cableConnected=disconnected, hdcp=NA, hdcp-version=NA, hdmi-2.0=NA, horizontalSize=0, verticalSize=0, fps=0, interlaced=NA
+  device.hdmiInput; active-color-mapping=NA, active-colorDepth=NA
+  device.hdmiInput; activePixelClockMhz=0
+  device.edid; edid-status=NA, edid-monitor-name=NA
+  device.autoEdid; decoder-name=auto-edid-disabled
+  device.edid; filename=4k
+  device.videoStream; input-fps=30.00, input-datarate=0Mbps, compression-factor= 1.00, stream-fps=30.00, stream-datarate=0Mbps
+  device.videoScaledStream; input-fps=30.00, input-datarate=0Mbps, stream-fps=15.00, stream-datarate=0Mbps
+
+
+device(d8:80:39:ea:ac:72);
+  device.gen; model=Zyper4K, type=decoder, name=4k_dec4, state=Down, uptime=0d:0h:0m:0s, lastChangeId=14
+  device.temperature; main=0C
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiOutput; cableConnected=disconnected, hdcp=NA, hdcp-version=NA, hdmi-2.0=NA, horizontalSize=0, verticalSize=0, fps=0, interlaced=NA
+  device.hdmiOutput; active-color-mapping=NA, active-colorDepth=NA
+  device.hdmiOutput; preferred-horizontalSize=NA, preferred-verticalSize=NA, preferred-fps=NA
+  device.hdmiOutput; maxPixelClockMhz=NA, supported-color-mappings=NA, max-colorDepth=NA
+  device.hdmiOutput; activePixelClockMhz=NA
+  device.edid; edid-status=NA, edid-monitor-name=NA
+  device.hdmiOutput; streamDatarate=0Mbps
+  device.connectedEncoder; mac=d8:80:39:ea:fe:54, name=4k_enc4, receivingVideoFromEncoder=no, reason=decoder down
+  device.connectedEncoderAnalogAudio; mac=none, name=N/A, receivingAudioFromEncoder=no
+  device.connectedEncoderHdmiDownmixAudio; mac=d8:80:39:ea:fe:54, name=4k_enc4, receivingAudioFromEncoder=no
+  device.activeVideoWall; name=none
+  device.inactiveVideoWall_1; name=Test_VW, positionRow 2, positionCol 2
+
+
+device(d8:80:39:eb:6:96);
+  device.gen; model=Zyper4K, type=decoder, name=4k_dec3, state=Down, uptime=0d:0h:0m:0s, lastChangeId=17
+  device.temperature; main=0C
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiOutput; cableConnected=disconnected, hdcp=NA, hdcp-version=NA, hdmi-2.0=NA, horizontalSize=0, verticalSize=0, fps=0, interlaced=NA
+  device.hdmiOutput; active-color-mapping=NA, active-colorDepth=NA
+  device.hdmiOutput; preferred-horizontalSize=NA, preferred-verticalSize=NA, preferred-fps=NA
+  device.hdmiOutput; maxPixelClockMhz=NA, supported-color-mappings=NA, max-colorDepth=NA
+  device.hdmiOutput; activePixelClockMhz=NA
+  device.edid; edid-status=NA, edid-monitor-name=NA
+  device.hdmiOutput; streamDatarate=0Mbps
+  device.connectedEncoder; mac=d8:80:39:ea:fe:54, name=4k_enc4, receivingVideoFromEncoder=no, reason=decoder down
+  device.connectedEncoderAnalogAudio; mac=none, name=N/A, receivingAudioFromEncoder=no
+  device.connectedEncoderHdmiDownmixAudio; mac=d8:80:39:ea:fe:54, name=4k_enc4, receivingAudioFromEncoder=no
+  device.activeVideoWall; name=none
+  device.inactiveVideoWall_1; name=Test_VW, positionRow 2, positionCol 1
+
+
+device(d8:80:39:eb:52:42);
+  device.gen; model=Zyper4K, type=decoder, name=4k_dec2, state=Down, uptime=0d:0h:0m:0s, lastChangeId=15
+  device.temperature; main=0C
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiOutput; cableConnected=disconnected, hdcp=NA, hdcp-version=NA, hdmi-2.0=NA, horizontalSize=0, verticalSize=0, fps=0, interlaced=NA
+  device.hdmiOutput; active-color-mapping=NA, active-colorDepth=NA
+  device.hdmiOutput; preferred-horizontalSize=NA, preferred-verticalSize=NA, preferred-fps=NA
+  device.hdmiOutput; maxPixelClockMhz=NA, supported-color-mappings=NA, max-colorDepth=NA
+  device.hdmiOutput; activePixelClockMhz=NA
+  device.edid; edid-status=NA, edid-monitor-name=NA
+  device.hdmiOutput; streamDatarate=0Mbps
+  device.connectedEncoder; mac=d8:80:39:ea:fe:54, name=4k_enc4, receivingVideoFromEncoder=no, reason=decoder down
+  device.connectedEncoderAnalogAudio; mac=none, name=N/A, receivingAudioFromEncoder=no
+  device.connectedEncoderHdmiDownmixAudio; mac=d8:80:39:ea:fe:54, name=4k_enc4, receivingAudioFromEncoder=no
+  device.activeVideoWall; name=none
+  device.inactiveVideoWall_1; name=Test_VW, positionRow 1, positionCol 2
+
+  
+device(d8:80:39:eb:5b:3c);
+  device.gen; model=Zyper4K, type=decoder, name=4k_dec1, state=Down, uptime=0d:0h:0m:0s, lastChangeId=16
+  device.temperature; main=0C
+  device.firmwareUpdate; status=idle, loadingFile=none, percentComplete=0
+  device.hdmiOutput; cableConnected=disconnected, hdcp=NA, hdcp-version=NA, hdmi-2.0=NA, horizontalSize=0, verticalSize=0, fps=0, interlaced=NA
+  device.hdmiOutput; active-color-mapping=NA, active-colorDepth=NA
+  device.hdmiOutput; preferred-horizontalSize=NA, preferred-verticalSize=NA, preferred-fps=NA
+  device.hdmiOutput; maxPixelClockMhz=NA, supported-color-mappings=NA, max-colorDepth=NA
+  device.hdmiOutput; activePixelClockMhz=NA
+  device.edid; edid-status=NA, edid-monitor-name=NA
+  device.hdmiOutput; streamDatarate=0Mbps
+  device.connectedEncoder; mac=d8:80:39:ea:fe:54, name=4k_enc4, receivingVideoFromEncoder=no, reason=decoder down
+  device.connectedEncoderAnalogAudio; mac=none, name=N/A, receivingAudioFromEncoder=no
+  device.connectedEncoderHdmiDownmixAudio; mac=d8:80:39:ea:fe:54, name=4k_enc4, receivingAudioFromEncoder=no
+  device.activeVideoWall; name=none
+  device.inactiveVideoWall_1; name=Test_VW, positionRow 1, positionCol 1
+lastChangeIdMax(3456);

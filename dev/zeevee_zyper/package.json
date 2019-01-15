@@ -1,0 +1,67 @@
+{
+  "name": "zeevee_zyper",
+  "version": "1.0.1",
+  "description": "Driver for Zyper Management Platform over a TCP Connection",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "ZeeVee",
+    "models": [ "Management Platform" ],
+    "type": "device",
+    "subtype": "matrix",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [ "Disconnected", "Connected" ]
+      }
+    ],
+    "commands": [
+    ],
+    "pointSetupSchema": {
+      "title": "Zyper Management Platform Settings",
+      "type": "object",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address:",
+          "type": "string",
+          "default": "192.168.99.40"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 23,
+          "description": "Default: 23"
+        },
+        "decoders": {
+          "title": "Decoders",
+          "type": "array",
+          "format": "table",
+          "uniqueItems": true,
+          "items": {
+            "title": "Decoder",
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "Name or MAC Address",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "decoders"
+      ]
+    }
+  }
+}
