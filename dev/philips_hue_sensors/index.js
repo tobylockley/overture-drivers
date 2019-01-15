@@ -14,7 +14,7 @@ exports.init = _host => {
 exports.createDevice = base => {
   const logger = base.logger || host.logger;
   let config;
-  let huejay = require('huejay');
+  let huejay;
   let hueClient;
   let initialised = false;
   let mySensors = {};  // Store config info, as well as last sensor state and update timestamp
@@ -75,6 +75,7 @@ exports.createDevice = base => {
 
 
   const start = () => {
+    huejay = require('huejay');
     hueClient = new huejay.Client({
       host: config.host,
       username: config.username,
