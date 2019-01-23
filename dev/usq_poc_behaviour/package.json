@@ -1,0 +1,372 @@
+{
+  "name": "usq_poc_behaviour",
+  "version": "1.0.0-beta.7",
+  "description": "Behaviour to handle 1UCP 2 projector flat floor teaching spaces",
+  "main": "index.js",
+  "directories": {},
+  "scripts": {},
+  "author": "Warren Hedges",
+  "license": "MIT",
+  "overture": {
+    "brand": "overture",
+    "models": [],
+    "type": "behavior",
+    "subtype": "",
+    "variables": [
+      {
+        "name": "Dest",
+        "type": "enum",
+        "perform": {
+          "action": "Set Dest",
+          "params": {
+            "Output": "$string"
+          }
+        }
+      },
+      {
+        "name": "Source",
+        "type": "enum",
+        "perform": {
+          "action": "Set Source",
+          "params": {
+            "Source": "$string"
+          }
+        }
+      },
+      {
+        "name": "Audio Source",
+        "type": "enum",
+        "enums": [
+          "mute",
+          "projLeft",
+          "projRight"
+        ],
+        "perform": {
+          "action": "Set Audio Source",
+          "params": {
+            "Source": "$string"
+          }
+        }
+      },
+      {
+        "name": "CurrentMode",
+        "type": "enum",
+        "enums": [
+          "initial",
+          "express",
+          "advanced"
+        ],
+        "perform": {
+          "action": "Set Current Mode",
+          "params": {
+            "Mode": "$string"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Dest",
+        "params": [
+          {
+            "name": "Output",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "Set Source",
+        "params": [
+          {
+            "name": "Source",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "Set Current Mode",
+        "params": [
+          {
+            "name": "Mode",
+            "enums": [
+              "initial",
+              "express",
+              "advanced"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Set Audio Source",
+        "params": [
+          {
+            "name": "Source",
+            "enums": [
+              "mute",
+              "projLeft",
+              "projRight"
+            ]
+          }
+        ]
+      }
+    ],
+    "pointSetupSchema": {
+      "title": "Express Setup Defaults",
+      "type": "object",
+      "properties": {
+        "Outputs": {
+          "title": "Outputs",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Output Device",
+            "properties": {
+              "name": {
+                "title": "Name",
+                "type": "string",
+                "description": "The name that will be displayed on the user interface."
+              },
+              "deviceName": {
+                "title": "Device Name",
+                "type": "string",
+                "description": "The name of the Device that will be controlled by Overture."
+              },
+              "xPoint": {
+                "title": "Matrix Crosspoint",
+                "type": "string",
+                "description": "The name used for the matrix output."
+              },
+              "initialSource": {
+                "title": "Start-up Source",
+                "type": "string",
+                "description": "The source to route when the system shuts down."
+              },
+              "expressMode": {
+                "type": "object",
+                "title": "Express Mode -",
+                "properties": {
+                  "used": {
+                    "title": "Display in Express Mode?",
+                    "type": "boolean",
+                    "format": "checkbox",
+                    "description": "Will this output be displayed on the user interface in Express Mode."
+                  },
+                  "source": {
+                    "title": "Pre-selected Source in Express Mode",
+                    "type": "string",
+                    "description": "The source that will be displayed on this output device in Express mode - must match name of input."
+                  }
+                }
+              },
+              "advancedMode": {
+                "type": "object",
+                "title": "Advanced Mode -",
+                "properties": {
+                  "used": {
+                    "title": "Display in Advanced Mode?",
+                    "type": "boolean",
+                    "format": "checkbox",
+                    "description": "Will this output be displayed on the user interface in Advanced Mode."
+                  },
+                  "source": {
+                    "title": "Pre-selected Source in Advanced Mode",
+                    "type": "string",
+                    "description": "The source that will be displayed on this output device in Advanced mode - must match variable name of input."
+                  }
+                }
+              }
+            }
+          },
+          "default": [
+            {
+              "name": "Left Screen",
+              "deviceName": "Proj Left",
+              "xPoint": "Proj Left",
+              "initialSource": "",
+              "expressMode": {
+                "used": true,
+                "source": "PC"
+              },
+              "advancedMode": {
+                "used": true,
+                "source": ""
+              }
+            },
+            {
+              "name": "Right Screen",
+              "deviceName": "Proj Right",
+              "xPoint": "Proj Right",
+              "initialSource": "",
+              "expressMode": {
+                "used": true,
+                "source": "PC"
+              },
+              "advancedMode": {
+                "used": true,
+                "source": ""
+              }
+            },
+            {
+              "name": "Wacom",
+              "deviceName": "",
+              "xPoint": "Wacom",
+              "initialSource": "PC",
+              "expressMode": {
+                "used": false,
+                "source": "PC"
+              },
+              "advancedMode": {
+                "used": true,
+                "source": "PC"
+              }
+            },
+            {
+              "name": "Lecture Record",
+              "deviceName": "Vaddio",
+              "xPoint": "Vaddio",
+              "initialSource": "Presenter Camera",
+              "expressMode": {
+                "used": false,
+                "source": "Presenter Camera"
+              },
+              "advancedMode": {
+                "used": true,
+                "source": "Presenter Camera"
+              }
+            }
+          ]
+        },
+        "Inputs": {
+          "title": "Inputs",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Input Device",
+            "properties": {
+              "name": {
+                "title": "Name",
+                "type": "string",
+                "description": "The name that will be displayed on the user interface."
+              },
+              "deviceName": {
+                "title": "Device Name",
+                "type": "string",
+                "description": "The name of the Device that will be controlled by Overture."
+              },
+              "xPoint": {
+                "title": "Matrix Crosspoint",
+                "type": "string",
+                "description": "The name used for the matrix input."
+              },
+              "expressMode": {
+                "type": "object",
+                "title": "Express Mode -",
+                "properties": {
+                  "used": {
+                    "title": "Display in Express Mode?",
+                    "type": "boolean",
+                    "format": "checkbox",
+                    "description": "Will this input be displayed on the user interface in Express Mode."
+                  }
+                }
+              },
+              "advancedMode": {
+                "type": "object",
+                "title": "Advanced Mode -",
+                "properties": {
+                  "used": {
+                    "title": "Display in Advanced Mode?",
+                    "type": "boolean",
+                    "format": "checkbox",
+                    "description": "Will this output be displayed on the user interface in Advanced Mode."
+                  }
+                }
+              }
+            }
+          },
+          "default": [
+            {
+              "name": "PC",
+              "deviceName": "",
+              "xPoint": "PC",
+              "expressMode": {
+                "used": true
+              },
+              "advancedMode": {
+                "used": true
+              }
+            },
+            {
+              "name": "PC Ext",
+              "deviceName": "",
+              "xPoint": "PC Ext",
+              "expressMode": {
+                "used": false
+              },
+              "advancedMode": {
+                "used": true
+              }
+            },
+            {
+              "name": "Laptop",
+              "deviceName": "",
+              "xPoint": "Laptop",
+              "expressMode": {
+                "used": true
+              },
+              "advancedMode": {
+                "used": true
+              }
+            },
+            {
+              "name": "Document Camera",
+              "deviceName": "Doc Cam",
+              "xPoint": "Doc Cam",
+              "expressMode": {
+                "used": true
+              },
+              "advancedMode": {
+                "used": true
+              }
+            },
+            {
+              "name": "Clickshare",
+              "deviceName": "Clickshare",
+              "xPoint": "Clickshare",
+              "expressMode": {
+                "used": true
+              },
+              "advancedMode": {
+                "used": true
+              }
+            },
+            {
+              "name": "Presenter Camera",
+              "deviceName": "Camera Presenter",
+              "xPoint": "Camera Presenter",
+              "expressMode": {
+                "used": false
+              },
+              "advancedMode": {
+                "used": true
+              }
+            },
+            {
+              "name": "Audience Camera",
+              "deviceName": "Camera Audience",
+              "xPoint": "Camera Audience",
+              "expressMode": {
+                "used": false
+              },
+              "advancedMode": {
+                "used": true
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
