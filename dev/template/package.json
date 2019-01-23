@@ -27,7 +27,8 @@
         "enums": ["Off", "On"],
         "perform": {
           "action": "Set Power",
-          "params": { "Status": "$string"} }
+          "params": { "Status": "$string"}
+        }
       }
     ],
 
