@@ -22,10 +22,10 @@
     ],
     "commands": [
       {
-        "name": "Select Source",
+        "name": "selectSource",
         "params": {
           "Channel": { "type": "string" },
-          "Name": { "type": "enum", "enums": ["HDMI1", "HDMI2", "HDMI3", "HDMI4"] }
+          "Name": { "type": "string" }
         }
       }
     ],
@@ -77,8 +77,5 @@
         "switchers"
       ]
     }
-  },
-  "dependencies": {
-    "telnet-client": "^0.15.5"
   }
 }
