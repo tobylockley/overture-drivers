@@ -1,0 +1,55 @@
+{
+  "name": "grandview_smartscreen",
+  "version": "1.0.0",
+  "description": "Driver For IP control of Grandview Smart-Screen",
+  "main": "index.js",
+  "scripts": {
+	  "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "Grandview",
+    "models": ["GRIP180V"],
+    "type": "device",
+    "subtype": "generic",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": ["Disconnected", "Connected"]
+      },
+      {
+        "name": "Commands",
+        "type": "enum",
+        "enums": ["Idle", "Stop", "Up", "Down"],
+        "perform": {
+          "action": "Send Command",
+          "params": {"Name": "$string"}
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Send Command",
+        "params": {
+          "Name": {"type": "string"}
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Setup for Grandview Smart-Screen",
+      "properties": {
+        "host": {
+          "title": "Hostname/IP Address",
+          "type": "string",
+          "default": "192.168.1.2"
+        }
+      },
+      "required": [
+        "host"
+      ]
+    }
+  }
+}
