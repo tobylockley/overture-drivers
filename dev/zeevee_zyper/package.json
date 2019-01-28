@@ -1,6 +1,6 @@
 {
   "name": "zeevee_zyper",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Driver for Zyper Management Platform over a TCP Connection",
   "main": "index.js",
   "scripts": {
@@ -21,6 +21,14 @@
       }
     ],
     "commands": [
+      {
+        "name": "Select Source",
+        "params": {
+          "Channel": { "type": "integer" },
+          "Name": { "type": "string" },
+          "Index": { "type": "integer" }
+        }
+      }
     ],
     "pointSetupSchema": {
       "title": "Zyper Management Platform Settings",

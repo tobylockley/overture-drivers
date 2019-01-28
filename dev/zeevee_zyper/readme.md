@@ -3,6 +3,9 @@
 ## Overview
 
 Driver for a Zeevee Zyper Management Platform, controlling Zyper 4K and UHD devices, over a TCP connection.
+After configuring IP address and decoder names, the driver will retrieve list of available sources automatically. Source lists will update automatically every 30 seconds.
+When selecting video wall from source list, it will trigger the same source on the complete configured video wall (video wall must be pre-configured in MaestroZ).
+
 
 ## Setup
 
@@ -39,3 +42,6 @@ To select the input source to display.
   - Removed hard-coded switcher logic
   - Placed all available sources, including video-walls, in one enum list for simplicity
   - Now tracks when decoder is in video-wall mode
+
+### 1.0.2
+  - Removed dev files, added some info to readme
