@@ -1,0 +1,105 @@
+{
+  "name": "philips_hue_groups",
+  "version": "1.0.1",
+  "description": "Overture driver for Philips Hue using Huejay, focusing on group control",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "Philips",
+    "models": [
+      "Hue"
+    ],
+    "type": "device",
+    "subtype": "lighting",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "name": "setPower",
+        "params": {
+          "Group": {
+            "type": "string"
+          },
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "setLevel",
+        "params": {
+          "Group": {
+            "type": "string"
+          },
+          "Level": {
+            "type": "integer"
+          }
+        },
+        "optimize": true
+      },
+      {
+        "name": "setColorTemperature",
+        "params": {
+          "Group": {
+            "type": "string"
+          },
+          "Level": {
+            "type": "integer"
+          }
+        },
+        "optimize": true
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Philips Hue Setup",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address of Hue Bridge:",
+          "type": "string",
+          "default": "192.168.1.10"
+        },
+        "username": {
+          "title": "Username:",
+          "type": "string",
+          "description": "Enter Username as provided by the Hue Bridge"
+        },
+        "groups": {
+          "title": "Groups",
+          "description": "Must match configured group name exactly",
+          "type": "array",
+          "format": "table",
+          "uniqueItems": true,
+          "items": {
+            "title": "Group",
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "host",
+        "username",
+        "groups"
+      ]
+    }
+  },
+  "dependencies": {
+    "huejay": "^1.8.5"
+  }
+}

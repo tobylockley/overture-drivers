@@ -1,9 +1,7 @@
 'use strict';
 
 const TICK_PERIOD = 5000;           // In-built tick interval
-
 let express, app, server, path;
-
 
 let host;
 exports.init = _host => {
@@ -31,7 +29,9 @@ exports.createDevice = base => {
 
     app.get('/', (req, res) => {
       // res.send(`Hello World!<br><br>${config.token}`);
-      res.sendFile(path.join(__dirname + '/index.html'));
+      let toServe = path.join(__dirname + '/public/index.html');
+      res.sendFile(toServe);
+      logger.debug(`Serving file from: ${toServe}`);
     });
 
     if (config.startup) startServer();

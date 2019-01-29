@@ -1,0 +1,131 @@
+{
+  "name": "samsung_bde_bluray",
+  "version": "1.0.0",
+  "description": "Driver for IR control of Samsung BD-E Blu Ray Recorder",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "Samsung",
+    "model": "BD-E Series",
+    "type": "device",
+    "subtype": "player",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": ["Disconnected", "Connected"]
+      },
+      {
+        "name": "IRCommands",
+        "type": "enum",
+        "enums": [
+          "Idle",
+          "3d Toggle",
+          "Channel Down",
+          "Channel List",
+          "Channel Up",
+          "Cursor Down",
+          "Cursor Enter",
+          "Cursor Left",
+          "Cursor Right",
+          "Cursor Up",
+          "Digit 0",
+          "Digit 1",
+          "Digit 2",
+          "Digit 3",
+          "Digit 4",
+          "Digit 5",
+          "Digit 6",
+          "Digit 7",
+          "Digit 8",
+          "Digit 9",
+          "Exit",
+          "Forward",
+          "Function Blue",
+          "Function Green",
+          "Function Red",
+          "Function Yellow",
+          "Guide",
+          "Info",
+          "Menu Home",
+          "Menu Main",
+          "Menu Pop Up",
+          "Menu Title",
+          "Next",
+          "Open Close",
+          "Pause",
+          "Pip",
+          "Play",
+          "Power Toggle",
+          "Previous",
+          "Record",
+          "Record Pause",
+          "Return",
+          "Reverse",
+          "Search",
+          "Smart Hub",
+          "Stop",
+          "Teletext",
+          "Tools",
+          "Www"
+        ],
+        "perform": {
+          "action": "Send Command",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Send Command",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Setup for  GC IR emitter",
+      "properties": {
+        "host": {
+          "title": "GC IR emitter IP/Hostname",
+          "type": "string",
+          "default": "192.168.1.1"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 4998,
+          "description": "Default: 4998"
+        },
+        "module": {
+          "title": "Module#:",
+          "type": "string",
+          "default": "1",
+          "description": "Module of GC (1 for Itach)"
+        },
+        "ir_port": {
+          "title": "IR Port:",
+          "type": "string",
+          "default": "1",
+          "description": "IR blaster port in use (1-3)"
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "module",
+        "ir_port"
+      ]
+    }
+  },
+  "dependencies": {}
+}

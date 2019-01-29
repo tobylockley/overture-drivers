@@ -1,0 +1,59 @@
+{
+  "name": "projector_simulator",
+  "version": "1.0.0",
+  "description": "Projector Simulator",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsc -w",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"    
+  },
+  "keywords": [],
+  "author": "KB",
+  "license": "MIT",
+  "devDependencies": {
+  },
+  "dependencies": {
+  },
+  "overture":{
+    "brand": "Barco",
+    "model": "projector",
+    "type": "device",
+    "subtype": "projector",
+    "pointSetupSchema": {
+      "title": "Projector Simulator",
+      "type": "object",
+      "properties": {
+        "host": {
+          "type": "string",
+          "description": "Host address",
+          "default": "192.168.1.10"
+        },
+        "port": {
+          "type": "integer",
+          "default": 4352
+        },
+        "auth": {
+          "type": "boolean",
+          "format": "checkbox"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "variables": [
+      {"name":"Status", "type":"enum", "enums":["Disconnected","Connected"]},
+      {"name":"Power", "type":"enum", "enums":["Off","On"], "perform" :{ "action":"Set Power", "params":{ "Status":"$string"}}},
+      {"name":"Shutter", "type":"enum", "enums":["Closed","Open"], "perform" :{ "action":"Set Shutter", "params":{ "Status":"$string"}}},
+      {"name":"Sources", "type":"enum", "enums":["Laptop","CNN","Video Stream","Skype"], "perform" :{ "action":"Select Source", "params":{ "Name":"$string"}}},
+      {"name":"Brightness", "type":"integer", "min":0, "max":100, "perform" :{ "action":"Set Brightness", "params":{ "Level":"$value"}}},
+      {"name":"Contrast", "type":"integer", "min":0, "max":100, "perform" :{ "action":"Set Contrast", "params":{ "Level":"$value"}}},
+      {"name":"Temperature", "type":"integer"},
+      {"name":"HoursLamp1", "type":"integer"}
+    ],
+    "commands": [
+      
+    ]
+  }
+}
