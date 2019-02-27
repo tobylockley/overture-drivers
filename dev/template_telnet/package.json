@@ -1,0 +1,62 @@
+{
+  "name": "template_telnet",
+  "version": "1.0.0-beta.1",
+  "description": "Driver using telnet",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "BRAND",
+    "models": [
+      "MODEL"
+    ],
+    "type": "device",
+    "subtype": "generic",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ]
+      }
+    ],
+    "commands": [],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Settings",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address:",
+          "type": "string",
+          "default": "192.168."
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 23,
+          "description": "Telnet: 23"
+        }
+      },
+      "required": [
+        "host",
+        "port"
+      ]
+    }
+  },
+  "dependencies": {
+    "telnet-client": "^0.16.2"
+  }
+}
