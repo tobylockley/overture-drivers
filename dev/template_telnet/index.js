@@ -88,9 +88,9 @@ exports.createDevice = base => {
 
   function sendDefer(data) {
     base.commandDefer(CMD_DEFER_TIME);
-    telnetClient.send(data).then(() => {
+    telnetClient.send(data).then(recvd => {
       // Handled in onFrame
-      logger.silly(`Telnet send OK (${data})`);
+      logger.silly(`Telnet send OK (${data}): ${recvd}`);
     }, err => {
       base.commandError(`Telnet send error: ${err}`);
     });
