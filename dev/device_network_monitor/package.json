@@ -1,0 +1,73 @@
+{
+  "name": "device_network_monitor",
+  "version": "1.0.0",
+  "description": "Driver for monitoring multiple devices network status",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "",
+    "models": [],
+    "type": "device",
+    "subtype": "generic",
+    "variables": [
+    ],
+    "commands": [
+    ],
+    "pointSetupSchema": {
+      "title": "Device Network Monitor Settings",
+      "type": "object",
+      "properties": {
+        "timeout": {
+          "title": "Ping Timeout (in milliseconds):",
+          "type": "integer",
+          "default": 1000
+        },
+        "frequency": {
+          "title": "Ping Frequency (in milliseconds):",
+          "type": "integer",
+          "default": 10000
+        },
+        "debounce": {
+          "title": "Debouncing:",
+          "type": "integer",
+          "default": 3,
+          "description": "Number of pings that need to fail before declaring the device as offline (no debouncing applied to online)"
+        },
+        "devices": {
+          "title": "Devices To Monitor",
+          "type": "array",
+          "format": "table",
+          "uniqueItems": true,
+          "items": {
+            "title": "Device",
+            "type": "object",
+            "properties": {
+              "host": {
+                "title": "Hostname or IP Address",
+                "type": "string"
+              },
+              "name": {
+                "title": "Friendly Name",
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_]+$"
+              }
+            },
+            "required": [
+              "host",
+              "name"
+            ]
+          }
+        }
+      },
+      "required": [
+        "frequency",
+        "debounce",
+        "devices"
+      ]
+    }
+  }
+}
