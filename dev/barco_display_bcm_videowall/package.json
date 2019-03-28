@@ -1,0 +1,90 @@
+{
+  "name": "barco_display_bcm_videowall",
+  "version": "1.0.0",
+  "description": "Driver For Barco BCM",
+  "main": "index.js",
+    "scripts": {
+	"start": "node index.js"
+  },
+  "author": "Medialon",
+  "license": "Me",
+  "overture": {
+    "brand": "Barco",
+    "model": "BCM",
+    "models": ["BCM"],
+    "type": "device",
+    "subtype": "display",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": ["Disconnected","Connected"]
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "enums": ["Off","On"],
+        "perform":{"action":"Set Power", "params": { "Status":"$string"}}
+      },
+      {
+        "name": "Sources",
+        "type": "enum",
+        "enums": ["DisplayPort1", "HDMI1", "DVI1", "DVI2", "OPS1"],
+        "perform":{"action":"Select Source", "params": { "Name":"$string"}}
+        
+      },
+      {
+        "name": "Error",
+        "type": "string"  
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off","On"]
+          }
+        }
+      },
+      {
+        "name": "Select Source",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Driver",
+      "properties": {
+        "host": {
+          "title": "host name or IP address:",
+          "type": "string",
+          "default": "127.0.0.1"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 23500,
+          "description": "Default: 23500"
+        },
+        "deviceID": {
+          "title": "Device ID",
+          "type": "string",
+          "default": "MyWall",
+          "description": "Default: MyWall"
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "deviceID"
+      ]
+    }
+
+  }
+}
