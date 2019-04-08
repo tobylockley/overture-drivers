@@ -1,13 +1,13 @@
 {
-  "name": "teac_hdb850",
-  "version": "1.0.0-beta.3-modified",
-  "description": "Driver for IR control of Teac DVR",
+  "name": "teac_hdb850_new",
+  "version": "1.0.0-beta.4",
+  "description": "Driver for IR control of Teac DVR (Different Up/Down)",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
-  "author": "AVD_Toby",
-  "license": "Unlicensed",
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
   "overture": {
     "brand": "Teac",
     "model": "HDB850",
