@@ -1,13 +1,13 @@
 {
   "name": "barco_display_bcm_videowall",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Driver For Barco BCM",
   "main": "index.js",
     "scripts": {
 	"start": "node index.js"
   },
-  "author": "Medialon",
-  "license": "Me",
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
   "overture": {
     "brand": "Barco",
     "model": "BCM",
@@ -31,11 +31,10 @@
         "type": "enum",
         "enums": ["DisplayPort1", "HDMI1", "DVI1", "DVI2", "OPS1"],
         "perform":{"action":"Select Source", "params": { "Name":"$string"}}
-        
       },
       {
         "name": "Error",
-        "type": "string"  
+        "type": "string"
       }
     ],
     "commands": [
@@ -72,7 +71,7 @@
           "default": 23500,
           "description": "Default: 23500"
         },
-        "deviceID": {
+        "device_id": {
           "title": "Device ID",
           "type": "string",
           "default": "MyWall",
@@ -82,9 +81,8 @@
       "required": [
         "host",
         "port",
-        "deviceID"
+        "device_id"
       ]
     }
-
   }
 }
