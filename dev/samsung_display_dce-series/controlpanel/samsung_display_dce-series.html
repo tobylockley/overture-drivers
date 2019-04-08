@@ -1,0 +1,106 @@
+<!----------
+Samsung DCE Display Template
+
+This template is used for monitoring and control of a Samsung DCE display.
+-------->
+
+<med-display
+	med-point=".Status"
+></med-display>
+
+<med-on-off
+	med-point=".Power"
+    med-label-on="Power On"
+	med-state-on="1"
+    med-label-off="Power Off"
+	med-state-off="0"
+></med-on-off>
+
+<med-on-off
+    med-point=".AudioMute"
+    med-label="Audio Mute"
+    med-label-on="Audio On"
+	med-state-on="0"
+    med-label-off="Audio Off"
+	med-state-off="1"
+></med-on-off>
+
+<med-slider
+	med-label="Audio Level"
+	med-point=".AudioLevel"
+></med-slider>
+
+<med-select
+    med-label="Input Source"
+	med-point=".Sources"
+></med-select>
+
+<med-container
+	med-label="Advanced Controls"
+	med-visible="false"
+>
+    <med-display
+	    med-point=".DeviceName"
+	    med-label="Device Name"
+    ></med-display>
+
+	<med-slider
+		med-point=".Brightness"
+	></med-slider>
+
+	<med-slider
+		med-point=".Contrast"
+	></med-slider>
+
+	<med-slider
+		med-point=".Sharpness"
+	></med-slider>
+
+	<med-led
+	    med-label="Temp status"
+		med-point=".TemperatureStatus"
+		med-colors="green, red"
+	></med-led>
+
+	<med-display
+	    med-label="Temp readout"
+		med-point=".Temperature"
+	></med-display>
+
+	<med-led
+	    med-label="Fan"
+		med-point=".Fan"
+		med-colors="green, red"
+	></med-led>
+
+	<med-led
+	    med-label="Sync"
+		med-point=".Sync"
+		med-colors="green, red"
+	></med-led>
+
+	<med-display
+	    med-point=".MDCConnectionType"
+	    med-label="Connection"
+	></med-display>
+
+	<med-display
+		med-point=".Model"
+		med-label="Display Model"
+	></med-display>
+
+	<med-display
+		med-point=".Serial"
+		med-label="Display SN#"
+	></med-display>
+
+	<med-display
+		med-point=".SWVersion"
+		med-label="Software Version"
+	></med-display>
+
+	<med-toggle
+		med-point=".NetworkStandby"
+	></med-toggle>
+
+</med-container>
