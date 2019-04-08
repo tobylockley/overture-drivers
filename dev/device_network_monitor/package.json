@@ -1,6 +1,6 @@
 {
   "name": "device_network_monitor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Driver for monitoring multiple devices network status",
   "main": "index.js",
   "scripts": {
@@ -39,6 +39,7 @@
         },
         "devices": {
           "title": "Devices To Monitor",
+          "description": "Friendly names must contain only alphanumeric characters and underscores, and must start with a letter.",
           "type": "array",
           "format": "table",
           "uniqueItems": true,
@@ -53,7 +54,7 @@
               "name": {
                 "title": "Friendly Name",
                 "type": "string",
-                "pattern": "^[A-Za-z0-9_]+$"
+                "pattern": "^[A-Za-z][A-Za-z0-9_]+$"
               }
             },
             "required": [
