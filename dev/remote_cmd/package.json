@@ -1,0 +1,41 @@
+{
+  "name": "remote_cmd",
+  "version": "1.0.0-beta.1",
+  "description": "Run a command on the remote CS",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Toby",
+  "license": "MIT",
+  "overture": {
+    "brand": "AVD",
+    "models": [
+      "Unspecified"
+    ],
+    "type": "device",
+    "subtype": "generic",
+    "variables": [
+      {
+        "name": "Run",
+        "type": "string",
+        "perform": {
+          "action": "Run",
+          "params": {
+            "Cmd": "$string"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Run",
+        "params": {
+          "Cmd": { "type": "string" }
+        }
+      }
+    ],
+    "pointSetupSchema": {}
+  },
+  "dependencies": {}
+}
