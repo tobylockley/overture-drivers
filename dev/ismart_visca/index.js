@@ -15,43 +15,34 @@ exports.createDevice = base => {
   const logger = base.logger || host.logger;
   let config;
   let tcpClient;
-
-  let frameParser = host.createFrameParser();
-  frameParser.setSeparator('\n');
-  frameParser.on('data', data => onFrame(data));
+  let visca_header;
 
 
   // ------------------------------ SETUP FUNCTIONS ------------------------------
 
   function isConnected() { return base.getVar('Status').string === 'Connected'; }
-  function isPoweredOn() { return isConnected() && base.getVar('Power').string === 'On'; }
-  function isDTVMode() { return isConnected() && isPoweredOn() && base.getVar('Sources').string === 'DTV'; }
 
   function setup(_config) {
     config = _config;
-    base.setTickPeriod(TICK_PERIOD);
+    visca_header = 0x80 + config.visca_address;
 
+    base.setTickPeriod(TICK_PERIOD);
     // Register polling functions
     base.setPoll({ action: 'getPower', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true });
-    base.setPoll({ action: 'getSource', period: POLL_PERIOD, enablePollFn: isPoweredOn, startImmediately: true });
-    base.setPoll({ action: 'getAudioLevel', period: POLL_PERIOD, enablePollFn: isPoweredOn, startImmediately: true });
-    base.setPoll({ action: 'getAudioMute', period: POLL_PERIOD, enablePollFn: isPoweredOn, startImmediately: true });
-    base.setPoll({ action: 'getChannel', period: POLL_PERIOD, enablePollFn: isDTVMode, startImmediately: true });
   }
 
   function start() {
-    if (config.simulation) base.getVar('Status').string = 'Connected';
-    else initTcpClient();
-  }
-
-  function tick() {
-    if (!config.simulation && !tcpClient) initTcpClient();
+    initTcpClient();
   }
 
   function stop() {
     base.getVar('Status').string = 'Disconnected';
     tcpClient && tcpClient.end();
     tcpClient = null;
+  }
+
+  function tick() {
+    if (!tcpClient) initTcpClient();
   }
 
   function initTcpClient() {
@@ -71,7 +62,7 @@ exports.createDevice = base => {
     });
 
     tcpClient.on('data', data => {
-      frameParser.push( data.toString() );
+      onFrame(data);
     });
 
     tcpClient.on('close', () => {
@@ -94,101 +85,27 @@ exports.createDevice = base => {
   }
 
   function sendDefer(data) {
-    if (send(data)) base.commandDefer(CMD_DEFER_TIME);
-    else base.commandError('Data not sent');
+    base.commandDefer(CMD_DEFER_TIME);
+    if (!send(data)) base.commandError('Data not sent');
   }
 
   function onFrame(data) {
-    let match;  // Used for regex matching below
     const pendingCommand = base.getPendingCommand();
+    let return_header = visca_header + 8;
 
-    logger.silly(`onFrame: ${data}`);
-    pendingCommand && logger.debug(`pendingCommand: ${pendingCommand.action}`);
+    if (pendingCommand) logger.silly(`onFrame pendingCommand: ${pendingCommand.action}, data: ${data}`);
+    else logger.silly(`onFrame: ${data}`);
 
-    // Use arrays to match pending command action to expected response
-    const setFns = [ 'setPower', 'selectSource', 'setAudioLevel', 'setAudioMute', 'setChannel', 'shiftChannel' ];
-
-    if ( pendingCommand && setFns.includes(pendingCommand.action) ) {
-      // Parse response after issueing a SET function
-
-      match = data.match(/POWR0{16}/);
-      if (match) {
+    if (pendingCommand) {
+      match = data.match(/POWR(\d+)/);
+      if (match && pendingCommand.action == 'getPower') {
+        base.getVar('Power').value = parseInt(match[1]);  // 0 = off, 1 = on
+        base.commandDone();
+      }
+      else if (match && pendingCommand.action == 'setPower') {
         base.getVar('Power').string = pendingCommand.params.Status;
         base.commandDone();
       }
-
-      match = data.match(/INPT0{16}/);
-      if (match) {
-        base.getVar('Sources').string = pendingCommand.params.Name;
-        base.commandDone();
-        if (pendingCommand.params.Name === 'DTV') getChannel();  // Get channel when set to DTV mode
-      }
-
-      match = data.match(/VOLU0{16}/);
-      if (match) {
-        base.getVar('AudioLevel').value = parseInt(pendingCommand.params.Level);
-        base.commandDone();
-      }
-
-      match = data.match(/AMUT0{16}/);
-      if (match) {
-        base.getVar('AudioMute').string = pendingCommand.params.Status;
-        base.commandDone();
-      }
-
-      match = data.match(/CHNN0{16}/);
-      if (match) {
-        base.getVar('Channel').value = parseInt(pendingCommand.params.Name);
-        base.commandDone();
-      }
-
-      match = data.match(/IRCC0{16}/);
-      if (match) {
-        base.getVar('ChannelShift').value = 0;  // Reset to 'idle'
-        base.commandDone();
-      }
-
-    }
-    else {
-      // Parse response after issueing a GET function, OR after a "notify" frame
-      // Notify frames are received after changing something, either from the CS or an IR remote
-
-      match = data.match(/POWR(\d+)/);
-      if (match) {
-        base.getVar('Power').value = parseInt(match[1]);  // 0 = off, 1 = on
-        pendingCommand && base.commandDone();
-      }
-
-      match = data.match(/INPT0{16}/);
-      if (match) {
-        base.getVar('Sources').string = 'DTV';
-        pendingCommand && base.commandDone();
-      }
-
-      match = data.match(/INPT0{7}1(\d+)/);
-      if (match) {
-        base.getVar('Sources').string = `HDMI${parseInt(match[1])}`;
-        pendingCommand && base.commandDone();
-      }
-
-      match = data.match(/VOLU(\d+)/);
-      if (match) {
-        base.getVar('AudioLevel').value = parseInt(match[1]);
-        pendingCommand && base.commandDone();
-      }
-
-      match = data.match(/AMUT(\d+)/);
-      if (match) {
-        base.getVar('AudioMute').value = parseInt(match[1]);  // 0 = unmute, 1 = mute
-        pendingCommand && base.commandDone();
-      }
-
-      match = data.match(/CHNN(\d+)\./);  // Ignores values after decimal point
-      if (match) {
-        base.getVar('Channel').value = parseInt(match[1]);
-        pendingCommand && base.commandDone();
-      }
-
     }
   }
 
@@ -196,105 +113,42 @@ exports.createDevice = base => {
   // ------------------------------ GET FUNCTIONS ------------------------------
 
   function getPower() {
-    sendDefer('*SEPOWR################\n');
-  }
-
-  function getSource() {
-    sendDefer('*SEINPT################\n');
-  }
-
-  function getAudioLevel() {
-    sendDefer('*SEVOLU################\n');
-  }
-
-  function getAudioMute() {
-    sendDefer('*SEAMUT################\n');
-  }
-
-  function getChannel() {
-    sendDefer('*SECHNN################\n');
+    sendDefer(Buffer.from([visca_header, 0x09, 0x04, 0x00, 0xFF]));
   }
 
 
   // ------------------------------ SET FUNCTIONS ------------------------------
   function setPower(params) {
-    if (config.simulation) {
-      base.getVar('Power').string = params.Status;
-      return;
-    }
-
     if (params.Status == 'Off') sendDefer('*SCPOWR0000000000000000\n');
     else if (params.Status == 'On') sendDefer('*SCPOWR0000000000000001\n');
   }
 
-  function selectSource(params) {
-    if (config.simulation) {
-      base.getVar('Sources').string = params.Name;
-      return;
-    }
-
-    if (params.Name == 'DTV') sendDefer('*SCINPT0000000000000000\n');
-    else {
-      let match = params.Name.match(/HDMI(\d)/);
-      match && sendDefer(`*SCINPT000000010000000${match[1]}\n`);
-    }
+  function recallPreset(params) {
+    if (params.Status == 'Off') sendDefer('*SCPOWR0000000000000000\n');
+    else if (params.Status == 'On') sendDefer('*SCPOWR0000000000000001\n');
   }
 
-  function setAudioLevel(params) {
-    if (config.simulation) {
-      base.getVar('AudioLevel').value = params.Level;
-      return;
-    }
-
-    let vol = params.Level.toString().padStart(3, '0');  // Formats the integer with leading zeroes, e.g. 53 = '053'
-    sendDefer(`*SCVOLU0000000000000${vol}\n`);
+  function savePreset(params) {
+    if (params.Status == 'Off') sendDefer('*SCPOWR0000000000000000\n');
+    else if (params.Status == 'On') sendDefer('*SCPOWR0000000000000001\n');
   }
 
-  function setAudioMute(params) {
-    if (config.simulation) {
-      base.getVar('AudioMute').string = params.Status;
-      return;
-    }
-
-    if (params.Status == 'Off') sendDefer('*SCAMUT0000000000000000\n');
-    else if (params.Status == 'On') sendDefer('*SCAMUT0000000000000001\n');
+  function sendPtz(params) {
+    if (params.Status == 'Off') sendDefer('*SCPOWR0000000000000000\n');
+    else if (params.Status == 'On') sendDefer('*SCPOWR0000000000000001\n');
   }
 
-  function setChannel(params) {
-    if (isDTVMode()) {
-      if (config.simulation) {
-        base.getVar('Channel').value = params.Name;
-        return;
-      }
-      let channel = params.Name.toString().padStart(8, '0');
-      sendDefer(`*SCCHNN${channel}.0000000\n`);
-    }
-    else {
-      logger.error('Cannot change channel unless set to DTV mode');
-    }
+  function setAutoTracking(params) {
+    if (params.Status == 'Off') sendDefer('*SCPOWR0000000000000000\n');
+    else if (params.Status == 'On') sendDefer('*SCPOWR0000000000000001\n');
   }
 
-  function shiftChannel(params) {
-    if (isDTVMode()) {
-      if (config.simulation) {
-        let delta = { 'Up': 1, 'Down': -1 };
-        base.getVar('Channel').value += delta[params.Name];
-        return;
-      }
-      if (params.Name == 'Up') sendDefer('*SCIRCC0000000000000033\n');
-      else if (params.Name == 'Down') sendDefer('*SCIRCC0000000000000034\n');
-      base.getVar('ChannelShift').string = params.Name;
-    }
-    else {
-      logger.error('Cannot change channel unless set to DTV mode');
-    }
-  }
 
 
   // ------------------------------ EXPORTED FUNCTIONS ------------------------------
   return {
     setup, start, stop, tick,
-    getPower, getSource, getAudioLevel, getAudioMute, getChannel,
-    setPower, selectSource, setAudioLevel, setAudioMute, setChannel, shiftChannel
+    getPower,
+    setPower, recallPreset, savePreset, sendPtz, setAutoTracking
   };
 };

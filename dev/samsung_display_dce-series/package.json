@@ -1,6 +1,6 @@
 {
   "name": "samsung_display_dce-series",
-  "version": "1.0.1",
+  "version": "1.0.0-hotfix1",
   "description": "Driver For Samsung DCE Series Displays",
   "main": "index.js",
     "scripts": {
@@ -33,7 +33,7 @@
       {
         "name": "Status",
         "type": "enum",
-        "enums": ["Disconnected","Connected"]       
+        "enums": ["Disconnected","Connected"]
       },
       {
         "name": "Power",
@@ -47,7 +47,7 @@
         "type": "enum",
         "enums": ["Off","On"],
         "perform":{"action":"Set Network Standby", "params": { "Status":"$string"}}
-        
+
       },
       {
         "name": "AudioMute",
@@ -55,12 +55,12 @@
         "type": "enum",
         "enums": ["Off","On"],
         "perform":{"action":"Set Audio Mute", "params": { "Status":"$string"}}
-        
+
       },
       {
         "name": "AudioLevel",
         "type": "integer",
-        "perform":{"action":"Set Audio Level", "params": { "Level":"$value"}}  
+        "perform":{"action":"Set Audio Level", "params": { "Level":"$value"}}
       },
       {
         "name": "Sources",
@@ -68,7 +68,7 @@
         "type": "enum",
         "enums": ["PC","DVI","A/V","Component","Magicinfo","DVI-V","TV","DTV","HDMI1","HDMI2","HDBT"],
         "perform":{"action":"Select Source", "params": { "Name":"$string"}}
-        
+
       },
       {
         "name": "Contrast",
@@ -97,12 +97,12 @@
       {
         "name": "TemperatureStatus",
         "type": "enum",
-        "enums": ["Normal","Error"]  
+        "enums": ["Normal","Error"]
       },
       {
         "name": "Fan",
         "type": "enum",
-        "enums": ["Normal","Error"]  
+        "enums": ["Normal","Error"]
       },
       {
         "name": "Temperature",
@@ -114,7 +114,7 @@
       {
         "name": "Sync",
         "type": "enum",
-        "enums": ["Normal","Error, No Sync"]  
+        "enums": ["Normal","Error, No Sync"]
       },
       {
         "name": "MDCConnectionType",
@@ -140,7 +140,7 @@
       },
       {
         "name": "Error",
-        "type": "string"  
+        "type": "string"
       }
     ],
     "commands": [
@@ -235,7 +235,7 @@
         "mdc": {
           "title": "ID",
           "type": "integer",
-          "default": "1", 
+          "default": "0",
 		      "description": "Found in 'Multi-Control' menu setting."
         }
       },

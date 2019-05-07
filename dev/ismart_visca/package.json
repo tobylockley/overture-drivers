@@ -90,6 +90,20 @@
             "Action": "$string"
           }
         }
+      },
+      {
+        "name": "Auto_Tracking",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "perform": {
+          "action": "Set Auto Tracking",
+          "params": {
+            "Action": "$string"
+          }
+        }
       }
     ],
     "commands": [
@@ -116,6 +130,12 @@
         "params": {
           "Name": { "type": "enum", "enums": [ "Pan_Left", "Pan_Right", "Tilt_Up", "Tilt_Down", "Zoom_In", "Zoom_Out" ] }
         }
+      },
+      {
+        "name": "Set Auto Tracking",
+        "params": {
+          "Status": { "type": "enum", "enums": [ "Off", "On" ] }
+        }
       }
     ],
     "pointSetupSchema": {
@@ -139,8 +159,8 @@
           "default": 1,
           "description": "Default: 1"
         },
-        "command_delay": {
-          "title": "Delay Between PTZ Commands (milliseconds):",
+        "stop_delay": {
+          "title": "PTZ Stop Delay (milliseconds):",
           "type": "integer",
           "default": 500,
           "description": "Will effect travel distance per button press"

@@ -173,5 +173,5 @@ Adjusts the sharpness of the source content. **Only available when Source is DTV
 ### 1.0.0
 - Initial version.
 
-### 1.0.1
+### 1.0.0-hotfix1
 - Edit by AVD, attempt to fix TCP reconnect error

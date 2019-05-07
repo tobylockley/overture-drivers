@@ -70,6 +70,7 @@ class MDCDevice {
         sourceNames: this.sourceNames
       } = realSources.filter(name => sourcesKeys.includes(name))
       .reduce((acc, name) => {
+        
         let hexValue = INPUT_SOURCES[name];
         acc.sources[name] = hexValue;
         acc.sourceNames[hexValue.toString(16)] = name;
@@ -139,45 +140,65 @@ class MDCDevice {
   }
 
   sendCommand(data) {
+    let _sendCommand = () => {
+      if (this.tcpClient)
+        return this.tcpClient.write(  Buffer.concat([Buffer.from([MSG_HEADER]), data, makeChecksum(data)]) );
+      else {
+        this.logger.error("TCP Client is not initialized!")
+        return false;
+      }
+    };
+
     this.logger.silly(`TCPClient send: ${data}`);
-    return this.tcpClient && this.tcpClient.write(  Buffer.concat([Buffer.from([MSG_HEADER]), data, makeChecksum(data)]) );
+    if (this.isConnected()) {
+      return _sendCommand();
+    } else {
+      return false;
+    }
   }
 
   // create a tcp client and handle events
   initTcpClient() {
-    if (this.tcpClient) return;
+    if (!this.tcpClient) {
+      this.tcpClient = host.createTCPClient()
+      this.tcpClient.setOptions({
+        receiveTimeout: TCP_IDLE_TIMEOUT,
+        autoReconnectionAttemptDelay: TCP_RECONNECT_DELAY
+      });
 
-    this.tcpClient = host.createTCPClient();
-    this.tcpClient.setOptions({
-      receiveTimeout: TCP_IDLE_TIMEOUT,
-      autoReconnectionAttemptDelay: TCP_RECONNECT_DELAY
-    });
-    this.tcpClient.connect(this.config.port, this.config.host);
+      this.tcpClient.on('data', (data) => {
+        this.frameParser.push(data.toString('hex'));
+      });
 
-    this.tcpClient.on('data', (data) => {
-      this.frameParser.push(data.toString('hex'));
-    });
+      this.tcpClient.on('connect', () => {
+        this.logger.debug("TCP Connection Open");
+        this.base.getVar('Status').value = 1
+        // onConnect && onConnect()
+        this.startPoll();
+      });
 
-    this.tcpClient.on('connect', () => {
-      this.logger.debug("TCP Connection Open");
-      this.base.getVar('Status').value = 1
-      this.startPoll();
-    });
+      this.tcpClient.on('close', () => {
+        this.logger.debug("TCP Connection Closed");
+        this.base.getVar('Status').value = 0;
+        // this.disconnect();  // Let the connection try to reconnect by itself
+      });
 
-    this.tcpClient.on('close', () => {
-      this.logger.debug("TCP Connection Closed");
-      this.base.getVar('Status').value = 0;
-      // this.disconnect();  // Let the connection try to reconnect
-    });
+      this.tcpClient.on('error', (err) => {
+        this.logger.debug("TCP Connection Error", err);
+        this.base.getVar('Status').value = 0;
+        this.disconnect();
+      });
+    }
 
-    this.tcpClient.on('error', (err) => {
-      this.logger.error("TCP Connection Error", err);
-      this.base.getVar('Status').value = 0;
-      this.disconnect();
-    });
+    if (!this.tcpClient.isConnected()) {
+      this.tcpClient.connect(this.config.port, this.config.host);
+    // } else {
+    //   onConnect && onConnect();
+    }
   }
 
   parse(frame) {
+    this.logger.silly(`parsing frame [${this.base.getPendingCommand().action}]: ${frame}`);
     if (!isFullFrame(frame)) {
       this.frameAccum += frame;
       if (isFullFrame(this.frameAccum)) {
