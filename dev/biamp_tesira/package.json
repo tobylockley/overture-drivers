@@ -1,0 +1,180 @@
+{
+  "name": "biamp_tesira",
+  "version": "1.0.0-beta.7",
+  "description": "Driver for Biamp Tesira Audio DSP",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "Biamp",
+    "models": [
+      "Tesira CS"
+    ],
+    "type": "device",
+    "subtype": "audiosystem",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "AudioMuteAV1",
+        "type": "enum",
+        "enums": [
+          "false",
+          "true"
+        ],
+        "perform": {
+          "action": "setAudioMuteAV1",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "AudioMuteMic1",
+        "type": "enum",
+        "enums": [
+          "false",
+          "true"
+        ],
+        "perform": {
+          "action": "setAudioMuteMic1",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "Preset",
+        "type": "enum",
+        "enums": [
+          "Idle",
+          "AudienceMicOFF",
+          "AudienceMicON",
+          "DeskMicOFF",
+          "DeskMicON"
+        ],
+        "perform": {
+          "action": "Recall Preset",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "AudioLevelAV1",
+        "type": "integer",
+        "min": -100,
+        "max": 0,
+        "perform": {
+          "action": "setAudioLevelAV1",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      },
+      {
+        "name": "AudioLevelMic1",
+        "type": "integer",
+        "min": -100,
+        "max": 0,
+        "perform": {
+          "action": "setAudioLevelMic1",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set State",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "false",
+              "true"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Recall Preset",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Idle",
+              "AudienceMicOFF",
+              "AudienceMicON",
+              "DeskMicOFF",
+              "DeskMicON"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Set Audio Level AV1",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        },
+        "optimize": true
+      },
+      {
+        "name": "Set Audio Level Mic1",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        },
+        "optimize": true
+      },
+      {
+        "name": "Toggle Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "toggle"
+            ]
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Tesira Forte network information",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address:",
+          "type": "string",
+          "default": "192.168.1.100"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 23,
+          "description": "Default Telnet: 23"
+        }
+      },
+      "required": [
+        "host",
+        "port"
+      ]
+    }
+  },
+  "dependencies": {
+    "telnet-client": "^0.16.2"
+  }
+}
