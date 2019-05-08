@@ -1,0 +1,100 @@
+{
+  "name": "zeevee_zyper_ajax",
+  "version": "1.0.3",
+  "description": "Driver for Zyper Management Platform over a TCP Connection",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "ZeeVee",
+    "models": [ "Management Platform" ],
+    "type": "device",
+    "subtype": "matrix",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [ "Disconnected", "Connected" ]
+      },
+      {
+        "name": "MacAddress",
+        "type": "string"
+      },
+      {
+        "name": "SerialNumber",
+        "type": "string"
+      },
+      {
+        "name": "FirmwareVersion",
+        "type": "string"
+      }
+    ],
+    "commands": [
+      {
+        "name": "Select Source",
+        "params": {
+          "Channel": { "type": "integer" },
+          "Name": { "type": "string" },
+          "Index": { "type": "integer" }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "title": "Zyper Management Platform Settings",
+      "type": "object",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address:",
+          "type": "string",
+          "default": "192.168.99.40"
+        },
+        "decoders": {
+          "title": "Decoders",
+          "type": "array",
+          "format": "table",
+          "uniqueItems": true,
+          "items": {
+            "title": "Decoder",
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "Name or MAC Address",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        },
+        "videowalls": {
+          "title": "Video Walls",
+          "type": "array",
+          "format": "table",
+          "uniqueItems": true,
+          "items": {
+            "title": "Video Wall",
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "Name",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        }
+      },
+      "required": [
+        "host",
+        "decoders",
+        "videowalls"
+      ]
+    }
+  }
+}
