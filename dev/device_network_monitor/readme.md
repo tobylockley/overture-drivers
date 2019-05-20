@@ -13,7 +13,7 @@ Can be chained with Overture alarms to automatically inform network managers/IT 
   - "Debouncing": Number of failed pings that need to happen in a row before declaring the device as offline. No debouncing is applied to online status.
   - "Devices": A dynamic array of devices that should be monitored.
     - "Host": Hostname/IP Address of device to be monitored.
-    - "Friendly Name": Name to display in overture for this device. Can only contain letters, numbers, and underscores.
+    - "Friendly Name": Name to display in overture for this device. Can only contain letters, numbers, and underscores. Must start with a letter.
 
 ## Variables
 

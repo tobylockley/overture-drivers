@@ -64,7 +64,7 @@ exports.createDevice = base => {
     });
 
     tcpClient.on('data', data => {
-      frameParser.push( data.toString() );
+      frameParser.push(data);
     });
 
     tcpClient.on('close', () => {
@@ -87,8 +87,8 @@ exports.createDevice = base => {
   }
 
   function sendDefer(data) {
-    if (send(data)) base.commandDefer(CMD_DEFER_TIME);
-    else base.commandError('Data not sent');
+    base.commandDefer(CMD_DEFER_TIME);
+    if (!send(data)) base.commandError('Data not sent');
   }
 
   function onFrame(data) {

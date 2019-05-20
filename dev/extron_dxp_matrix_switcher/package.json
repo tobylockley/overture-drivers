@@ -1,0 +1,235 @@
+{
+    "name": "extron_dxp_matrix_switcher",
+    "version": "1.0.0-beta.3",
+    "description": "Extron DXP HD 4K Series Matrix Switchers using SIS",
+    "main": "index.js",
+    "directories": {
+      
+    },
+    "scripts": {
+      
+    },
+    "devDependencies": {
+      
+    },
+    "dependencies": {},
+    "author": "Warren Hedges",
+    "license": "SEE LICENSE IN license.txt",
+    "overture": {
+        "brand": "Extron",
+        "models": [
+            "DXP 44 HD 4K — 4 inputs by 4 outputs with 2 audio outputs",
+            "DXP 84 HD 4K — 8 inputs by 4 outputs with 2 audio outputs",
+            "DXP 88 HD 4K — 8 inputs by 8 outputs with 2 audio outputs",
+            "DXP 168 HD 4K — 16 inputs by 8 outputs with 4 audio outputs",
+            "DXP 1616 HD 4K — 16 inputs by 16 outputs with 4 audio outputs"
+        ],
+        "type": "device",
+        "subtype": "matrix",
+        "pointSetupSchema": {
+            "title": "Extron Matrix Switcher",
+            "type": "object",
+            "properties": {
+                "model": {
+                    "title": "Extron Model:",
+                    "type": "string",
+                    "propertyOrder": 1,
+                    "description": "Select the model family.",
+                    "enum": [
+                        "DXP 44 HD 4K",
+                        "DXP 44 HD 4K PLUS",
+                        "DXP 84 HD 4K",
+                        "DXP 84 HD 4K PLUS",
+                        "DXP 88 HD 4K",
+                        "DXP 88 HD 4K PLUS",
+                        "DXP 1684 HD 4K",
+                        "DXP 1616 HD 4K"
+                    ]
+                },
+                "host": {
+                    "title": "IP Address:",
+                    "type": "string",
+                    "propertyOrder": 2,
+                    "description": "IP address of the Extron switcher.",
+                    "default": ""
+                },
+                "port": {
+                    "title": "Port:",
+                    "propertyOrder": 3,
+                    "description": "Default port is 23.",
+                    "type": "integer",
+                    "default": 23
+                },
+                "auth": {
+                    "title": "Password ",
+                    "propertyOrder": 4,
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "password": {
+                    "title": "Password:",
+                    "propertyOrder": 5,
+                    "description": "Enter the administrator password.",
+                    "type": "string"
+                },
+                "outputs": {
+                    "type": "array",
+                    "format": "table",
+                    "propertyOrder": 6,
+                    "title": "Outputs",
+                    "description": "Enter the friendly name for each of the outputs and its corresponding number.",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "object",
+                        "title": "Output",
+                        "properties": {
+                            "name": {
+                                "name": "Output Label",
+                                "type": "string"
+                            },
+                            "channel": {
+                                "name": "Output Number",
+                                "description": "Output Number",
+                                "type": "integer"
+                            }
+                        }
+                    }
+                },
+                "inputs": {
+                    "type": "array",
+                    "format": "table",
+                    "propertyOrder": 7,
+                    "title": "Inputs",
+                    "description": "Enter the friendly name of each input and its corresponding number",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "object",
+                        "title": "Input",
+                        "properties": {
+                            "name": {
+                                "name": "Input Name",
+                                "type": "string"
+                            },
+                            "channel": {
+                                "name": "Input Number",
+                                "type": "integer"
+                            }
+                        }
+                    }
+                },
+                "changeInputNames": {
+                    "type": "boolean",
+                    "propertyOrder": 21,
+                    "title": "Change Input Names?",
+                    "description": "This option will update the Extron presentation switcher Input Names to match the names submitted here. Names will be cut off at 16 characters.",
+                    "format": "checkbox",
+                    "default": "false"
+                }
+            },
+            "required": [
+                "host",
+                "port"
+            ]
+        },
+        "variables": [
+            {
+            "name": "Status",
+            "type": "enum",
+            "enums": [
+                "Disconnected",
+                "Connected"
+            ]
+            },
+            {
+                "name": "VerboseMode",
+                "type": "integer"
+            },
+            {
+                "name" : "Source",
+                "type": "enum",
+                "perform": {"action": "Set Source","params":{"Source": "$string"}}
+            },
+            {
+                "name" : "Dest",
+                "type" : "enum",
+                "perform": {"action": "Set Dest","params":{"Dest": "$string"}}
+            },
+            {
+                "name" : "AudioSource",
+                "type": "enum",
+                "perform": {"action": "Set Audio Source","params":{"Source": "$string"}}
+            },
+            {
+                "name" : "AudioDest",
+                "type" : "enum",
+                "perform": {"action": "Set Audio Dest","params":{"Dest": "$string"}}
+            }
+        ],
+        "commands": [
+            {
+                "name": "Select Source",
+                "params": {
+                    "Source": {
+                        "type": "string"
+                    },
+                    "Dest": {
+                        "type": "string"
+                    },
+                    "Mode": {
+                        "type": "enum",
+                        "enums": [
+                            "HDMI",
+                            "Audio",
+                            "All"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "Select Audio Source",
+                "params": {
+                    "Source": {
+                        "type": "string"
+                    },
+                    "Dest": {
+                        "type": "string"
+                    }
+                }
+            },
+            {
+                "name": "Select Video Source",
+                "params": {
+                    "Source": {
+                        "type": "string"
+                    },
+                    "Dest": {
+                        "type": "string"
+                    }
+                }
+            },
+            {
+            "name": "Set Video Mute",
+            "params": {
+                "Channel": {
+                "type": "integer"
+                },
+                "Status": {
+                "type": "integer"
+                }
+            }
+            },
+            {
+                "name": "Set Audio Mute",
+                "params": {
+                    "Channel": {
+                        "type": "integer"
+                    },
+                    "Status": {
+                        "type": "integer"
+                    }
+                }
+            }
+        ]
+    }
+}
+  

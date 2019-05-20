@@ -1,0 +1,250 @@
+{
+  "name": "samsung_display_dce-series",
+  "version": "1.0.0-hotfix1",
+  "description": "Driver For Samsung DCE Series Displays",
+  "main": "index.js",
+    "scripts": {
+	"start": "node index.js"
+  },
+  "author": "Medialon",
+  "license": "SEE LICENSE IN license.txt",
+  "overture": {
+    "brand": "Samsung",
+    "model": "DCE",
+    "models": [
+      "ED65E",
+      "ED75E",
+      "EM65E",
+      "EM75E",
+      "DC32E",
+      "DC40E",
+      "DC48E",
+      "DC55E",
+      "DC32E-M",
+      "DC40E-M",
+      "DC48E-M",
+      "DC55E-M",
+      "DC40E-H",
+      "DC48E-H"
+    ],
+    "type": "device",
+    "subtype": "display",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": ["Disconnected","Connected"]
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "enums": ["Off","On"],
+        "perform":{"action":"Set Power", "params": { "Status":"$string"}}
+      },
+      {
+        "name": "NetworkStandby",
+        "smooth": true,
+        "type": "enum",
+        "enums": ["Off","On"],
+        "perform":{"action":"Set Network Standby", "params": { "Status":"$string"}}
+
+      },
+      {
+        "name": "AudioMute",
+        "smooth": true,
+        "type": "enum",
+        "enums": ["Off","On"],
+        "perform":{"action":"Set Audio Mute", "params": { "Status":"$string"}}
+
+      },
+      {
+        "name": "AudioLevel",
+        "type": "integer",
+        "perform":{"action":"Set Audio Level", "params": { "Level":"$value"}}
+      },
+      {
+        "name": "Sources",
+        "smooth": true,
+        "type": "enum",
+        "enums": ["PC","DVI","A/V","Component","Magicinfo","DVI-V","TV","DTV","HDMI1","HDMI2","HDBT"],
+        "perform":{"action":"Select Source", "params": { "Name":"$string"}}
+
+      },
+      {
+        "name": "Contrast",
+        "smooth": true,
+        "type": "integer",
+        "perform":{"action":"Set Contrast", "params": { "Level":"$value"}},
+        "min": 1,
+        "max": 100
+      },
+      {
+        "name": "Brightness",
+        "smooth": true,
+        "type": "integer",
+        "perform":{"action":"Set Brightness", "params": { "Level":"$value"}},
+        "min": 1,
+        "max": 100
+      },
+      {
+        "name": "Sharpness",
+        "smooth": true,
+        "type": "integer",
+        "perform":{"action":"Set Sharpness", "params": { "Level":"$value"}},
+        "min": 1,
+        "max": 100
+      },
+      {
+        "name": "TemperatureStatus",
+        "type": "enum",
+        "enums": ["Normal","Error"]
+      },
+      {
+        "name": "Fan",
+        "type": "enum",
+        "enums": ["Normal","Error"]
+      },
+      {
+        "name": "Temperature",
+        "type": "integer",
+        "min": 0,
+        "max": 125,
+        "unit": "celsius"
+      },
+      {
+        "name": "Sync",
+        "type": "enum",
+        "enums": ["Normal","Error, No Sync"]
+      },
+      {
+        "name": "MDCConnectionType",
+        "type": "enum",
+        "enums": ["RS232","RJ45",""],
+        "default": 2
+      },
+      {
+        "name": "Model",
+        "type": "string"
+      },
+      {
+        "name": "Serial",
+        "type": "string"
+      },
+      {
+        "name": "SWVersion",
+        "type": "string"
+      },
+      {
+        "name": "DeviceName",
+        "type": "string"
+      },
+      {
+        "name": "Error",
+        "type": "string"
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off","On"]
+          }
+        }
+      },
+      {
+        "name": "Set Network Standby",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off","On","Auto"]
+          }
+        }
+      },
+      {
+        "name": "Set Audio Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off","On"]
+          }
+        }
+      },
+      {
+        "name": "Set Audio Level",
+        "params": {
+          "Level": {
+            "type": "string"
+          }
+        },
+        "optimize": true
+      },
+      {
+        "name": "Select Source",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Set Brightness",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        },
+        "optimize": true
+      },
+      {
+        "name": "Set Contrast",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        },
+        "optimize": true
+      },
+      {
+        "name": "Set Sharpness",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        },
+        "optimize": true
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Driver",
+      "properties": {
+        "host": {
+          "title": "host name or IP address:",
+          "type": "string",
+          "default": "127.0.0.1",
+          "description": "MDC network IP address or hostname"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 1515,
+          "description": "MDC network port.  Default: 1515"
+        },
+        "mdc": {
+          "title": "ID",
+          "type": "integer",
+          "default": "0",
+		      "description": "Found in 'Multi-Control' menu setting."
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "mdc"
+      ]
+    }
+
+  }
+}

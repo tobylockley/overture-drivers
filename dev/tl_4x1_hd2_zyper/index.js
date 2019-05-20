@@ -154,6 +154,10 @@ exports.createDevice = base => {
 
   }
 
+  // TODO
+  // Adjust lastChangeId on frame
+  // LG screen mute
+
 
   // ------------------------------ GET FUNCTIONS ------------------------------
 

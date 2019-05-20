@@ -1,0 +1,177 @@
+{
+  "name": "ismart_visca",
+  "version": "1.0.0-beta.1",
+  "description": "Driver for iSmart VISCA camera using Global Cache iTach",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "iSmart",
+    "model": "LTC-A2001N",
+    "type": "device",
+    "subtype": "camera",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "perform": {
+          "action": "Set Power",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "Presets",
+        "type": "enum",
+        "enums": [
+          "Idle",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "perform": {
+          "action": "Recall Preset",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      },
+      {
+        "name": "Preset_Save",
+        "type": "enum",
+        "enums": [
+          "Idle",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "perform": {
+          "action": "Save Preset",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      },
+      {
+        "name": "PTZ",
+        "type": "enum",
+        "enums": [
+          "Idle",
+          "Pan_Left",
+          "Pan_Right",
+          "Tilt_Up",
+          "Tilt_Down",
+          "Zoom_In",
+          "Zoom_Out"
+        ],
+        "perform": {
+          "action": "Send Ptz",
+          "params": {
+            "Action": "$string"
+          }
+        }
+      },
+      {
+        "name": "Auto_Tracking",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "perform": {
+          "action": "Set Auto Tracking",
+          "params": {
+            "Action": "$string"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Status": { "type": "enum", "enums": [ "Off", "On" ] }
+        }
+      },
+      {
+        "name": "Recall Preset",
+        "params": {
+          "Name": { "type": "string" }
+        }
+      },
+      {
+        "name": "Save Preset",
+        "params": {
+          "Name": { "type": "string" }
+        }
+      },
+      {
+        "name": "Send Ptz",
+        "params": {
+          "Name": { "type": "enum", "enums": [ "Pan_Left", "Pan_Right", "Tilt_Up", "Tilt_Down", "Zoom_In", "Zoom_Out" ] }
+        }
+      },
+      {
+        "name": "Set Auto Tracking",
+        "params": {
+          "Status": { "type": "enum", "enums": [ "Off", "On" ] }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "iSmart VISCA Camera Settings",
+      "properties": {
+        "host": {
+          "title": "Hostname or IP Address of Global Cache IP->Serial:",
+          "type": "string",
+          "default": "192.168.1.70"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 4999,
+          "description": "Default: 4999"
+        },
+        "visca_address": {
+          "title": "VISCA Device Address:",
+          "type": "integer",
+          "default": 1,
+          "description": "Default: 1"
+        },
+        "stop_delay": {
+          "title": "PTZ Stop Delay (milliseconds):",
+          "type": "integer",
+          "default": 500,
+          "description": "Will effect travel distance per button press"
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "visca_address",
+        "command_delay"
+      ]
+    }
+  }
+}

@@ -1,0 +1,305 @@
+{
+  "name": "thor_rf11iq",
+  "version": "1.0.0",
+  "description": "Driver for Thor RF11iQ PDU using TCP Connection",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "Thor",
+    "model": "RF11iQ",
+    "type": "device",
+    "subtype": "generic",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Power_1",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "smooth": 10000,
+        "perform": {
+          "action": "Set Value",
+          "params": {
+            "Status": "$value",
+            "Channel": "p1"
+          }
+        }
+      },
+      {
+        "name": "Power_2",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "smooth": 10000,
+        "perform": {
+          "action": "Set Value",
+          "params": {
+            "Status": "$value",
+            "Channel": "p2"
+          }
+        }
+      },
+      {
+        "name": "Power_3",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "smooth": 10000,
+        "perform": {
+          "action": "Set Value",
+          "params": {
+            "Status": "$value",
+            "Channel": "p3"
+          }
+        }
+      },
+      {
+        "name": "Power_4",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "smooth": 10000,
+        "perform": {
+          "action": "Set Value",
+          "params": {
+            "Status": "$value",
+            "Channel": "p4"
+          }
+        }
+      },
+      {
+        "name": "Power_5",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "smooth": 10000,
+        "perform": {
+          "action": "Set Value",
+          "params": {
+            "Status": "$value",
+            "Channel": "p5"
+          }
+        }
+      },
+      {
+        "name": "Power_6",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "smooth": 10000,
+        "perform": {
+          "action": "Set Value",
+          "params": {
+            "Status": "$value",
+            "Channel": "p6"
+          }
+        }
+      },
+      {
+        "name": "Power_7",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "smooth": 10000,
+        "perform": {
+          "action": "Set Value",
+          "params": {
+            "Status": "$value",
+            "Channel": "p7"
+          }
+        }
+      },
+      {
+        "name": "Power_IEC",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "smooth": 10000,
+        "perform": {
+          "action": "Set Value",
+          "params": {
+            "Status": "$value",
+            "Channel": "p8"
+          }
+        }
+      },
+      {
+        "name": "Current_1",
+        "type": "real"
+      },
+      {
+        "name": "Current_2",
+        "type": "real"
+      },
+      {
+        "name": "Current_3",
+        "type": "real"
+      },
+      {
+        "name": "Current_4",
+        "type": "real"
+      },
+      {
+        "name": "Current_5",
+        "type": "real"
+      },
+      {
+        "name": "Current_6",
+        "type": "real"
+      },
+      {
+        "name": "Current_7",
+        "type": "real"
+      },
+      {
+        "name": "Current_IEC",
+        "type": "real"
+      },
+      {
+        "name": "Status_Sockets",
+        "type": "enum",
+        "enums": [
+          "Damaged",
+          "Nominal"
+        ]
+      },
+      {
+        "name": "Status_IEC",
+        "type": "enum",
+        "enums": [
+          "Damaged",
+          "Nominal"
+        ]
+      },
+      {
+        "name": "Status_Alarm",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "smooth": 10000,
+        "perform": {
+          "action": "Set Value",
+          "params": {
+            "Status": "$value",
+            "Channel": "bz"
+          }
+        }
+      },
+      {
+        "name": "Buzzer_Enable_Sockets",
+        "type": "enum",
+        "enums": [
+          "Disabled",
+          "Enabled"
+        ],
+        "smooth": 10000,
+        "perform": {
+          "action": "Set Value",
+          "params": {
+            "Status": "$value",
+            "Channel": "b1"
+          }
+        }
+      },
+      {
+        "name": "Buzzer_Enable_IEC",
+        "type": "enum",
+        "enums": [
+          "Disabled",
+          "Enabled"
+        ],
+        "smooth": 10000,
+        "perform": {
+          "action": "Set Value",
+          "params": {
+            "Status": "$value",
+            "Channel": "b2"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Value",
+        "params": {
+          "Status": {
+            "type": "string"
+          },
+          "Channel": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Thor RF11iQ IP Settings",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address:",
+          "type": "string",
+          "default": "10.1.1.18"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 80
+        },
+        "username": {
+          "title": "Username:",
+          "type": "string",
+          "default": "admin"
+        },
+        "password": {
+          "title": "Password:",
+          "type": "string",
+          "default": "THORRF11"
+        },
+        "polling_interval": {
+          "title": "Polling Interval (milliseconds):",
+          "type": "integer",
+          "default": 10000
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "username",
+        "password",
+        "polling_interval"
+      ]
+    }
+  },
+  "dependencies": {
+    "xml2js": "^0.4.19"
+  }
+}
