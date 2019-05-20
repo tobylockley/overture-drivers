@@ -1,5 +1,5 @@
 *.code-workspace
-_*/
+drivers/_*/
 **/node_modules/
 **/overture_macros/
 toby_test*/
