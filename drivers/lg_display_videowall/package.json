@@ -1,0 +1,190 @@
+{
+  "name": "lg_display_videowall",
+  "version": "1.0.0",
+  "description": "Driver for LG videowall display",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "LG",
+    "models": [
+      "47LV35A"
+    ],
+    "type": "device",
+    "subtype": "display",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "smooth": 10000,
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "perform": {
+          "action": "Set Power",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "Sources",
+        "type": "enum",
+        "enums": [
+          "RGB",
+          "HDMI1",
+          "HDMI2",
+          "DisplayPort",
+          "OPS/DVI"
+        ],
+        "perform": {
+          "action": "Select Source",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      },
+      {
+        "name": "ScreenMute",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "perform": {
+          "action": "Set Screen Mute",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "AudioMute",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "perform": {
+          "action": "Set Audio Mute",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "AudioLevel",
+        "type": "integer",
+        "min": 0,
+        "max": 100,
+        "perform": {
+          "action": "Set Audio Level",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      },
+      {
+        "name": "Temperature",
+        "type": "integer"
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Select Source",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Set Screen Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Set Audio Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Set Audio Level",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "LG Display IP Settings",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address:",
+          "type": "string",
+          "default": "192.168.1."
+        },
+        "mac": {
+          "title": "MAC Address:",
+          "type": "string",
+          "default": "38:8C:50:",
+          "description": "Needed for Wake On Lan functionality"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 9761,
+          "description": "Default: 9761"
+        }
+      },
+      "required": [
+        "host",
+        "mac",
+        "port"
+      ]
+    }
+  },
+  "dependencies": {
+    "wakeonlan": "^0.1.0"
+  }
+}
