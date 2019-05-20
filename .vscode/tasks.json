@@ -4,9 +4,9 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Overture-Package",
+      "label": "Package Driver",
       "type": "shell",
-      "command": "echo Hello"
+      "command": "node ${workspaceFolder}/scripts/zip.js ${fileDirname}"
     }
   ]
 }
