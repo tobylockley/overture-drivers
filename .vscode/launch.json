@@ -7,6 +7,7 @@
       "name": "Toby CS",
       "program": "${workspaceFolder}/OvertureCS/index.js",
       "cwd": "${workspaceFolder}/OvertureCS/",
+      "runtimeArgs": ["--nolazy"],
       "skipFiles": [
         "<node_internals>/**/*.js",
         "${workspaceFolder}/OvertureCS/node_modules/**/*.js",
@@ -15,11 +16,11 @@
       "env": {
         "UXURI": "http://203.27.185.62:9950",
         "UID": "TobyCS_Node",
-        "logLevel": "silly",
         "NODE_ENV": "development",
-        "_DEBUGDRIVER": "true",
-        "_IGNOREUXPROJECT": "true",
-        "DRIVERPATH": "${workspaceFolder}/dev"
+        "DRIVERPATH": "${workspaceRoot}/dev",
+        "DEBUGDRIVER": "true",
+        "LOGLEVEL": "silly",
+        "_IGNOREUXPROJECT": "true"
       },
       "windows": {
         "program": "${workspaceFolder}\\..\\index.js",
@@ -40,6 +41,23 @@
         "port": 9229,
         "localRoot": "${workspaceRoot}/",
         "remoteRoot": "/data/controlserver/drivers"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Windows CS",
+      "runtimeExecutable": "C:\\Program Files\\Barco\\Barco Overture Control Server\\OvertureCS.exe",
+      "windows": {
+        "runtimeExecutable": "C:\\Program Files\\Barco\\Barco Overture Control Server\\OvertureCS.exe"
+      },
+      "protocol": "inspector",
+      "env": {
+        "data": "C:\\Program Files\\Barco\\Barco Overture Control Server\\data\\",
+        "driverPath": "${workspaceRoot}",
+        "debugDriver": "true",
+        "logLevel": "silly"
+      },
+      "outputCapture": "std"
     }
   ]
 }

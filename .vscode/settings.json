@@ -12,5 +12,8 @@
     }
   },
   "editor.tabSize": 2,
-  "editor.detectIndentation": false
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": true,
+  "debug.inlineValues": true,
+  "debug.toolBarLocation": "docked"
 }
