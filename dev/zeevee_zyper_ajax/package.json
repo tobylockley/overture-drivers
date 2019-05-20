@@ -37,8 +37,7 @@
         "name": "Select Source",
         "params": {
           "Channel": { "type": "integer" },
-          "Name": { "type": "string" },
-          "Index": { "type": "integer" }
+          "Name": { "type": "string" }
         }
       }
     ],
