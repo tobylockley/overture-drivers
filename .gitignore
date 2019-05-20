@@ -1,8 +1,9 @@
-.vscode/
 *.code-workspace
 _*/
 **/node_modules/
 **/overture_macros/
-toby_test/
+toby_test*/
 toby_test*.zip
 desktop.ini
+OvertureCS/
+.DS_Store

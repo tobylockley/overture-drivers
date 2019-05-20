@@ -1,0 +1,16 @@
+{
+  "ego.power-tools": {
+    "commands": {
+      "overtureZip": {
+        "script": "../.scripts/overture_zip.js",
+        "button": {
+          "text": "CMD: Zip Overture Driver",
+          "color": "#86e532",
+          "tooltip": "Package the Overture driver from current tab into the zip folder"
+        }
+      }
+    }
+  },
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false
+}

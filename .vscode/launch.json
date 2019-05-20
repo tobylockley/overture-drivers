@@ -1,0 +1,45 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Toby CS",
+      "program": "${workspaceFolder}/OvertureCS/index.js",
+      "cwd": "${workspaceFolder}/OvertureCS/",
+      "skipFiles": [
+        "<node_internals>/**/*.js",
+        "${workspaceFolder}/OvertureCS/node_modules/**/*.js",
+        "${workspaceFolder}/OvertureCS/core/*.js"
+      ],
+      "env": {
+        "UXURI": "http://203.27.185.62:9950",
+        "UID": "TobyCS_Node",
+        "logLevel": "silly",
+        "NODE_ENV": "development",
+        "_DEBUGDRIVER": "true",
+        "_IGNOREUXPROJECT": "true",
+        "DRIVERPATH": "${workspaceFolder}/dev"
+      },
+      "windows": {
+        "program": "${workspaceFolder}\\..\\index.js",
+        "cwd": "${workspaceFolder}\\..\\",
+        "env": {
+          "DRIVERPATH": "Home / Overture Drivers <-- Needs updating"
+        }
+      }
+    },
+    {
+        "type": "node",
+        "request": "attach",
+        "name": "OvertureCS Docker",
+        "restart": true,
+        "sourceMaps": true,
+        "protocol": "inspector",
+        "address": "127.0.0.1",
+        "port": 9229,
+        "localRoot": "${workspaceRoot}/",
+        "remoteRoot": "/data/controlserver/drivers"
+    }
+  ]
+}
