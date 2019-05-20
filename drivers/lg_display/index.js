@@ -121,22 +121,22 @@ exports.createDevice = base => {
   }
 
   const onFrame = data => {
-    logger.silly(`onFrame: ${data}`);
     let match = data.match(/(\w) \d+ OK([0-9a-fA-F]+)/);
     if (match) {
+      logger.silly(`onFrame: ${data}`);
       base.commandDone();
       switch (match[1]) {
         case 'a':
-          base.getVar('Power').string = (parseInt(match[2]) == 1) ? 'On' : 'Off';
+          base.getVar('Power').string = (parseInt(match[2]) === 1) ? 'On' : 'Off';
           break;
         case 'b':
-          base.getVar('Sources').string = SOURCES.find(x => x.value == parseInt(match[2], 16)).name;
+          base.getVar('Sources').string = SOURCES.find(x => x.value === parseInt(match[2], 16)).name;
           break;
         case 'd':
-          base.getVar('ScreenMute').string = (parseInt(match[2]) == 1) ? 'On' : 'Off';
+          base.getVar('ScreenMute').string = (parseInt(match[2]) === 1) ? 'On' : 'Off';
           break;
         case 'e':
-          base.getVar('AudioMute').string = (parseInt(match[2]) == 1) ? 'Off' : 'On';
+          base.getVar('AudioMute').string = (parseInt(match[2]) === 1) ? 'Off' : 'On';
           break;
         case 'f':
           base.getVar('AudioLevel').value = parseInt(match[2], 16);
@@ -152,6 +152,9 @@ exports.createDevice = base => {
           break;
       }
     }
+    else {
+      logger.warn(`onFrame, unrecognized: ${data}`);
+    }
   }
 
   const getPower = () => sendDefer(Buffer.from(`ka ${setID} FF\r`));
@@ -159,8 +162,6 @@ exports.createDevice = base => {
   const getScreenMute = () => sendDefer(Buffer.from(`kd ${setID} FF\r`));
   const getAudioMute = () => sendDefer(Buffer.from(`ke ${setID} FF\r`));
   const getAudioLevel = () => sendDefer(Buffer.from(`kf ${setID} FF\r`));
-  const getBrightness = () => sendDefer(Buffer.from(`kh ${setID} FF\r`));
-  const getContrast = () => sendDefer(Buffer.from(`kg ${setID} FF\r`));
   const getTemperature = () => sendDefer(Buffer.from(`dn ${setID} FF\r`));
 
   const setPower = params => {
@@ -190,17 +191,9 @@ exports.createDevice = base => {
     sendDefer(Buffer.from(`kf ${setID} ${params.Level.toString(16)}\r`));
   }
 
-  const setBrightness = params => {
-    sendDefer(Buffer.from(`kh ${setID} ${params.Level.toString(16)}\r`));
-  }
-
-  const setContrast = params => {
-    sendDefer(Buffer.from(`kg ${setID} ${params.Level.toString(16)}\r`));
-  }
-
   return {
     setup, start, stop, tick,
-    setPower, selectSource, setScreenMute, setAudioMute, setAudioLevel, setBrightness, setContrast,
-    getPower, getSource, getScreenMute, getAudioMute, getAudioLevel, getBrightness, getContrast, getTemperature
+    setPower, selectSource, setScreenMute, setAudioMute, setAudioLevel,
+    getPower, getSource, getScreenMute, getAudioMute, getAudioLevel, getTemperature
   }
 }

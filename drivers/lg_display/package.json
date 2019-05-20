@@ -97,30 +97,6 @@
         }
       },
       {
-        "name": "Brightness",
-        "type": "integer",
-        "min": 0,
-        "max": 100,
-        "perform": {
-          "action": "Set Brightness",
-          "params": {
-            "Level": "$value"
-          }
-        }
-      },
-      {
-        "name": "Contrast",
-        "type": "integer",
-        "min": 0,
-        "max": 100,
-        "perform": {
-          "action": "Set Contrast",
-          "params": {
-            "Level": "$value"
-          }
-        }
-      },
-      {
         "name": "Temperature",
         "type": "integer"
       }
@@ -177,22 +153,6 @@
             "type": "integer"
           }
         }
-      },
-      {
-        "name": "Set Brightness",
-        "params": {
-          "Level": {
-            "type": "integer"
-          }
-        }
-      },
-      {
-        "name": "Set Contrast",
-        "params": {
-          "Level": {
-            "type": "integer"
-          }
-        }
       }
     ],
     "pointSetupSchema": {
@@ -207,7 +167,8 @@
         "mac": {
           "title": "MAC Address:",
           "type": "string",
-          "default": "38:8C:50:"
+          "default": "38:8C:50:",
+          "description": "Needed for Wake On Lan functionality"
         },
         "port": {
           "title": "Port:",
