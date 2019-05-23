@@ -1,6 +1,6 @@
 {
   "name": "lg_display",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Driver for LG display",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,8 @@
   "overture": {
     "brand": "LG",
     "models": [
-      "32SM5KD-BH"
+      "32SM5KD-BH",
+      "55UU640C"
     ],
     "type": "device",
     "subtype": "display",
@@ -27,7 +28,7 @@
       {
         "name": "Power",
         "type": "enum",
-        "smooth": 10000,
+        "smooth": 20000,
         "enums": [
           "Off",
           "On"
@@ -36,23 +37,6 @@
           "action": "Set Power",
           "params": {
             "Status": "$string"
-          }
-        }
-      },
-      {
-        "name": "Sources",
-        "type": "enum",
-        "enums": [
-          "RGB",
-          "HDMI1",
-          "HDMI2",
-          "DisplayPort",
-          "OPS/DVI"
-        ],
-        "perform": {
-          "action": "Select Source",
-          "params": {
-            "Name": "$string"
           }
         }
       },
@@ -67,6 +51,19 @@
           "action": "Set Screen Mute",
           "params": {
             "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "Sources",
+        "type": "enum",
+        "enums": [
+          "Determined by config"
+        ],
+        "perform": {
+          "action": "Select Source",
+          "params": {
+            "Name": "$string"
           }
         }
       },
@@ -115,14 +112,6 @@
         }
       },
       {
-        "name": "Select Source",
-        "params": {
-          "Name": {
-            "type": "string"
-          }
-        }
-      },
-      {
         "name": "Set Screen Mute",
         "params": {
           "Status": {
@@ -131,6 +120,14 @@
               "Off",
               "On"
             ]
+          }
+        }
+      },
+      {
+        "name": "Select Source",
+        "params": {
+          "Name": {
+            "type": "string"
           }
         }
       },
@@ -162,29 +159,151 @@
         "host": {
           "title": "Host name or IP address:",
           "type": "string",
-          "default": "192.168.1."
-        },
-        "mac": {
-          "title": "MAC Address:",
-          "type": "string",
-          "default": "38:8C:50:",
-          "description": "Needed for Wake On Lan functionality"
+          "default": ""
         },
         "port": {
           "title": "Port:",
           "type": "integer",
           "default": 9761,
           "description": "Default: 9761"
+        },
+        "mac": {
+          "title": "MAC Address:",
+          "type": "string",
+          "default": "38:8C:50:",
+          "pattern": "^(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$",
+          "description": "Needed for Wake On Lan functionality"
+        },
+        "setID": {
+          "title": "Set ID:",
+          "type": "integer",
+          "default": 1,
+          "minimum": 1,
+          "maximum": 255,
+          "description": "Found in General Settings. Default: 1"
+        },
+        "inputs": {
+          "type": "object",
+          "title": "Available Inputs",
+          "properties": {
+            "hdmi1": {
+              "title": "HDMI 1",
+              "hexcode": "0x90",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": true
+            },
+            "hdmi2": {
+              "title": "HDMI 2",
+              "hexcode": "0x91",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": true
+            },
+            "hdmi3": {
+              "title": "HDMI 3",
+              "hexcode": "0x92",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "hdmi4": {
+              "title": "HDMI 4",
+              "hexcode": "0x93",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "dvi": {
+              "title": "DVI",
+              "hexcode": "0x95",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "displayport": {
+              "title": "Display Port",
+              "hexcode": "0xC0",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "rgb": {
+              "title": "RGB",
+              "hexcode": "0x60",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "comp1": {
+              "title": "Component 1",
+              "hexcode": "0x40",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "comp2": {
+              "title": "Component 2",
+              "hexcode": "0x41",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "av1": {
+              "title": "AV 1",
+              "hexcode": "0x20",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "av2": {
+              "title": "AV 2",
+              "hexcode": "0x21",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "dtv": {
+              "title": "Digital TV (Antenna)",
+              "hexcode": "0x00",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "dtvc": {
+              "title": "Digital TV (Cable)",
+              "hexcode": "0x01",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "atv": {
+              "title": "Analogue TV (Antenna)",
+              "hexcode": "0x10",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "atvc": {
+              "title": "Analogue TV (Cable)",
+              "hexcode": "0x11",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            }
+          }
         }
       },
       "required": [
         "host",
+        "port",
         "mac",
-        "port"
+        "setID",
+        "inputs"
       ]
     }
   },
   "dependencies": {
-    "wakeonlan": "^0.1.0"
+    "wol": "^1.0.6"
   }
 }

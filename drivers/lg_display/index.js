@@ -1,196 +1,208 @@
-'use strict';
+'use strict'
 
-const CMD_DEFER_TIME = 5000;
-const POLL_PERIOD = 5000;
-const TICK_PERIOD = 5000;
-const TCP_TIMEOUT = 30000;
-const TCP_RECONNECT_DELAY = 1000;
+const CMD_DEFER_TIME = 3000        // Timeout when using commandDefer
+const TICK_PERIOD = 5000           // In-built tick interval
+const POLL_PERIOD = 5000           // Continuous polling function interval
+const TCP_TIMEOUT = 30000          // Will timeout after this length of inactivity
+const TCP_RECONNECT_DELAY = 3000   // How long to wait before attempting to reconnect
 
-let host;
+let host
 exports.init = _host => {
-  host = _host;
+  host = _host
 }
 
 exports.createDevice = base => {
-  const logger = base.logger || host.logger;
-  let config;
-  let tcpClient;
-  let networkUtilities;
-  let wol = require('wakeonlan');  // Used to turn display on
+  const logger = base.logger || host.logger
+  let config
+  let tcpClient
+  let wol = require('wol')  // Used to turn wake from power off, must be enabled in menu
+  let sourcesInfo = []  // Used to store inputs sources hex codes
 
-  const setID = '01'  // This is used for IP control, see http://www.proaudioinc.com/Dealer_Area/RS232.pdf
-  const SOURCES = [
-    { name: 'RGB', value: 0x60 },
-    { name: 'HDMI1', value: 0x90 },
-    { name: 'HDMI2', value: 0x91 },
-    { name: 'DisplayPort', value: 0xD0 },
-    { name: 'OPS/DVI', value: 0xA5 }
-  ]
+  let frameParser = host.createFrameParser()
+  frameParser.setSeparator('x')
+  frameParser.on('data', data => onFrame(data))
 
-  let frameParser = host.createFrameParser();
-  frameParser.setSeparator('x');
-  frameParser.on('data', data => onFrame(data));
 
-  const setup = _config => {
-    config = _config;
-    networkUtilities = host.createNetworkUtilities();
-    base.setTickPeriod(TICK_PERIOD);
-    let poll_functions = [
-      'Get Power',
-      'Get Source',
-      'Get Screen Mute',
-      'Get Audio Mute',
-      'Get Audio Level',
-      'Get Brightness',
-      'Get Contrast',
-      'Get Temperature'
-    ]
-    poll_functions.forEach(fn => {
-      logger.debug(`Initialising polling for: ${fn}`);
-      base.setPoll({
-        action: fn,
-        period: POLL_PERIOD,
-        enablePollFn: () => { return base.getVar('Status').string === 'Connected'; },
-        startImmediately: true
-      });
-    });
-  }
+  // ------------------------------ SETUP FUNCTIONS ------------------------------
 
-  const start = () => {
-    initTcpClient();
-  }
+  function isConnected() { return base.getVar('Status').string === 'Connected' }
 
-  const stop = () => {
-    disconnect();
-    if (tcpClient) {
-      tcpClient.end();
-      tcpClient = null;
+  function setup(_config) {
+    config = _config
+    base.setTickPeriod(TICK_PERIOD)
+    base.setPoll({ action: 'getPower', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
+    base.setPoll({ action: 'getScreenMute', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
+    base.setPoll({ action: 'getSource', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
+    base.setPoll({ action: 'getAudioMute', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
+    base.setPoll({ action: 'getAudioLevel', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
+    base.setPoll({ action: 'getTemperature', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
+
+    // Load this drivers package.json and get sources title and hexcode, add only if enabled
+    let sourcesData = require('./package.json').overture.pointSetupSchema.properties.inputs.properties
+    for (let name in sourcesData) {
+      if (config.inputs && config.inputs[name] === true) {  // Enabled in driver config
+        let source = sourcesData[name]
+        logger.silly(`Adding input source: ${source.title}, Hex code: ${source.hexcode}`)
+        sourcesInfo.push({title: source.title, hexcode: parseInt(source.hexcode, 16)})
+      }
     }
+    base.getVar('Sources').enums = sourcesInfo.map(x => x.title)
   }
 
-  const disconnect = () => {
-    base.getVar('Status').string = 'Disconnected';
-    base.getVar('Power').string = 'Off';
+  function start() {
+    initTcpClient()
+  }
+
+  function stop() {
+    base.getVar('Status').string = 'Disconnected'
+    base.getVar('Power').string = 'Off'
+    tcpClient && tcpClient.end()
+    tcpClient = null
   }
 
   function tick() {
-    // If no connection, send a wake on lan message.
-    // if (base.getVar('Status').string === 'Disconnected') wol(config.mac).then( () => logger.silly(`[tick] WOL sent to ${config.mac}`) );
-    !tcpClient && initTcpClient();
+    if (!tcpClient) initTcpClient()
   }
 
-  const initTcpClient = () => {
-    if (!tcpClient) {
-      tcpClient = host.createTCPClient();
-      tcpClient.setOptions({
-        receiveTimeout: TCP_TIMEOUT,
-        autoReconnectionAttemptDelay: TCP_RECONNECT_DELAY
-      })
-      tcpClient.connect(config.port, config.host);
+  function initTcpClient() {
+    if (tcpClient) return  // Return if tcpClient already exists
 
-      tcpClient.on('connect', () => {
-        logger.silly(`TCPClient connected`);
-        base.getVar('Status').string = 'Connected';
-        base.startPolling();
-      })
+    tcpClient = host.createTCPClient()
+    tcpClient.setOptions({
+      receiveTimeout: TCP_TIMEOUT,
+      autoReconnectionAttemptDelay: TCP_RECONNECT_DELAY
+    })
+    tcpClient.connect(config.port, config.host)
 
-      tcpClient.on('data', data => {
-        frameParser.push(data.toString());
-      })
+    tcpClient.on('connect', () => {
+      logger.silly('TCPClient connected')
+      base.getVar('Status').string = 'Connected'
+      base.startPolling()
+    })
 
-      tcpClient.on('close', () => {
-        logger.silly(`TCPClient closed`);
-        disconnect();
-      })
+    tcpClient.on('data', data => {
+      frameParser.push(data.toString())
+    })
 
-      tcpClient.on('error', err => {
-        logger.error(`TCPClient: ${err}`);
-        stop();
-      })
-    }
+    tcpClient.on('close', () => {
+      logger.silly('TCPClient closed')
+      base.getVar('Status').string = 'Disconnected'  // Triggered on timeout, this allows auto reconnect
+    })
+
+    tcpClient.on('error', err => {
+      logger.error(`TCPClient: ${err}`)
+      stop()  // Throw out the tcpClient and get a fresh connection
+    })
   }
 
-  const send = data => {
-    logger.silly(`TCPClient send: ${data}`);
-    return tcpClient && tcpClient.write(data);
+
+  // ------------------------------ SEND/RECEIVE HANDLERS ------------------------------
+
+  function send(data) {
+    logger.silly(`TCPClient send: ${data}`)
+    return tcpClient && tcpClient.write(data)
   }
 
-  const sendDefer = data => {
-    base.commandDefer(CMD_DEFER_TIME);
-    if (!send(data)) base.commandError(`Data not sent`);
+  function sendDefer(data) {
+    base.commandDefer(CMD_DEFER_TIME)
+    if (!send(data)) base.commandError('Data not sent')
   }
 
-  const onFrame = data => {
-    let match = data.match(/(\w) \d+ OK([0-9a-fA-F]+)/);
-    if (match) {
-      logger.silly(`onFrame: ${data}`);
-      base.commandDone();
-      switch (match[1]) {
-        case 'a':
-          base.getVar('Power').string = (parseInt(match[2]) === 1) ? 'On' : 'Off';
-          break;
-        case 'b':
-          base.getVar('Sources').string = SOURCES.find(x => x.value === parseInt(match[2], 16)).name;
-          break;
-        case 'd':
-          base.getVar('ScreenMute').string = (parseInt(match[2]) === 1) ? 'On' : 'Off';
-          break;
-        case 'e':
-          base.getVar('AudioMute').string = (parseInt(match[2]) === 1) ? 'Off' : 'On';
-          break;
-        case 'f':
-          base.getVar('AudioLevel').value = parseInt(match[2], 16);
-          break;
-        case 'h':
-          base.getVar('Brightness').value = parseInt(match[2], 16);
-          break;
-        case 'g':
-          base.getVar('Contrast').value = parseInt(match[2], 16);
-          break;
-        case 'n':
-          base.getVar('Temperature').value = parseInt(match[2], 16);
-          break;
+  function onFrame(data) {
+    const pendingCommand = base.getPendingCommand()
+    logger.silly(`onFrame (pending = ${pendingCommand.action}): ${data}`)
+
+    let match = data.match(/(\w) (\d+) OK([0-9a-fA-F]+)/)
+    if (match && pendingCommand) {
+      let id = parseInt(match[2], 16)
+      let val = parseInt(match[3], 16)
+      if (id === config.setID) {
+        if (match[1] === 'a') {
+          base.getVar('Power').value = val
+          base.commandDone()
+        }
+        else if (match[1] === 'd') {
+          base.getVar('ScreenMute').value = val
+          base.commandDone()
+        }
+        else if (match[1] === 'b') {
+          base.getVar('Sources').string = sourcesInfo.find(x => x.hexcode === val).title
+          base.commandDone()
+        }
+        else if (match[1] === 'e') {
+          base.getVar('AudioMute').string = ['On', 'Off'][val]  // 0 = Muted, 1 = Unmuted
+          base.commandDone()
+        }
+        else if (match[1] === 'f') {
+          base.getVar('AudioLevel').value = val
+          base.commandDone()
+        }
+        else if (match[1] === 'n') {
+          base.getVar('Temperature').value = val
+          base.commandDone()
+        }
+      }
+      else {
+        base.commandError(`onFrame: Set ID received (${id}) does not match configured ID (${config.setID})`)
       }
     }
+    else if (match && !pendingCommand) {
+      logger.warn(`Received data but no pending command: ${data}`)
+    }
     else {
-      logger.warn(`onFrame, unrecognized: ${data}`);
+      logger.warn(`onFrame data not processed`)
     }
   }
 
-  const getPower = () => sendDefer(Buffer.from(`ka ${setID} FF\r`));
-  const getSource = () => sendDefer(Buffer.from(`xb ${setID} FF\r`));
-  const getScreenMute = () => sendDefer(Buffer.from(`kd ${setID} FF\r`));
-  const getAudioMute = () => sendDefer(Buffer.from(`ke ${setID} FF\r`));
-  const getAudioLevel = () => sendDefer(Buffer.from(`kf ${setID} FF\r`));
-  const getTemperature = () => sendDefer(Buffer.from(`dn ${setID} FF\r`));
 
-  const setPower = params => {
+  // ------------------------------ GET FUNCTIONS ------------------------------
+
+  function getPower() { sendDefer(`ka ${config.setID} FF\r`) }
+  function getSource() { sendDefer(`xb ${config.setID} FF\r`) }
+  function getScreenMute() { sendDefer(`kd ${config.setID} FF\r`) }
+  function getAudioMute() { sendDefer(`ke ${config.setID} FF\r`) }
+  function getAudioLevel() { sendDefer(`kf ${config.setID} FF\r`) }
+  function getTemperature() { sendDefer(`dn ${config.setID} FF\r`) }
+
+
+  // ------------------------------ SET FUNCTIONS ------------------------------
+
+  function setPower(params) {
     if (params.Status == 'Off') {
-      sendDefer(Buffer.from(`ka ${setID} 00\r`));
+      sendDefer(`ka ${config.setID} 00\r`)
     }
     else if (params.Status == 'On') {
-      wol(config.mac).then(() => logger.silly(`setPower: WOL sent to ${config.mac}`));
+      wol.wake(config.mac).then(
+        resolved => {
+          logger.silly(`setPower: WOL sent to ${config.mac}`)
+        },
+        error => {
+          logger.error(`setPower WOL Error: ${error.message}`)
+        }
+      )
     }
   }
 
-  const selectSource = params => {
-    sendDefer(`xb ${setID} ${SOURCES.find(x => x.name === params.Name).value.toString(16)}\r`);
+  function selectSource(params) {
+    sendDefer(`xb ${config.setID} ${sourcesInfo.find(x => x.title === params.Name).hexcode.toString(16)}\r`)
   }
 
-  const setScreenMute = params => {
-    if (params.Status == 'Off') sendDefer(Buffer.from(`kd ${setID} 00\r`));
-    else if (params.Status == 'On') sendDefer(Buffer.from(`kd ${setID} 01\r`));
+  function setScreenMute(params) {
+    if (params.Status == 'Off') sendDefer(`kd ${config.setID} 00\r`)
+    else if (params.Status == 'On') sendDefer(`kd ${config.setID} 01\r`)
   }
 
-  const setAudioMute = params => {
-    if (params.Status == 'Off') sendDefer(`ke ${setID} 01\r`);
-    else if (params.Status == 'On') sendDefer(`ke ${setID} 00\r`);
+  function setAudioMute(params) {
+    if (params.Status == 'Off') sendDefer(`ke ${config.setID} 01\r`)
+    else if (params.Status == 'On') sendDefer(`ke ${config.setID} 00\r`)
   }
 
-  const setAudioLevel = params => {
-    sendDefer(Buffer.from(`kf ${setID} ${params.Level.toString(16)}\r`));
+  function setAudioLevel(params) {
+    sendDefer(`kf ${config.setID} ${params.Level.toString(16)}\r`)
   }
 
+
+  // ------------------------------ EXPORTED FUNCTIONS ------------------------------
   return {
     setup, start, stop, tick,
     setPower, selectSource, setScreenMute, setAudioMute, setAudioLevel,
