@@ -1,5 +1,5 @@
 {
-  "name": "template",
+  "name": "template_tcp",
   "version": "1.0.0",
   "description": "Driver",
   "main": "index.js",
@@ -19,15 +19,23 @@
       {
         "name": "Status",
         "type": "enum",
-        "enums": ["Disconnected", "Connected"]
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
       },
       {
         "name": "Power",
         "type": "enum",
-        "enums": ["Off", "On"],
+        "enums": [
+          "Off",
+          "On"
+        ],
         "perform": {
           "action": "Set Power",
-          "params": { "Status": "$string"}
+          "params": {
+            "Status": "$string"
+          }
         }
       }
     ],
@@ -36,7 +44,9 @@
       {
         "name": "Set Power",
         "params": {
-          "Status": { "type": "string" }
+          "Status": {
+            "type": "string"
+          }
         }
       }
     ],
@@ -48,13 +58,13 @@
         "host": {
           "title": "Host name or IP address:",
           "type": "string",
-          "default": "192.168.99.1"
+          "default": ""
         },
         "port": {
           "title": "Port:",
           "type": "integer",
-          "default": 23,
-          "description": "Telnet: 23"
+          "default": 9999,
+          "description": "Default: 9999"
         }
       },
       "required": [
