@@ -15,11 +15,11 @@
       ],
       "env": {
         "UXURI": "http://203.27.185.62:9950",
-        "UID": "TobyCS_Node",
+        "UID": "TobyCS",
         "NODE_ENV": "development",
-        "DRIVERPATH": "${workspaceRoot}/dev",
-        "DEBUGDRIVER": "true",
-        "LOGLEVEL": "silly",
+        "driverPath": "${workspaceRoot}/drivers",
+        "debugDriver": "true",
+        "logLevel": "silly",
         "_IGNOREUXPROJECT": "true"
       },
       "windows": {
@@ -28,7 +28,8 @@
         "env": {
           "DRIVERPATH": "Home / Overture Drivers <-- Needs updating"
         }
-      }
+      },
+      "internalConsoleOptions": "openOnSessionStart"
     },
     {
         "type": "node",

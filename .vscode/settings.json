@@ -15,5 +15,5 @@
   "editor.insertSpaces": true,
   "editor.detectIndentation": true,
   "debug.inlineValues": true,
-  "debug.toolBarLocation": "docked"
+  "debug.toolBarLocation": "floating"
 }
