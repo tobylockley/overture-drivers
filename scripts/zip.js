@@ -6,6 +6,9 @@ const glob = require('glob')
 const archiver = require('archiver')
 
 function zipDriver(inputPath, outputPath, moveToArchive = true) {
+
+  inputPath = path.resolve(inputPath)
+  outputPath = path.resolve(outputPath)
   
   const pkg = require(path.join(inputPath, 'package.json'))
   if ( !(pkg.name && pkg.version && pkg.overture) ) throw new Error(`${inputPath} does not contain an overture driver`)

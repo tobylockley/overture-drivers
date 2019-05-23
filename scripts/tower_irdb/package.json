@@ -1,0 +1,15 @@
+{
+  "name": "tower_irdb",
+  "version": "1.0.0",
+  "description": "Convert Tower IR codes to overture driver files",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "dependencies": {
+    "archiver": "^3.0.0",
+    "readline-sync": "^1.4.9"
+  }
+}
