@@ -1,6 +1,6 @@
 {
   "name": "lg_display",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Driver for LG display",
   "main": "index.js",
   "scripts": {
@@ -11,8 +11,7 @@
   "overture": {
     "brand": "LG",
     "models": [
-      "32SM5KD-BH",
-      "55UU640C"
+      "47LV35A"
     ],
     "type": "device",
     "subtype": "display",
@@ -150,6 +149,30 @@
             "type": "integer"
           }
         }
+      },
+      {
+        "name": "Set Tile Mode",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "1x2",
+              "2x2",
+              "3x3",
+              "4x4",
+              "5x5"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Set Tile Id",
+        "params": {
+          "Value": {
+            "type": "integer"
+          }
+        }
       }
     ],
     "pointSetupSchema": {
@@ -181,6 +204,12 @@
           "minimum": 1,
           "maximum": 255,
           "description": "Found in General Settings. Default: 1"
+        },
+        "videowall": {
+          "title": "Enable Videowall Control",
+          "type": "boolean",
+          "format": "checkbox",
+          "description": "Enable tile mode and tile ID controls for this display"
         },
         "inputs": {
           "type": "object",
@@ -293,14 +322,7 @@
             }
           }
         }
-      },
-      "required": [
-        "host",
-        "port",
-        "mac",
-        "setID",
-        "inputs"
-      ]
+      }
     }
   },
   "dependencies": {

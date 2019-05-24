@@ -4,7 +4,7 @@ const CMD_DEFER_TIME = 3000        // Timeout when using commandDefer
 const TICK_PERIOD = 5000           // In-built tick interval
 const POLL_PERIOD = 5000           // Continuous polling function interval
 const TCP_TIMEOUT = 30000          // Will timeout after this length of inactivity
-const TCP_RECONNECT_DELAY = 3000   // How long to wait before attempting to reconnect
+const TCP_RECONNECT_DELAY = 1000   // How long to wait before attempting to reconnect
 
 let host
 exports.init = _host => {
@@ -26,6 +26,7 @@ exports.createDevice = base => {
   // ------------------------------ SETUP FUNCTIONS ------------------------------
 
   function isConnected() { return base.getVar('Status').string === 'Connected' }
+  function isInTileMode() { return isConnected && base.getVar('TileMode').value > 0 }
 
   function setup(_config) {
     config = _config
@@ -47,6 +48,38 @@ exports.createDevice = base => {
       }
     }
     base.getVar('Sources').enums = sourcesInfo.map(x => x.title)
+
+    // Create videowall variables and set polls if enabled
+    if (config.videowall) {
+      base.createVariable({
+        name: 'TileMode',
+        type: 'enum',
+        enums: [
+          "Off",
+          "1x2",
+          "2x2",
+          "3x3",
+          "4x4",
+          "5x5"
+        ],
+        perform: {
+          action: 'setTileMode',
+          params: { Status: '$string' }
+        }
+      })
+      base.createVariable({
+        name: 'TileId',
+        type: 'integer',
+        min: 1,
+        max: 25,
+        perform: {
+          action: 'setTileId',
+          params: { Value: '$value' }
+        }
+      })
+      base.setPoll({ action: 'getTileMode', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
+      base.setPoll({ action: 'getTileId', period: POLL_PERIOD, enablePollFn: isInTileMode, startImmediately: true })
+    }
   }
 
   function start() {
@@ -141,6 +174,23 @@ exports.createDevice = base => {
           base.getVar('Temperature').value = val
           base.commandDone()
         }
+        else if (match[1] === 'z' && base.getVar('TileMode')) {
+          let bytes = match[3].match(/.{2}/g).map(x => parseInt(x, 16))
+          let tileMode = bytes[0]
+          let rows = bytes[1]
+          let cols = bytes[2]
+          let tileString = (tileMode > 0) ? `${rows}x${cols}` : 'Off'
+          checkTileIdMax(rows, cols)
+          base.getVar('TileMode').string = tileString
+          base.commandDone()
+        }
+        else if (match[1] === 'i' && base.getVar('TileId')) {
+          base.getVar('TileId').value = val
+          base.commandDone()
+        }
+        else {
+          base.commandError(`Unable to process received data: ${data}`)
+        }
       }
       else {
         base.commandError(`onFrame: Set ID received (${id}) does not match configured ID (${config.setID})`)
@@ -163,6 +213,8 @@ exports.createDevice = base => {
   function getAudioMute() { sendDefer(`ke ${config.setID} FF\r`) }
   function getAudioLevel() { sendDefer(`kf ${config.setID} FF\r`) }
   function getTemperature() { sendDefer(`dn ${config.setID} FF\r`) }
+  function getTileMode() { sendDefer(`dz ${config.setID} FF\r`) }
+  function getTileId() { sendDefer(`di ${config.setID} FF\r`) }
 
 
   // ------------------------------ SET FUNCTIONS ------------------------------
@@ -201,11 +253,43 @@ exports.createDevice = base => {
     sendDefer(`kf ${config.setID} ${params.Level.toString(16)}\r`)
   }
 
+  function setTileMode(params) {
+    let rows = 1
+    let cols = 1
+    let match = params.Status.match(/(\d)x(\d)/)
+    if (match && params.Status !== 'Off') {
+      rows = parseInt(match[1])
+      cols = parseInt(match[2])
+    }
+    checkTileIdMax(rows, cols)
+    sendDefer(`dd ${config.setID} ${rows.toString(16)}${cols.toString(16)}\r`)
+  }
+
+  function setTileId(params) {
+    if (params.Value <= base.getVar('TileId').max) {
+      sendDefer(`di ${config.setID} ${params.Value.toString(16)}\r`)
+    }
+  }
+
+
+  // ------------------------------ HELPER FUNCTIONS ------------------------------
+
+  function checkTileIdMax(rows, cols) {
+    // Make sure the current Tile ID is <= rows x cols, otherwise reset to 1
+    let idMax = rows * cols
+    let tileId = base.getVar('TileId')
+    if (tileId.value > idMax) {
+      logger.info(`Current Tile ID (${tileId.value}) exceeds requested Tile Mode maximum (${rows}x${cols} = ${idMax}), resetting to 1`)
+      tileId.value = 1
+    }
+    tileId.max = idMax
+  }
+
 
   // ------------------------------ EXPORTED FUNCTIONS ------------------------------
   return {
     setup, start, stop, tick,
-    setPower, selectSource, setScreenMute, setAudioMute, setAudioLevel,
-    getPower, getSource, getScreenMute, getAudioMute, getAudioLevel, getTemperature
+    setPower, selectSource, setScreenMute, setAudioMute, setAudioLevel, setTileMode, setTileId,
+    getPower, getSource, getScreenMute, getAudioMute, getAudioLevel, getTemperature, getTileMode, getTileId
   }
 }
