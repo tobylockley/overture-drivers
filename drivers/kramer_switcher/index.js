@@ -1,7 +1,7 @@
 'use strict'
 
-const CMD_DEFER_TIME = 5000
-const POLL_PERIOD = 5000
+const CMD_DEFER_TIME = 3000
+const POLL_PERIOD = 10000
 const TICK_PERIOD = 5000
 const TCP_TIMEOUT = 30000
 const TCP_RECONNECT_DELAY = 1000
@@ -22,24 +22,25 @@ exports.createDevice = base => {
 
   // ------------------------------ SETUP FUNCTIONS ------------------------------
 
+  function isConnected() { return base.getVar('Status').string === 'Connected' }
+
   function setup(_config) {
     config = _config
     base.setTickPeriod(TICK_PERIOD)
 
-    let msgEnd = (128 + config.machineNumber).toString(16)  // See manual, pg 22
-    frameParser.setSeparator(msgEnd)
+    config.msgEnd = (128 + config.machineNumber).toString(16)  // See manual, pg 19
+    frameParser.setSeparator(new RegExp(`[0-9a-fA-F]{6}${config.msgEnd}`))
+    // Incoming hex Buffer is converted to hex string before its passed to frameParser
 
-    let sources = ['None', 'Input1', 'Input2']
     let num_outputs
     if (config.model === 'VM-28H') num_outputs = 8
     else if (config.model === 'VM-216H') num_outputs = 16
-
     // Create variables for each output and set up polling
     for (let i = 1; i <= num_outputs; i++) {
       base.createVariable({
         name: `Sources_Output${i}`,
         type: 'enum',
-        enums: sources,
+        enums: ['None', 'Input1', 'Input2'],
         perform: {
           action: 'selectSource',
           params: {
@@ -48,16 +49,7 @@ exports.createDevice = base => {
           }
         }
       })
-
-      base.setPoll({
-        action: 'getSource',
-        period: POLL_PERIOD,
-        enablePollFn: () => { return base.getVar('Status').string === 'Connected'; },
-        startImmediately: true,
-        params: {
-          Channel: i
-        }
-      })
+      base.setPoll({ action: 'getSource', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true , params: {Channel: i}})
     }
   }
 
@@ -114,7 +106,7 @@ exports.createDevice = base => {
   function send(data) {
     if (data instanceof Buffer) {
       let logdata = data.toString('hex').match(/.{1,2}/g).join(' ')
-      logger.silly(`TCPClient Hex send: ${logdata}`)
+      logger.silly(`TCPClient send HEX: ${logdata}`)
     }
     else {
       logger.silly(`TCPClient send: ${data}`)
@@ -129,29 +121,28 @@ exports.createDevice = base => {
 
   function onFrame(data) {
     const pendingCommand = base.getPendingCommand();
-    if (data.length !== 8) {
-      base.commandError(`Received frame unexpected length (${data.length}): ${data}`)
-    }
-    else {
-      let bytes = data.match(/.{1,2}/g)
-      logger.silly(`onFrame: ${bytes.join(' ')}`);
-      pendingCommand && logger.silly(`pendingCommand: ${pendingCommand.action}`);
+    let bytes = data.match(/.{1,2}/g)
+    if (pendingCommand && bytes.length === 4 && bytes[3] === config.msgEnd) {
+      logger.debug(`onFrame (pending = ${pendingCommand.action}): ${bytes.join(' ')}`);
 
       bytes = bytes.map(x => parseInt(x, 16))
-      let destination = (bytes[0] >> 6) & 1  // Get only the 6th bit, should be 1 for switcher -> PC
-      let instruction = bytes[0] & 0b111111  // bitmask lowest 6 bits, switch video = 1
-      let input = bytes[1] & 0b1111111  // bitmask lowest 7 bits
-      let output = bytes[2] & 0b1111111  // bitmask lowest 7 bits
-      let machineNumber = bytes[3] & 0b11111  // bitmask lowest 5 bits
-
+      let destination = (bytes[0] >> 6) & 0b1  // Get only the 7th bit, should be 1 for switcher -> PC
+      let instruction = bytes[0] & 0b111111  // Bitmask lowest 6 bits, switch video = 1
+      let input = bytes[1] & 0b1111111  // Bitmask lowest 7 bits
+      let output = bytes[2] & 0b1111111  // Bitmask lowest 7 bits
+      let machineNumber = bytes[3] & 0b11111  // Bitmask lowest 5 bits
+      
       if (machineNumber === config.machineNumber && destination === 1) {
-        // 1 = Video was switched
+        // 1 = video switch command
         // 5 = video status request
         if (instruction === 1 || instruction === 5) {
           base.getVar(`Sources_Output${output}`).value = input  // 0 = 'None' (disconnected)
           base.commandDone();
         }
       }
+    }
+    else {
+      logger.warn(`onFrame data not processed: ${data}`)
     }
   }
 
@@ -161,11 +152,12 @@ exports.createDevice = base => {
   function selectSource(params) {
     let bytes = [
       0x01,  // Instruction, 1 = Switch video
-      0x80 + parseInt(params.Name),
+      0x80 + params.Name,
       0x80 + params.Channel,
       0x80 + config.machineNumber
     ]
-    sendDefer(Buffer.from(bytes))
+    send(Buffer.from(bytes))
+    base.getVar(`Sources_Output${params.Channel}`).value = params.Name
   }
 
   function getSource(params) {

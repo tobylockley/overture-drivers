@@ -28,7 +28,7 @@
             "type": "integer"
           },
           "Name": {
-            "type": "string"
+            "type": "integer"
           }
         }
       }
@@ -63,13 +63,7 @@
           "maximum": 31,
           "description": "Default: 1"
         }
-      },
-      "required": [
-        "host",
-        "port",
-        "model",
-        "machineNumber"
-      ]
+      }
     }
   }
 }
