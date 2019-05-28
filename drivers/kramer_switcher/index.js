@@ -29,7 +29,7 @@ exports.createDevice = base => {
     base.setTickPeriod(TICK_PERIOD)
 
     config.msgEnd = (128 + config.machineNumber).toString(16)  // See manual, pg 19
-    frameParser.setSeparator(new RegExp(`[0-9a-fA-F]{6}${config.msgEnd}`))
+    frameParser.setSeparator(new RegExp(`[0-9a-f]{6}${config.msgEnd}`, 'i'))
     // Incoming hex Buffer is converted to hex string before its passed to frameParser
 
     let num_outputs
@@ -120,10 +120,10 @@ exports.createDevice = base => {
   }
 
   function onFrame(data) {
-    const pendingCommand = base.getPendingCommand();
+    const pendingCommand = base.getPendingCommand()
     let bytes = data.match(/.{1,2}/g)
     if (pendingCommand && bytes.length === 4 && bytes[3] === config.msgEnd) {
-      logger.debug(`onFrame (pending = ${pendingCommand.action}): ${bytes.join(' ')}`);
+      logger.debug(`onFrame (pending = ${pendingCommand.action}): ${bytes.join(' ')}`)
 
       bytes = bytes.map(x => parseInt(x, 16))
       let destination = (bytes[0] >> 6) & 0b1  // Get only the 7th bit, should be 1 for switcher -> PC
@@ -137,12 +137,12 @@ exports.createDevice = base => {
         // 5 = video status request
         if (instruction === 1 || instruction === 5) {
           base.getVar(`Sources_Output${output}`).value = input  // 0 = 'None' (disconnected)
-          base.commandDone();
+          base.commandDone()
         }
       }
     }
     else {
-      logger.warn(`onFrame data not processed: ${data}`)
+      logger.warn(`onFrame data not processed (pending = ${pendingCommand && pendingCommand.action}): ${data}`)
     }
   }
 

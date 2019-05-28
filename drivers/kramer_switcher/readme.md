@@ -10,7 +10,8 @@ Driver for a Kramer HDMI switcher
 
 - "Host": The IP address or host name of the globalcache rs232 device.
 - "Port": The port of TCP communication. (Default 4999)
-- "Model": The model of the switcher
+- "Model": The model of the switcher.
+- "Machine Number": ID number of the device for RS232 purposes. (Default 1)
 
 
 ## Variables
