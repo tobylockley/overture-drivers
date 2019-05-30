@@ -1,0 +1,34 @@
+{
+  "gen": {
+    "ip": "192.168.99.40",
+    "hostname": "zyper.local",
+    "version": "1.8.34605",
+    "previousVersion": "1.7.3.33736",
+    "macAddress": "40:8d:5c:32:44:8b",
+    "serialNumber": "ZZMPFB408d5c32448bA",
+    "uptime": "26d:19h:5m:2s",
+    "freeMem": "6.020GB",
+    "bootCount": "86",
+    "runningInVm": "false"
+  },
+  "time": {
+    "time": "Tue May 28 11:06:42 2019",
+    "timezone": "Australia/Brisbane"
+  },
+  "license": {
+    "productID": "038D0240-045C-0532-4406-8B0700080009",
+    "license": "none",
+    "limit": "unlimited",
+    "knownDevices": "16",
+    "devicesUp": "16",
+    "devicesExceeded": "0"
+  },
+  "deviceUpdates": {
+    "active": "0"
+  },
+  "activeDeviceVersions": {
+    "num_0.10.2": "4",
+    "num_0.10.3": "4",
+    "num_3.5.2": "8"
+  }
+}

@@ -1,0 +1,506 @@
+[
+  {
+    "gen": {
+      "mac": "34:1b:22:80:57:f3",
+      "model": "ZyperUHD",
+      "type": "decoder",
+      "name": "uhd_dec3",
+      "state": "Up",
+      "uptime": "26d:18h:52m:43s",
+      "lastChangeId": "925"
+    },
+    "firmwareUpdate": {
+      "status": "idle",
+      "loadingFile": "none",
+      "percentComplete": "0"
+    },
+    "hdmiOutput": {
+      "cableConnected": "disconnected",
+      "hdcp": "NA",
+      "hdcp-version": "NA",
+      "hdmi-2.0": "NA",
+      "horizontalSize": "0",
+      "verticalSize": "0",
+      "fps": "0",
+      "interlaced": "NA",
+      "active-color-mapping": "NA",
+      "active-colorDepth": "NA",
+      "preferred-horizontalSize": "NA",
+      "preferred-verticalSize": "NA",
+      "preferred-fps": "NA",
+      "maxPixelClockMhz": "NA",
+      "supported-color-mappings": "NA",
+      "max-colorDepth": "NA",
+      "activePixelClockMhz": "NA",
+      "streamDatarate": "400Mbps"
+    },
+    "edid": {
+      "edid-status": "NA",
+      "edid-monitor-name": "NA"
+    },
+    "connectedEncoder": {
+      "mac": "34:1b:22:80:56:ef",
+      "name": "uhd_enc2",
+      "receivingVideoFromEncoder": "no",
+      "reason": "decoder hdmi down"
+    },
+    "connectedEncoderAudio": {
+      "mac": "34:1b:22:80:56:ef",
+      "name": "uhd_enc2",
+      "receivingAudioFromEncoder": "yes"
+    },
+    "activeVideoWall": {
+      "name": "none"
+    },
+    "inactiveVideoWall_1": {
+      "name": "UHD",
+      "positionRow 2": "",
+      "positionCol 1": ""
+    }
+  },
+  {
+    "gen": {
+      "mac": "34:1b:22:80:74:e8",
+      "model": "ZyperUHD",
+      "type": "decoder",
+      "name": "uhd_dec1",
+      "state": "Up",
+      "uptime": "26d:19h:3m:29s",
+      "lastChangeId": "923"
+    },
+    "firmwareUpdate": {
+      "status": "idle",
+      "loadingFile": "none",
+      "percentComplete": "0"
+    },
+    "hdmiOutput": {
+      "cableConnected": "disconnected",
+      "hdcp": "NA",
+      "hdcp-version": "NA",
+      "hdmi-2.0": "NA",
+      "horizontalSize": "0",
+      "verticalSize": "0",
+      "fps": "0",
+      "interlaced": "NA",
+      "active-color-mapping": "NA",
+      "active-colorDepth": "NA",
+      "preferred-horizontalSize": "NA",
+      "preferred-verticalSize": "NA",
+      "preferred-fps": "NA",
+      "maxPixelClockMhz": "NA",
+      "supported-color-mappings": "NA",
+      "max-colorDepth": "NA",
+      "activePixelClockMhz": "NA",
+      "streamDatarate": "400Mbps"
+    },
+    "edid": {
+      "edid-status": "NA",
+      "edid-monitor-name": "NA"
+    },
+    "connectedEncoder": {
+      "mac": "34:1b:22:80:56:ef",
+      "name": "uhd_enc2",
+      "receivingVideoFromEncoder": "no",
+      "reason": "decoder hdmi down"
+    },
+    "connectedEncoderAudio": {
+      "mac": "34:1b:22:80:56:d4",
+      "name": "uhd_enc1",
+      "receivingAudioFromEncoder": "no"
+    },
+    "activeVideoWall": {
+      "name": "none"
+    },
+    "inactiveVideoWall_1": {
+      "name": "UHD",
+      "positionRow 1": "",
+      "positionCol 1": ""
+    }
+  },
+  {
+    "gen": {
+      "mac": "34:1b:22:80:75:1b",
+      "model": "ZyperUHD",
+      "type": "decoder",
+      "name": "uhd_dec4",
+      "state": "Up",
+      "uptime": "26d:18h:52m:33s",
+      "lastChangeId": "929"
+    },
+    "firmwareUpdate": {
+      "status": "idle",
+      "loadingFile": "none",
+      "percentComplete": "0"
+    },
+    "hdmiOutput": {
+      "cableConnected": "disconnected",
+      "hdcp": "NA",
+      "hdcp-version": "NA",
+      "hdmi-2.0": "NA",
+      "horizontalSize": "0",
+      "verticalSize": "0",
+      "fps": "0",
+      "interlaced": "NA",
+      "active-color-mapping": "NA",
+      "active-colorDepth": "NA",
+      "preferred-horizontalSize": "NA",
+      "preferred-verticalSize": "NA",
+      "preferred-fps": "NA",
+      "maxPixelClockMhz": "NA",
+      "supported-color-mappings": "NA",
+      "max-colorDepth": "NA",
+      "activePixelClockMhz": "NA",
+      "streamDatarate": "400Mbps"
+    },
+    "edid": {
+      "edid-status": "NA",
+      "edid-monitor-name": "NA"
+    },
+    "connectedEncoder": {
+      "mac": "34:1b:22:80:56:ef",
+      "name": "uhd_enc2",
+      "receivingVideoFromEncoder": "no",
+      "reason": "decoder hdmi down"
+    },
+    "connectedEncoderAudio": {
+      "mac": "34:1b:22:80:56:ef",
+      "name": "uhd_enc2",
+      "receivingAudioFromEncoder": "yes"
+    },
+    "activeVideoWall": {
+      "name": "none"
+    },
+    "inactiveVideoWall_1": {
+      "name": "UHD",
+      "positionRow 2": "",
+      "positionCol 2": ""
+    }
+  },
+  {
+    "gen": {
+      "mac": "34:1b:22:80:75:2f",
+      "model": "ZyperUHD",
+      "type": "decoder",
+      "name": "uhd_dec2",
+      "state": "Up",
+      "uptime": "26d:18h:52m:54s",
+      "lastChangeId": "927"
+    },
+    "firmwareUpdate": {
+      "status": "idle",
+      "loadingFile": "none",
+      "percentComplete": "0"
+    },
+    "hdmiOutput": {
+      "cableConnected": "disconnected",
+      "hdcp": "NA",
+      "hdcp-version": "NA",
+      "hdmi-2.0": "NA",
+      "horizontalSize": "0",
+      "verticalSize": "0",
+      "fps": "0",
+      "interlaced": "NA",
+      "active-color-mapping": "NA",
+      "active-colorDepth": "NA",
+      "preferred-horizontalSize": "NA",
+      "preferred-verticalSize": "NA",
+      "preferred-fps": "NA",
+      "maxPixelClockMhz": "NA",
+      "supported-color-mappings": "NA",
+      "max-colorDepth": "NA",
+      "activePixelClockMhz": "NA",
+      "streamDatarate": "400Mbps"
+    },
+    "edid": {
+      "edid-status": "NA",
+      "edid-monitor-name": "NA"
+    },
+    "connectedEncoder": {
+      "mac": "34:1b:22:80:56:ef",
+      "name": "uhd_enc2",
+      "receivingVideoFromEncoder": "no",
+      "reason": "decoder hdmi down"
+    },
+    "connectedEncoderAudio": {
+      "mac": "34:1b:22:80:56:ef",
+      "name": "uhd_enc2",
+      "receivingAudioFromEncoder": "yes"
+    },
+    "activeVideoWall": {
+      "name": "none"
+    },
+    "inactiveVideoWall_1": {
+      "name": "UHD",
+      "positionRow 1": "",
+      "positionCol 2": ""
+    }
+  },
+  {
+    "gen": {
+      "mac": "d8:80:39:ea:ac:72",
+      "model": "Zyper4K",
+      "type": "decoder",
+      "name": "4k_dec4",
+      "state": "Up",
+      "uptime": "26d:19h:3m:28s",
+      "lastChangeId": "6820"
+    },
+    "temperature": {
+      "main": "64C"
+    },
+    "firmwareUpdate": {
+      "status": "idle",
+      "loadingFile": "none",
+      "percentComplete": "0"
+    },
+    "hdmiOutput": {
+      "cableConnected": "disconnected",
+      "hdcp": "NA",
+      "hdcp-version": "NA",
+      "hdmi-2.0": "NA",
+      "horizontalSize": "0",
+      "verticalSize": "0",
+      "fps": "0",
+      "interlaced": "NA",
+      "active-color-mapping": "NA",
+      "active-colorDepth": "NA",
+      "preferred-horizontalSize": "NA",
+      "preferred-verticalSize": "NA",
+      "preferred-fps": "NA",
+      "maxPixelClockMhz": "NA",
+      "supported-color-mappings": "NA",
+      "max-colorDepth": "NA",
+      "activePixelClockMhz": "NA",
+      "streamDatarate": "6531Mbps"
+    },
+    "edid": {
+      "edid-status": "NA",
+      "edid-monitor-name": "NA"
+    },
+    "connectedEncoder": {
+      "mac": "d8:80:39:eb:1d:7d",
+      "name": "4k_enc2",
+      "receivingVideoFromEncoder": "no",
+      "reason": "decoder hdmi down"
+    },
+    "connectedEncoderAnalogAudio": {
+      "mac": "none",
+      "name": "N/A",
+      "receivingAudioFromEncoder": "no"
+    },
+    "connectedEncoderHdmiDownmixAudio": {
+      "mac": "d8:80:39:eb:1d:7d",
+      "name": "4k_enc2",
+      "receivingAudioFromEncoder": "yes"
+    },
+    "activeVideoWall": {
+      "name": "none"
+    },
+    "inactiveVideoWall_1": {
+      "name": "4K",
+      "positionRow 2": "",
+      "positionCol 2": ""
+    }
+  },
+  {
+    "gen": {
+      "mac": "d8:80:39:eb:6:96",
+      "model": "Zyper4K",
+      "type": "decoder",
+      "name": "4k_dec3",
+      "state": "Up",
+      "uptime": "26d:19h:3m:28s",
+      "lastChangeId": "6853"
+    },
+    "temperature": {
+      "main": "69C"
+    },
+    "firmwareUpdate": {
+      "status": "idle",
+      "loadingFile": "none",
+      "percentComplete": "0"
+    },
+    "hdmiOutput": {
+      "cableConnected": "disconnected",
+      "hdcp": "NA",
+      "hdcp-version": "NA",
+      "hdmi-2.0": "NA",
+      "horizontalSize": "0",
+      "verticalSize": "0",
+      "fps": "0",
+      "interlaced": "NA",
+      "active-color-mapping": "NA",
+      "active-colorDepth": "NA",
+      "preferred-horizontalSize": "NA",
+      "preferred-verticalSize": "NA",
+      "preferred-fps": "NA",
+      "maxPixelClockMhz": "NA",
+      "supported-color-mappings": "NA",
+      "max-colorDepth": "NA",
+      "activePixelClockMhz": "NA",
+      "streamDatarate": "6531Mbps"
+    },
+    "edid": {
+      "edid-status": "NA",
+      "edid-monitor-name": "NA"
+    },
+    "connectedEncoder": {
+      "mac": "d8:80:39:ea:fe:54",
+      "name": "4k_enc4",
+      "receivingVideoFromEncoder": "no",
+      "reason": "decoder hdmi down"
+    },
+    "connectedEncoderAnalogAudio": {
+      "mac": "none",
+      "name": "N/A",
+      "receivingAudioFromEncoder": "no"
+    },
+    "connectedEncoderHdmiDownmixAudio": {
+      "mac": "d8:80:39:ea:fe:54",
+      "name": "4k_enc4",
+      "receivingAudioFromEncoder": "yes"
+    },
+    "activeVideoWall": {
+      "name": "none"
+    },
+    "inactiveVideoWall_1": {
+      "name": "4K",
+      "positionRow 2": "",
+      "positionCol 1": ""
+    }
+  },
+  {
+    "gen": {
+      "mac": "d8:80:39:eb:52:42",
+      "model": "Zyper4K",
+      "type": "decoder",
+      "name": "4k_dec2",
+      "state": "Up",
+      "uptime": "26d:19h:3m:28s",
+      "lastChangeId": "6858"
+    },
+    "temperature": {
+      "main": "66C"
+    },
+    "firmwareUpdate": {
+      "status": "idle",
+      "loadingFile": "none",
+      "percentComplete": "0"
+    },
+    "hdmiOutput": {
+      "cableConnected": "disconnected",
+      "hdcp": "NA",
+      "hdcp-version": "NA",
+      "hdmi-2.0": "NA",
+      "horizontalSize": "0",
+      "verticalSize": "0",
+      "fps": "0",
+      "interlaced": "NA",
+      "active-color-mapping": "NA",
+      "active-colorDepth": "NA",
+      "preferred-horizontalSize": "NA",
+      "preferred-verticalSize": "NA",
+      "preferred-fps": "NA",
+      "maxPixelClockMhz": "NA",
+      "supported-color-mappings": "NA",
+      "max-colorDepth": "NA",
+      "activePixelClockMhz": "NA",
+      "streamDatarate": "6531Mbps"
+    },
+    "edid": {
+      "edid-status": "NA",
+      "edid-monitor-name": "NA"
+    },
+    "connectedEncoder": {
+      "mac": "80:1f:12:4b:ab:8a",
+      "name": "4k_enc3",
+      "receivingVideoFromEncoder": "no",
+      "reason": "decoder hdmi down"
+    },
+    "connectedEncoderAnalogAudio": {
+      "mac": "none",
+      "name": "N/A",
+      "receivingAudioFromEncoder": "no"
+    },
+    "connectedEncoderHdmiDownmixAudio": {
+      "mac": "80:1f:12:4b:ab:8a",
+      "name": "4k_enc3",
+      "receivingAudioFromEncoder": "yes"
+    },
+    "activeVideoWall": {
+      "name": "none"
+    },
+    "inactiveVideoWall_1": {
+      "name": "4K",
+      "positionRow 1": "",
+      "positionCol 2": ""
+    }
+  },
+  {
+    "gen": {
+      "mac": "d8:80:39:eb:5b:3c",
+      "model": "Zyper4K",
+      "type": "decoder",
+      "name": "4k_dec1",
+      "state": "Up",
+      "uptime": "26d:19h:3m:28s",
+      "lastChangeId": "6854"
+    },
+    "temperature": {
+      "main": "67C"
+    },
+    "firmwareUpdate": {
+      "status": "idle",
+      "loadingFile": "none",
+      "percentComplete": "0"
+    },
+    "hdmiOutput": {
+      "cableConnected": "disconnected",
+      "hdcp": "NA",
+      "hdcp-version": "NA",
+      "hdmi-2.0": "NA",
+      "horizontalSize": "0",
+      "verticalSize": "0",
+      "fps": "0",
+      "interlaced": "NA",
+      "active-color-mapping": "NA",
+      "active-colorDepth": "NA",
+      "preferred-horizontalSize": "NA",
+      "preferred-verticalSize": "NA",
+      "preferred-fps": "NA",
+      "maxPixelClockMhz": "NA",
+      "supported-color-mappings": "NA",
+      "max-colorDepth": "NA",
+      "activePixelClockMhz": "NA",
+      "streamDatarate": "6531Mbps"
+    },
+    "edid": {
+      "edid-status": "NA",
+      "edid-monitor-name": "NA"
+    },
+    "connectedEncoder": {
+      "mac": "d8:80:39:eb:1d:7d",
+      "name": "4k_enc2",
+      "receivingVideoFromEncoder": "no",
+      "reason": "decoder hdmi down"
+    },
+    "connectedEncoderAnalogAudio": {
+      "mac": "none",
+      "name": "N/A",
+      "receivingAudioFromEncoder": "no"
+    },
+    "connectedEncoderHdmiDownmixAudio": {
+      "mac": "d8:80:39:eb:1d:7d",
+      "name": "4k_enc2",
+      "receivingAudioFromEncoder": "yes"
+    },
+    "activeVideoWall": {
+      "name": "none"
+    },
+    "inactiveVideoWall_1": {
+      "name": "4K",
+      "positionRow 1": "",
+      "positionCol 1": ""
+    }
+  }
+]

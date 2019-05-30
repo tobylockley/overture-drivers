@@ -1,0 +1,622 @@
+[
+  {
+    "gen": {
+      "mac": "34:1b:22:80:57:f3",
+      "model": "ZyperUHD",
+      "type": "decoder",
+      "name": "uhd_dec3",
+      "state": "Up",
+      "lastChangeId": "1338",
+      "firmware": "0.10.2.0"
+    },
+    "hdmi": {
+      "hdcp-mode": "force-version-1.4"
+    },
+    "ports": {
+      "video-port": "auto"
+    },
+    "ip": {
+      "mode": "dhcp",
+      "address": "192.168.99.149",
+      "mask": "255.255.0.0",
+      "gateway": "0.0.0.0"
+    },
+    "rs232": {
+      "sendingToMacOrIp": "none(0.0.0.0)",
+      "terminationChars": "\\n\\r",
+      "baudrate": "38400",
+      "dataBit": "8",
+      "stop_Bit": "1",
+      "parity": "none"
+    },
+    "power": {
+      "power-save": "disabled"
+    },
+    "edid": {
+      "preferMode": "max"
+    },
+    "display": {
+      "iconImageName": "GenericDisplay",
+      "manufacturer": "Unknown",
+      "model": "Unknown",
+      "location": "Unknown",
+      "serialNumber": "Unknown"
+    },
+    "displaySize": {
+      "width": "1920",
+      "height": "1080",
+      "fps": "60",
+      "mode": "stretch"
+    },
+    "displayTiming": {
+      "totalWidth": "auto",
+      "totalHeight": "auto",
+      "hsyncFronPorch": "auto",
+      "vsyncFronPorch": "auto",
+      "hsyncWidth": "auto",
+      "vsyncWidth": "auto",
+      "hSyncPolarity": "auto",
+      "vSyncPolarity": "auto"
+    },
+    "connectedEncoder": {
+      "macAddr": "34:1b:22:80:56:ef",
+      "name": "uhd_enc2",
+      "connectionMode": "fast-switched"
+    },
+    "audioConnections": {
+      "audioSourceMac": "34:1b:22:80:56:ef",
+      "audioSourceName": "uhd_enc2"
+    },
+    "autoAudioConnections": {
+      "audioFollowVideo": "false"
+    },
+    "usbUplink": {
+      "macAddr": "none",
+      "name": "none"
+    }
+  },
+  {
+    "gen": {
+      "mac": "34:1b:22:80:74:e8",
+      "model": "ZyperUHD",
+      "type": "decoder",
+      "name": "uhd_dec1",
+      "state": "Up",
+      "lastChangeId": "1336",
+      "firmware": "0.10.2.0"
+    },
+    "hdmi": {
+      "hdcp-mode": "force-version-1.4"
+    },
+    "ports": {
+      "video-port": "auto"
+    },
+    "ip": {
+      "mode": "dhcp",
+      "address": "192.168.99.109",
+      "mask": "255.255.0.0",
+      "gateway": "0.0.0.0"
+    },
+    "rs232": {
+      "sendingToMacOrIp": "none(0.0.0.0)",
+      "terminationChars": "\\n\\r",
+      "baudrate": "9600",
+      "dataBit": "8",
+      "stop_Bit": "1",
+      "parity": "none"
+    },
+    "power": {
+      "power-save": "disabled"
+    },
+    "edid": {
+      "preferMode": "max"
+    },
+    "display": {
+      "iconImageName": "GenericDisplay",
+      "manufacturer": "Unknown",
+      "model": "Unknown",
+      "location": "Unknown",
+      "serialNumber": "Unknown"
+    },
+    "displaySize": {
+      "width": "1920",
+      "height": "1080",
+      "fps": "60",
+      "mode": "stretch"
+    },
+    "displayTiming": {
+      "totalWidth": "auto",
+      "totalHeight": "auto",
+      "hsyncFronPorch": "auto",
+      "vsyncFronPorch": "auto",
+      "hsyncWidth": "auto",
+      "vsyncWidth": "auto",
+      "hSyncPolarity": "auto",
+      "vSyncPolarity": "auto"
+    },
+    "connectedEncoder": {
+      "macAddr": "34:1b:22:80:56:ef",
+      "name": "uhd_enc2",
+      "connectionMode": "fast-switched"
+    },
+    "audioConnections": {
+      "audioSourceMac": "34:1b:22:80:56:d4",
+      "audioSourceName": "uhd_enc1"
+    },
+    "autoAudioConnections": {
+      "audioFollowVideo": "false"
+    },
+    "usbUplink": {
+      "macAddr": "none",
+      "name": "none"
+    }
+  },
+  {
+    "gen": {
+      "mac": "34:1b:22:80:75:1b",
+      "model": "ZyperUHD",
+      "type": "decoder",
+      "name": "uhd_dec4",
+      "state": "Up",
+      "lastChangeId": "1346",
+      "firmware": "0.10.2.0"
+    },
+    "hdmi": {
+      "hdcp-mode": "auto"
+    },
+    "ports": {
+      "video-port": "auto"
+    },
+    "ip": {
+      "mode": "dhcp",
+      "address": "192.168.99.104",
+      "mask": "255.255.0.0",
+      "gateway": "0.0.0.0"
+    },
+    "rs232": {
+      "sendingToMacOrIp": "none(0.0.0.0)",
+      "terminationChars": "\\n\\r",
+      "baudrate": "38400",
+      "dataBit": "8",
+      "stop_Bit": "1",
+      "parity": "none"
+    },
+    "power": {
+      "power-save": "disabled"
+    },
+    "edid": {
+      "preferMode": "max"
+    },
+    "display": {
+      "iconImageName": "GenericDisplay",
+      "manufacturer": "Unknown",
+      "model": "Unknown",
+      "location": "Unknown",
+      "serialNumber": "Unknown"
+    },
+    "displaySize": {
+      "width": "1920",
+      "height": "1080",
+      "fps": "60",
+      "mode": "stretch"
+    },
+    "displayTiming": {
+      "totalWidth": "auto",
+      "totalHeight": "auto",
+      "hsyncFronPorch": "auto",
+      "vsyncFronPorch": "auto",
+      "hsyncWidth": "auto",
+      "vsyncWidth": "auto",
+      "hSyncPolarity": "auto",
+      "vSyncPolarity": "auto"
+    },
+    "connectedEncoder": {
+      "macAddr": "34:1b:22:80:56:ef",
+      "name": "uhd_enc2",
+      "connectionMode": "fast-switched"
+    },
+    "audioConnections": {
+      "audioSourceMac": "34:1b:22:80:56:ef",
+      "audioSourceName": "uhd_enc2"
+    },
+    "autoAudioConnections": {
+      "audioFollowVideo": "true"
+    },
+    "usbUplink": {
+      "macAddr": "none",
+      "name": "none"
+    }
+  },
+  {
+    "gen": {
+      "mac": "34:1b:22:80:75:2f",
+      "model": "ZyperUHD",
+      "type": "decoder",
+      "name": "uhd_dec2",
+      "state": "Up",
+      "lastChangeId": "1345",
+      "firmware": "0.10.2.0"
+    },
+    "hdmi": {
+      "hdcp-mode": "force-version-1.4"
+    },
+    "ports": {
+      "video-port": "auto"
+    },
+    "ip": {
+      "mode": "dhcp",
+      "address": "192.168.99.123",
+      "mask": "255.255.0.0",
+      "gateway": "0.0.0.0"
+    },
+    "rs232": {
+      "sendingToMacOrIp": "none(0.0.0.0)",
+      "terminationChars": "\\n\\r",
+      "baudrate": "38400",
+      "dataBit": "8",
+      "stop_Bit": "1",
+      "parity": "none"
+    },
+    "power": {
+      "power-save": "disabled"
+    },
+    "edid": {
+      "preferMode": "max"
+    },
+    "display": {
+      "iconImageName": "GenericDisplay",
+      "manufacturer": "Unknown",
+      "model": "Unknown",
+      "location": "Unknown",
+      "serialNumber": "Unknown"
+    },
+    "displaySize": {
+      "width": "1920",
+      "height": "1080",
+      "fps": "60",
+      "mode": "stretch"
+    },
+    "displayTiming": {
+      "totalWidth": "auto",
+      "totalHeight": "auto",
+      "hsyncFronPorch": "auto",
+      "vsyncFronPorch": "auto",
+      "hsyncWidth": "auto",
+      "vsyncWidth": "auto",
+      "hSyncPolarity": "auto",
+      "vSyncPolarity": "auto"
+    },
+    "connectedEncoder": {
+      "macAddr": "34:1b:22:80:56:ef",
+      "name": "uhd_enc2",
+      "connectionMode": "fast-switched"
+    },
+    "audioConnections": {
+      "audioSourceMac": "34:1b:22:80:56:ef",
+      "audioSourceName": "uhd_enc2"
+    },
+    "autoAudioConnections": {
+      "audioFollowVideo": "true"
+    },
+    "usbUplink": {
+      "macAddr": "none",
+      "name": "none"
+    }
+  },
+  {
+    "gen": {
+      "mac": "d8:80:39:ea:ac:72",
+      "model": "Zyper4K",
+      "type": "decoder",
+      "name": "4k_dec4",
+      "state": "Up",
+      "lastChangeId": "2267",
+      "firmware": "3.5.2.0",
+      "ethernet-management-port-mode": "enabled"
+    },
+    "hdmi": {
+      "hdcp-mode": "auto"
+    },
+    "ports": {
+      "video-port": "auto"
+    },
+    "ip": {
+      "mode": "dhcp",
+      "address": "192.168.99.195",
+      "mask": "255.255.255.0",
+      "gateway": "192.168.99.1"
+    },
+    "rs232": {
+      "sendingToMacOrIp": "none(0.0.0.0)",
+      "terminationChars": "\\n\\r",
+      "baudrate": "57600",
+      "dataBit": "8",
+      "stop_Bit": "1",
+      "parity": "none"
+    },
+    "ir": {
+      "sendingToMacOrIp": "none(0.0.0.0)"
+    },
+    "edid": {
+      "preferMode": "max"
+    },
+    "display": {
+      "iconImageName": "GenericDisplay",
+      "manufacturer": "Unknown",
+      "model": "Unknown",
+      "location": "Unknown",
+      "serialNumber": "Unknown"
+    },
+    "displaySize": {
+      "width": "auto",
+      "height": "auto",
+      "fps": "auto",
+      "mode": "stretch"
+    },
+    "displayTiming": {
+      "totalWidth": "auto",
+      "totalHeight": "auto",
+      "hsyncFronPorch": "auto",
+      "vsyncFronPorch": "auto",
+      "hsyncWidth": "auto",
+      "vsyncWidth": "auto",
+      "hSyncPolarity": "auto",
+      "vSyncPolarity": "auto"
+    },
+    "connectedEncoder": {
+      "macAddr": "d8:80:39:eb:1d:7d",
+      "name": "4k_enc2",
+      "connectionMode": "fast-switched"
+    },
+    "audioConnections": {
+      "analogSourceMac": "none",
+      "analogSourceName": "none",
+      "hdmiDownmixSourceMac": "d8:80:39:eb:1d:7d",
+      "hdmiDownmixSourceName": "4k_enc2"
+    },
+    "autoAudioConnections": {
+      "hdmiDownmixFollowVideo": "true"
+    },
+    "audioOutSourceType": {
+      "analogOutSourceType": "analog",
+      "hdmiOutSourceType": "hdmi-downmix"
+    }
+  },
+  {
+    "gen": {
+      "mac": "d8:80:39:eb:6:96",
+      "model": "Zyper4K",
+      "type": "decoder",
+      "name": "4k_dec3",
+      "state": "Up",
+      "lastChangeId": "2273",
+      "firmware": "3.5.2.0",
+      "ethernet-management-port-mode": "enabled"
+    },
+    "hdmi": {
+      "hdcp-mode": "auto"
+    },
+    "ports": {
+      "video-port": "auto"
+    },
+    "ip": {
+      "mode": "dhcp",
+      "address": "192.168.99.103",
+      "mask": "255.255.255.0",
+      "gateway": "192.168.99.1"
+    },
+    "rs232": {
+      "sendingToMacOrIp": "none(0.0.0.0)",
+      "terminationChars": "\\n\\r",
+      "baudrate": "57600",
+      "dataBit": "8",
+      "stop_Bit": "1",
+      "parity": "none"
+    },
+    "ir": {
+      "sendingToMacOrIp": "none(0.0.0.0)"
+    },
+    "edid": {
+      "preferMode": "max"
+    },
+    "display": {
+      "iconImageName": "GenericDisplay",
+      "manufacturer": "Unknown",
+      "model": "Unknown",
+      "location": "Unknown",
+      "serialNumber": "Unknown"
+    },
+    "displaySize": {
+      "width": "auto",
+      "height": "auto",
+      "fps": "auto",
+      "mode": "stretch"
+    },
+    "displayTiming": {
+      "totalWidth": "auto",
+      "totalHeight": "auto",
+      "hsyncFronPorch": "auto",
+      "vsyncFronPorch": "auto",
+      "hsyncWidth": "auto",
+      "vsyncWidth": "auto",
+      "hSyncPolarity": "auto",
+      "vSyncPolarity": "auto"
+    },
+    "connectedEncoder": {
+      "macAddr": "d8:80:39:ea:fe:54",
+      "name": "4k_enc4",
+      "connectionMode": "fast-switched"
+    },
+    "audioConnections": {
+      "analogSourceMac": "none",
+      "analogSourceName": "none",
+      "hdmiDownmixSourceMac": "d8:80:39:ea:fe:54",
+      "hdmiDownmixSourceName": "4k_enc4"
+    },
+    "autoAudioConnections": {
+      "hdmiDownmixFollowVideo": "true"
+    },
+    "audioOutSourceType": {
+      "analogOutSourceType": "analog",
+      "hdmiOutSourceType": "hdmi-downmix"
+    }
+  },
+  {
+    "gen": {
+      "mac": "d8:80:39:eb:52:42",
+      "model": "Zyper4K",
+      "type": "decoder",
+      "name": "4k_dec2",
+      "state": "Up",
+      "lastChangeId": "2297",
+      "firmware": "3.5.2.0",
+      "ethernet-management-port-mode": "enabled"
+    },
+    "hdmi": {
+      "hdcp-mode": "auto"
+    },
+    "ports": {
+      "video-port": "auto"
+    },
+    "ip": {
+      "mode": "dhcp",
+      "address": "192.168.99.142",
+      "mask": "255.255.255.0",
+      "gateway": "192.168.99.1"
+    },
+    "rs232": {
+      "sendingToMacOrIp": "none(0.0.0.0)",
+      "terminationChars": "\\n\\r",
+      "baudrate": "57600",
+      "dataBit": "8",
+      "stop_Bit": "1",
+      "parity": "none"
+    },
+    "ir": {
+      "sendingToMacOrIp": "none(0.0.0.0)"
+    },
+    "edid": {
+      "preferMode": "max"
+    },
+    "display": {
+      "iconImageName": "GenericDisplay",
+      "manufacturer": "Unknown",
+      "model": "Unknown",
+      "location": "Unknown",
+      "serialNumber": "Unknown"
+    },
+    "displaySize": {
+      "width": "auto",
+      "height": "auto",
+      "fps": "auto",
+      "mode": "stretch"
+    },
+    "displayTiming": {
+      "totalWidth": "auto",
+      "totalHeight": "auto",
+      "hsyncFronPorch": "auto",
+      "vsyncFronPorch": "auto",
+      "hsyncWidth": "auto",
+      "vsyncWidth": "auto",
+      "hSyncPolarity": "auto",
+      "vSyncPolarity": "auto"
+    },
+    "connectedEncoder": {
+      "macAddr": "80:1f:12:4b:ab:8a",
+      "name": "4k_enc3",
+      "connectionMode": "fast-switched"
+    },
+    "audioConnections": {
+      "analogSourceMac": "none",
+      "analogSourceName": "none",
+      "hdmiDownmixSourceMac": "80:1f:12:4b:ab:8a",
+      "hdmiDownmixSourceName": "4k_enc3"
+    },
+    "autoAudioConnections": {
+      "hdmiDownmixFollowVideo": "true"
+    },
+    "audioOutSourceType": {
+      "analogOutSourceType": "analog",
+      "hdmiOutSourceType": "hdmi-downmix"
+    }
+  },
+  {
+    "gen": {
+      "mac": "d8:80:39:eb:5b:3c",
+      "model": "Zyper4K",
+      "type": "decoder",
+      "name": "4k_dec1",
+      "state": "Up",
+      "lastChangeId": "2291",
+      "firmware": "3.5.2.0",
+      "ethernet-management-port-mode": "enabled"
+    },
+    "hdmi": {
+      "hdcp-mode": "auto"
+    },
+    "ports": {
+      "video-port": "auto"
+    },
+    "ip": {
+      "mode": "dhcp",
+      "address": "192.168.99.127",
+      "mask": "255.255.255.0",
+      "gateway": "192.168.99.1"
+    },
+    "rs232": {
+      "sendingToMacOrIp": "none(0.0.0.0)",
+      "terminationChars": "\\n\\r",
+      "baudrate": "57600",
+      "dataBit": "8",
+      "stop_Bit": "1",
+      "parity": "none"
+    },
+    "ir": {
+      "sendingToMacOrIp": "none(0.0.0.0)"
+    },
+    "edid": {
+      "preferMode": "max"
+    },
+    "display": {
+      "iconImageName": "GenericDisplay",
+      "manufacturer": "Unknown",
+      "model": "Unknown",
+      "location": "Unknown",
+      "serialNumber": "Unknown"
+    },
+    "displaySize": {
+      "width": "auto",
+      "height": "auto",
+      "fps": "auto",
+      "mode": "stretch"
+    },
+    "displayTiming": {
+      "totalWidth": "auto",
+      "totalHeight": "auto",
+      "hsyncFronPorch": "auto",
+      "vsyncFronPorch": "auto",
+      "hsyncWidth": "auto",
+      "vsyncWidth": "auto",
+      "hSyncPolarity": "auto",
+      "vSyncPolarity": "auto"
+    },
+    "connectedEncoder": {
+      "macAddr": "d8:80:39:eb:1d:7d",
+      "name": "4k_enc2",
+      "connectionMode": "fast-switched"
+    },
+    "audioConnections": {
+      "analogSourceMac": "none",
+      "analogSourceName": "none",
+      "hdmiDownmixSourceMac": "d8:80:39:eb:1d:7d",
+      "hdmiDownmixSourceName": "4k_enc2"
+    },
+    "autoAudioConnections": {
+      "hdmiDownmixFollowVideo": "true"
+    },
+    "audioOutSourceType": {
+      "analogOutSourceType": "analog",
+      "hdmiOutSourceType": "hdmi-downmix"
+    }
+  }
+]

@@ -1,0 +1,474 @@
+[
+  {
+    "gen": {
+      "mac": "34:1b:22:80:56:d4",
+      "model": "ZyperUHD",
+      "type": "encoder",
+      "name": "uhd_enc1",
+      "state": "Up",
+      "lastChangeId": "1167",
+      "firmware": "0.10.3.0"
+    },
+    "hdmi": {
+      "hdcp-mode": "enabled"
+    },
+    "ports": {
+      "video-port": "auto"
+    },
+    "ip": {
+      "mode": "dhcp",
+      "address": "192.168.99.119",
+      "mask": "255.255.0.0",
+      "gateway": "0.0.0.0"
+    },
+    "rs232": {
+      "sendingToMacOrIp": "server(192.168.99.40)",
+      "terminationChars": "\\n\\r",
+      "baudrate": "9600",
+      "dataBit": "8",
+      "stop_Bit": "1",
+      "parity": "none"
+    },
+    "source": {
+      "iconImageName": "GenericVideoSource",
+      "manufacturer": "Unknown",
+      "model": "Unknown",
+      "location": "Unknown",
+      "serialNumber": "Unknown"
+    },
+    "usbDownlinks": [],
+    "sendIpMcastRange": {
+      "first": "224.0.0.1",
+      "last": "239.255.255.255"
+    },
+    "videoStream": {
+      "ipMcastAddr": "224.16.86.212",
+      "mode": "enabled"
+    },
+    "audioIpMcast": {
+      "ipAddr": "224.16.86.212",
+      "mode": "enabled"
+    }
+  },
+  {
+    "gen": {
+      "mac": "34:1b:22:80:56:ef",
+      "model": "ZyperUHD",
+      "type": "encoder",
+      "name": "uhd_enc2",
+      "state": "Up",
+      "lastChangeId": "1169",
+      "firmware": "0.10.3.0"
+    },
+    "hdmi": {
+      "hdcp-mode": "enabled"
+    },
+    "ports": {
+      "video-port": "auto"
+    },
+    "ip": {
+      "mode": "dhcp",
+      "address": "192.168.99.148",
+      "mask": "255.255.0.0",
+      "gateway": "0.0.0.0"
+    },
+    "rs232": {
+      "sendingToMacOrIp": "server(192.168.99.40)",
+      "terminationChars": "\\n\\r",
+      "baudrate": "9600",
+      "dataBit": "8",
+      "stop_Bit": "1",
+      "parity": "none"
+    },
+    "source": {
+      "iconImageName": "GenericVideoSource",
+      "manufacturer": "Unknown",
+      "model": "Unknown",
+      "location": "Unknown",
+      "serialNumber": "Unknown"
+    },
+    "usbDownlinks": [],
+    "sendIpMcastRange": {
+      "first": "224.0.0.1",
+      "last": "239.255.255.255"
+    },
+    "videoStream": {
+      "ipMcastAddr": "224.16.86.239",
+      "mode": "enabled"
+    },
+    "audioIpMcast": {
+      "ipAddr": "224.16.86.239",
+      "mode": "enabled"
+    }
+  },
+  {
+    "gen": {
+      "mac": "34:1b:22:80:56:ff",
+      "model": "ZyperUHD",
+      "type": "encoder",
+      "name": "uhd_enc4",
+      "state": "Up",
+      "lastChangeId": "1173",
+      "firmware": "0.10.3.0"
+    },
+    "hdmi": {
+      "hdcp-mode": "enabled"
+    },
+    "ports": {
+      "video-port": "auto"
+    },
+    "ip": {
+      "mode": "dhcp",
+      "address": "192.168.99.162",
+      "mask": "255.255.0.0",
+      "gateway": "0.0.0.0"
+    },
+    "rs232": {
+      "sendingToMacOrIp": "server(192.168.99.40)",
+      "terminationChars": "\\n\\r",
+      "baudrate": "9600",
+      "dataBit": "8",
+      "stop_Bit": "1",
+      "parity": "none"
+    },
+    "source": {
+      "iconImageName": "GenericVideoSource",
+      "manufacturer": "Unknown",
+      "model": "Unknown",
+      "location": "Unknown",
+      "serialNumber": "Unknown"
+    },
+    "usbDownlinks": [],
+    "sendIpMcastRange": {
+      "first": "224.0.0.1",
+      "last": "239.255.255.255"
+    },
+    "videoStream": {
+      "ipMcastAddr": "224.16.86.255",
+      "mode": "enabled"
+    },
+    "audioIpMcast": {
+      "ipAddr": "224.16.86.255",
+      "mode": "enabled"
+    }
+  },
+  {
+    "gen": {
+      "mac": "34:1b:22:80:57:28",
+      "model": "ZyperUHD",
+      "type": "encoder",
+      "name": "uhd_enc3",
+      "state": "Up",
+      "lastChangeId": "1171",
+      "firmware": "0.10.3.0"
+    },
+    "hdmi": {
+      "hdcp-mode": "enabled"
+    },
+    "ports": {
+      "video-port": "auto"
+    },
+    "ip": {
+      "mode": "dhcp",
+      "address": "192.168.99.146",
+      "mask": "255.255.0.0",
+      "gateway": "0.0.0.0"
+    },
+    "rs232": {
+      "sendingToMacOrIp": "server(192.168.99.40)",
+      "terminationChars": "\\n\\r",
+      "baudrate": "9600",
+      "dataBit": "8",
+      "stop_Bit": "1",
+      "parity": "none"
+    },
+    "source": {
+      "iconImageName": "GenericVideoSource",
+      "manufacturer": "Unknown",
+      "model": "Unknown",
+      "location": "Unknown",
+      "serialNumber": "Unknown"
+    },
+    "usbDownlinks": [],
+    "sendIpMcastRange": {
+      "first": "224.0.0.1",
+      "last": "239.255.255.255"
+    },
+    "videoStream": {
+      "ipMcastAddr": "224.16.87.40",
+      "mode": "enabled"
+    },
+    "audioIpMcast": {
+      "ipAddr": "224.16.87.40",
+      "mode": "enabled"
+    }
+  },
+  {
+    "gen": {
+      "mac": "80:1f:12:4b:ab:8a",
+      "model": "Zyper4K",
+      "type": "encoder",
+      "name": "4k_enc3",
+      "state": "Up",
+      "lastChangeId": "7883",
+      "firmware": "3.5.2.0",
+      "ethernet-management-port-mode": "enabled"
+    },
+    "hdmi": {
+      "hdcp-mode": "enabled"
+    },
+    "ports": {
+      "video-port": "auto"
+    },
+    "ip": {
+      "mode": "dhcp",
+      "address": "192.168.99.139",
+      "mask": "255.255.255.0",
+      "gateway": "192.168.99.1"
+    },
+    "rs232": {
+      "sendingToMacOrIp": "none(0.0.0.0)",
+      "terminationChars": "\\n\\r",
+      "baudrate": "57600",
+      "dataBit": "8",
+      "stop_Bit": "1",
+      "parity": "none"
+    },
+    "ir": {
+      "sendingToMacOrIp": "none(0.0.0.0)"
+    },
+    "source": {
+      "iconImageName": "GenericVideoSource",
+      "manufacturer": "Unknown",
+      "model": "Unknown",
+      "location": "Unknown",
+      "serialNumber": "Unknown"
+    },
+    "audioOutSourceType": {
+      "analogOutSourceType": "none"
+    },
+    "sendIpMcastRange": {
+      "first": "224.1.1.1",
+      "last": "224.1.3.255"
+    },
+    "videoStream": {
+      "ipMcastAddr": "224.1.1.9",
+      "mode": "enabled"
+    },
+    "videoScaledStream": {
+      "ipMcastAddr": "224.1.1.11",
+      "mode": "disabled",
+      "sizeX": "1152",
+      "sizeY": "648"
+    },
+    "analogAudioIpMcast": {
+      "ipAddr": "0.0.0.0",
+      "mode": "disabled"
+    },
+    "audioDownmixIpMcast": {
+      "ipAddr": "224.1.1.10",
+      "mode": "disabled"
+    }
+  },
+  {
+    "gen": {
+      "mac": "d8:80:39:ea:fe:54",
+      "model": "Zyper4K",
+      "type": "encoder",
+      "name": "4k_enc4",
+      "state": "Up",
+      "lastChangeId": "2463",
+      "firmware": "3.5.2.0",
+      "ethernet-management-port-mode": "enabled"
+    },
+    "hdmi": {
+      "hdcp-mode": "enabled"
+    },
+    "ports": {
+      "video-port": "auto"
+    },
+    "ip": {
+      "mode": "dhcp",
+      "address": "192.168.99.183",
+      "mask": "255.255.255.0",
+      "gateway": "192.168.99.1"
+    },
+    "rs232": {
+      "sendingToMacOrIp": "none(0.0.0.0)",
+      "terminationChars": "\\n\\r",
+      "baudrate": "57600",
+      "dataBit": "8",
+      "stop_Bit": "1",
+      "parity": "none"
+    },
+    "ir": {
+      "sendingToMacOrIp": "none(0.0.0.0)"
+    },
+    "source": {
+      "iconImageName": "GenericVideoSource",
+      "manufacturer": "Unknown",
+      "model": "Unknown",
+      "location": "Unknown",
+      "serialNumber": "Unknown"
+    },
+    "audioOutSourceType": {
+      "analogOutSourceType": "none"
+    },
+    "sendIpMcastRange": {
+      "first": "224.1.1.1",
+      "last": "224.1.3.255"
+    },
+    "videoStream": {
+      "ipMcastAddr": "224.1.1.7",
+      "mode": "enabled"
+    },
+    "videoScaledStream": {
+      "ipMcastAddr": "224.1.1.5",
+      "mode": "disabled",
+      "sizeX": "2304",
+      "sizeY": "1296"
+    },
+    "analogAudioIpMcast": {
+      "ipAddr": "0.0.0.0",
+      "mode": "disabled"
+    },
+    "audioDownmixIpMcast": {
+      "ipAddr": "224.1.1.8",
+      "mode": "enabled"
+    }
+  },
+  {
+    "gen": {
+      "mac": "d8:80:39:ea:fe:94",
+      "model": "Zyper4K",
+      "type": "encoder",
+      "name": "4k_enc1",
+      "state": "Up",
+      "lastChangeId": "1693",
+      "firmware": "3.5.2.0",
+      "ethernet-management-port-mode": "enabled"
+    },
+    "hdmi": {
+      "hdcp-mode": "enabled"
+    },
+    "ports": {
+      "video-port": "auto"
+    },
+    "ip": {
+      "mode": "dhcp",
+      "address": "192.168.99.147",
+      "mask": "255.255.255.0",
+      "gateway": "192.168.99.1"
+    },
+    "rs232": {
+      "sendingToMacOrIp": "none(0.0.0.0)",
+      "terminationChars": "\\n\\r",
+      "baudrate": "57600",
+      "dataBit": "8",
+      "stop_Bit": "1",
+      "parity": "none"
+    },
+    "ir": {
+      "sendingToMacOrIp": "none(0.0.0.0)"
+    },
+    "source": {
+      "iconImageName": "GenericVideoSource",
+      "manufacturer": "Unknown",
+      "model": "Unknown",
+      "location": "Unknown",
+      "serialNumber": "Unknown"
+    },
+    "audioOutSourceType": {
+      "analogOutSourceType": "none"
+    },
+    "sendIpMcastRange": {
+      "first": "224.1.1.1",
+      "last": "224.1.3.255"
+    },
+    "videoStream": {
+      "ipMcastAddr": "224.1.1.1",
+      "mode": "disabled"
+    },
+    "videoScaledStream": {
+      "ipMcastAddr": "0.0.0.0",
+      "mode": "disabled",
+      "sizeX": "0",
+      "sizeY": "0"
+    },
+    "analogAudioIpMcast": {
+      "ipAddr": "0.0.0.0",
+      "mode": "disabled"
+    },
+    "audioDownmixIpMcast": {
+      "ipAddr": "224.1.1.2",
+      "mode": "disabled"
+    }
+  },
+  {
+    "gen": {
+      "mac": "d8:80:39:eb:1d:7d",
+      "model": "Zyper4K",
+      "type": "encoder",
+      "name": "4k_enc2",
+      "state": "Up",
+      "lastChangeId": "2467",
+      "firmware": "3.5.2.0",
+      "ethernet-management-port-mode": "enabled"
+    },
+    "hdmi": {
+      "hdcp-mode": "disabled"
+    },
+    "ports": {
+      "video-port": "auto"
+    },
+    "ip": {
+      "mode": "dhcp",
+      "address": "192.168.99.154",
+      "mask": "255.255.255.0",
+      "gateway": "192.168.99.1"
+    },
+    "rs232": {
+      "sendingToMacOrIp": "none(0.0.0.0)",
+      "terminationChars": "\\n\\r",
+      "baudrate": "57600",
+      "dataBit": "8",
+      "stop_Bit": "1",
+      "parity": "none"
+    },
+    "ir": {
+      "sendingToMacOrIp": "none(0.0.0.0)"
+    },
+    "source": {
+      "iconImageName": "GenericVideoSource",
+      "manufacturer": "Unknown",
+      "model": "Unknown",
+      "location": "Unknown",
+      "serialNumber": "Unknown"
+    },
+    "audioOutSourceType": {
+      "analogOutSourceType": "none"
+    },
+    "sendIpMcastRange": {
+      "first": "224.1.1.1",
+      "last": "224.1.3.255"
+    },
+    "videoStream": {
+      "ipMcastAddr": "224.1.1.4",
+      "mode": "enabled"
+    },
+    "videoScaledStream": {
+      "ipMcastAddr": "224.1.1.3",
+      "mode": "disabled",
+      "sizeX": "1152",
+      "sizeY": "648"
+    },
+    "analogAudioIpMcast": {
+      "ipAddr": "0.0.0.0",
+      "mode": "disabled"
+    },
+    "audioDownmixIpMcast": {
+      "ipAddr": "224.1.1.6",
+      "mode": "enabled"
+    }
+  }
+]

@@ -1,0 +1,102 @@
+[
+  {
+    "gen": {
+      "name": "Lshape"
+    },
+    "audio": {
+      "sourceWindow": "none"
+    },
+    "window": [
+      {
+        "encoder-name": "4k_enc2",
+        "percentPosX": "5",
+        "percentPosY": "5",
+        "percentSizeX": "30",
+        "percentSizeY": "30",
+        "layer": "1"
+      },
+      {
+        "encoder-name": "4k_enc3",
+        "percentPosX": "35",
+        "percentPosY": "5",
+        "percentSizeX": "30",
+        "percentSizeY": "30",
+        "layer": "1"
+      },
+      {
+        "encoder-name": "4k_enc2",
+        "percentPosX": "65",
+        "percentPosY": "5",
+        "percentSizeX": "30",
+        "percentSizeY": "30",
+        "layer": "1"
+      },
+      {
+        "encoder-name": "4k_enc4",
+        "percentPosX": "5",
+        "percentPosY": "35",
+        "percentSizeX": "60",
+        "percentSizeY": "60",
+        "layer": "1"
+      },
+      {
+        "encoder-name": "4k_enc3",
+        "percentPosX": "65",
+        "percentPosY": "35",
+        "percentSizeX": "30",
+        "percentSizeY": "30",
+        "layer": "1"
+      },
+      {
+        "encoder-name": "4k_enc2",
+        "percentPosX": "65",
+        "percentPosY": "65",
+        "percentSizeX": "30",
+        "percentSizeY": "30",
+        "layer": "1"
+      }
+    ]
+  },
+  {
+    "gen": {
+      "name": "2x2"
+    },
+    "audio": {
+      "sourceWindow": "none"
+    },
+    "window": [
+      {
+        "encoder-name": "4k_enc2",
+        "percentPosX": "0",
+        "percentPosY": "0",
+        "percentSizeX": "50",
+        "percentSizeY": "50",
+        "layer": "1"
+      },
+      {
+        "encoder-name": "4k_enc3",
+        "percentPosX": "50",
+        "percentPosY": "0",
+        "percentSizeX": "50",
+        "percentSizeY": "50",
+        "layer": "1"
+      },
+      {
+        "encoder-name": "4k_enc4",
+        "percentPosX": "0",
+        "percentPosY": "50",
+        "percentSizeX": "50",
+        "percentSizeY": "50",
+        "layer": "1"
+      },
+      {
+        "encoder-name": "4k_enc2",
+        "percentPosX": "50",
+        "percentPosY": "50",
+        "percentSizeX": "50",
+        "percentSizeY": "50",
+        "layer": "1"
+      }
+    ]
+  }
+]

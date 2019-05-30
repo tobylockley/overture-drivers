@@ -1,0 +1,46 @@
+[
+  {
+    "gen": {
+      "name": "4K",
+      "videoSourceMac": "d8:80:39:ea:fe:54",
+      "numDisplayRows": "2",
+      "numDisplayCols": "2"
+    },
+    "bezel": {
+      "top": "0",
+      "bottom": "0",
+      "left": "0",
+      "right": "0"
+    },
+    "decodersRow1": {
+      "col1": "4k_dec1",
+      "col2": "4k_dec2"
+    },
+    "decodersRow2": {
+      "col1": "4k_dec3",
+      "col2": "4k_dec4"
+    }
+  },
+  {
+    "gen": {
+      "name": "UHD",
+      "videoSourceMac": "34:1b:22:80:56:ef",
+      "numDisplayRows": "2",
+      "numDisplayCols": "2"
+    },
+    "bezel": {
+      "top": "0",
+      "bottom": "0",
+      "left": "0",
+      "right": "0"
+    },
+    "decodersRow1": {
+      "col1": "uhd_dec1",
+      "col2": "uhd_dec2"
+    },
+    "decodersRow2": {
+      "col1": "uhd_dec3",
+      "col2": "uhd_dec4"
+    }
+  }
+]
