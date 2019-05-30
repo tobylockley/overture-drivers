@@ -1,7 +1,7 @@
 {
-  "name": "kramer_switcher",
-  "version": "1.0.0",
-  "description": "Driver for kramer switcher",
+  "name": "kramer_distributor",
+  "version": "1.0.0-beta.1",
+  "description": "Driver for kramer distributor",
   "main": "index.js",
   "scripts": {
 	  "start": "node index.js"
@@ -18,15 +18,23 @@
         "name": "Status",
         "type": "enum",
         "enums": ["Disconnected", "Connected"]
+      },
+      {
+        "name": "Sources",
+        "type": "enum",
+        "enums": ["None", "Input1", "Input2"],
+        "perform": {
+          "action": "selectSource",
+          "params": {
+            "Name": "$value"
+          }
+        }
       }
     ],
     "commands": [
       {
-        "name": "Select Source",
+        "name": "selectSource",
         "params": {
-          "Channel": {
-            "type": "integer"
-          },
           "Name": {
             "type": "integer"
           }
@@ -35,7 +43,7 @@
     ],
     "pointSetupSchema": {
       "type": "object",
-      "title": "Kramer HDMI Switcher",
+      "title": "Kramer HDMI Distributor",
       "properties": {
         "host": {
           "title": "Host name or IP of Global Cache RS232",
@@ -47,14 +55,6 @@
           "type": "integer",
           "default": 4999,
           "description": "Default: 4999"
-        },
-        "model": {
-          "title": "Model:",
-          "type": "string",
-          "enum": [
-            "VM-28H",
-            "VM-216H"
-          ]
         },
         "machineNumber": {
           "title": "Machine Number:",

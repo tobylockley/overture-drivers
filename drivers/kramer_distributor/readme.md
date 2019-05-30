@@ -1,16 +1,15 @@
-# Kramer HDMI Switcher
+# Kramer HDMI Distributor
 
 
 ## Overview
 
-Driver for a Kramer HDMI switcher
+Driver for a Kramer HDMI Distributor
 
 
 ## Setup
 
 - "Host": The IP address or host name of the globalcache rs232 device.
 - "Port": The port of TCP communication. (Default 4999)
-- "Model": The model of the switcher.
 - "Machine Number": ID number of the device for RS232 purposes. (Default 1)
 
 
@@ -21,9 +20,9 @@ Driver for a Kramer HDMI switcher
   - "Disconnected" : The device is not connected.
   - "Connected" : The device is connected, and able to receive commands.
 
-### Sources (per output)
+### Sources
 [enum] List of input sources user can select from.
-  - "None": Disconnect output
+  - "None": Disconnect outputs
   - "Input1": Change input source to Input1
   - "Input2": Change input source to Input2
 
@@ -32,7 +31,6 @@ Driver for a Kramer HDMI switcher
 
 ### Select Source
 Select the input source to display.
-  - "Channel": [integer] Which output to switch
   - "Name": [string] The name of the input source (given by variable "Sources")
 
 

@@ -1,7 +1,7 @@
 'use strict'
 
 const CMD_DEFER_TIME = 3000
-const POLL_PERIOD = 10000
+const POLL_PERIOD = 5000
 const TICK_PERIOD = 5000
 const TCP_TIMEOUT = 30000
 const TCP_RECONNECT_DELAY = 1000
@@ -32,25 +32,7 @@ exports.createDevice = base => {
     frameParser.setSeparator(new RegExp(`[0-9a-f]{6}${config.msgEnd}`, 'i'))
     // Incoming hex Buffer is converted to hex string before its passed to frameParser
 
-    let num_outputs
-    if (config.model === 'VM-28H') num_outputs = 8
-    else if (config.model === 'VM-216H') num_outputs = 16
-    // Create variables for each output and set up polling
-    for (let i = 1; i <= num_outputs; i++) {
-      base.createVariable({
-        name: `Sources_Output${i}`,
-        type: 'enum',
-        enums: ['None', 'Input1', 'Input2'],
-        perform: {
-          action: 'selectSource',
-          params: {
-            Channel: i,
-            Name: '$value'
-          }
-        }
-      })
-      base.setPoll({ action: 'getSource', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true , params: {Channel: i}})
-    }
+    base.setPoll({ action: 'getSource', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true})
   }
 
   function start() {
@@ -135,8 +117,18 @@ exports.createDevice = base => {
       if (machineNumber === config.machineNumber && destination === 1) {
         // 1 = video switch command
         // 5 = video status request
-        if (instruction === 1 || instruction === 5) {
-          base.getVar(`Sources_Output${output}`).value = input  // 0 = 'None' (disconnected)
+        if (instruction === 1) {
+          base.getVar('Sources').value = input  // 0 = 'None' (disconnected)
+          base.commandDone()
+        }
+        else if (instruction === 5) {
+          // When using request command, value is in the 'output' byte
+          base.getVar('Sources').value = output
+          base.commandDone()
+        }
+        else {
+          // When using request command, value is in the 'output' byte
+          logger.debug(`Instruction not processed`)
           base.commandDone()
         }
       }
@@ -153,18 +145,27 @@ exports.createDevice = base => {
     let bytes = [
       0x01,  // Instruction, 1 = Switch video
       0x80 + params.Name,
-      0x80 + params.Channel,
+      0x80,  // All outputs
       0x80 + config.machineNumber
     ]
-    send(Buffer.from(bytes))
-    base.getVar(`Sources_Output${params.Channel}`).value = params.Name
+    sendDefer(Buffer.from(bytes))
   }
 
   function getSource(params) {
     let bytes = [
       0x05,  // Instruction, 5 = Request video status
       0x80,
-      0x80 + params.Channel,
+      0x81,
+      0x80 + config.machineNumber
+    ]
+    sendDefer(Buffer.from(bytes))
+  }
+
+  function getVersion() {
+    let bytes = [
+      0x3D,
+      0x83,
+      0x80,
       0x80 + config.machineNumber
     ]
     sendDefer(Buffer.from(bytes))
@@ -173,6 +174,6 @@ exports.createDevice = base => {
 
   return {
     setup, start, stop, tick,
-    selectSource, getSource
+    selectSource, getSource, getVersion
   }
 }
