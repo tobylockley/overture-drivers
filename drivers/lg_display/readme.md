@@ -112,3 +112,6 @@ Set this screens tile ID (position in the videowall, top left = 1)
 
 ### 1.0.4
 - Added videowall functionality. Must be enabled in config.
+
+### 1.0.5
+- Added an alternative DVI input source for hex code 0x80

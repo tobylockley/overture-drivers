@@ -1,6 +1,6 @@
 {
   "name": "lg_display",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Driver for LG display",
   "main": "index.js",
   "scripts": {
@@ -246,6 +246,13 @@
             "dvi": {
               "title": "DVI",
               "hexcode": "0x95",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "dvi_alt": {
+              "title": "DVI (Alt)",
+              "hexcode": "0x80",
               "type": "boolean",
               "format": "checkbox",
               "default": false
