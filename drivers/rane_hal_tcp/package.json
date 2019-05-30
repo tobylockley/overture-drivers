@@ -1,0 +1,196 @@
+{
+  "name": "rane_hal",
+  "version": "1.0.0",
+  "description": "Driver for Rane HAL/Halogen",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "Rane",
+    "models": [
+      "HAL",
+      "Halogen Software"
+    ],
+    "type": "device",
+    "subtype": "audiosystem",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Level",
+        "params": {
+          "ControlNumber": {
+            "type": "integer"
+          },
+          "Level": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Set Selector",
+        "params": {
+          "ControlNumber": {
+            "type": "integer"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Index": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Set Toggle",
+        "params": {
+          "ControlNumber": {
+            "type": "integer"
+          },
+          "Status": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Send Command",
+        "params": {
+          "ControlNumber": {
+            "type": "integer"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Index": {
+            "type": "integer"
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "HAL Configuration",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address:",
+          "type": "string"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 4996,
+          "description": "Default: 4996"
+        },
+        "levels": {
+          "type": "array",
+          "format": "table",
+          "title": "Levels",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Level",
+            "properties": {
+              "name": {
+                "type": "string",
+                "title": "Overture Variable Name",
+                "pattern": "^[A-Za-z0-9_]+$"
+              },
+              "number": {
+                "type": "integer",
+                "title": "Control Number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        "selectors": {
+          "type": "array",
+          "format": "table",
+          "title": "Selectors",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Selector",
+            "properties": {
+              "name": {
+                "type": "string",
+                "title": "Overture Variable Name",
+                "pattern": "^[A-Za-z0-9_]+$"
+              },
+              "number": {
+                "type": "integer",
+                "title": "Control Number",
+                "minimum": 0
+              },
+              "options": {
+                "type": "array",
+                "format": "table",
+                "title": "Options",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "title": "Option"
+                }
+              }
+            }
+          }
+        },
+        "toggles": {
+          "type": "array",
+          "format": "table",
+          "title": "Toggles",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Toggle",
+            "properties": {
+              "name": {
+                "type": "string",
+                "title": "Overture Variable Name",
+                "pattern": "^[A-Za-z0-9_]+$"
+              },
+              "number": {
+                "type": "integer",
+                "title": "Control Number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        "commands": {
+          "type": "array",
+          "format": "table",
+          "title": "Commands",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Command",
+            "properties": {
+              "name": {
+                "type": "string",
+                "title": "Overture Variable Name",
+                "pattern": "^[A-Za-z0-9_]+$"
+              },
+              "number": {
+                "type": "integer",
+                "title": "Control Number",
+                "minimum": 0
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
