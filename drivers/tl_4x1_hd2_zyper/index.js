@@ -1,3 +1,7 @@
+// TODO
+// Add human names for input sources
+// Switch to AJAX
+
 'use strict';
 
 const CMD_DEFER_TIME = 2000;
