@@ -1,5 +1,5 @@
 {
-  "name": "av_pro_cloud9",
+  "name": "avpro_cloud9",
   "version": "1.0.0-beta.2",
   "description": "Driver for AV Pro Cloud 9 Matrix",
   "main": "index.js",

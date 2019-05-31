@@ -1,5 +1,5 @@
 {
-  "name": "av_pro_connect_switcher",
+  "name": "avpro_connect_switcher",
   "version": "1.0.1",
   "description": "Driver for AV Pro Connect Matrix",
   "main": "index.js",
