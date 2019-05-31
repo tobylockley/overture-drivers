@@ -1,152 +1,202 @@
+'use strict'
+
+const CMD_DEFER_TIME = 3000        // Timeout when using commandDefer
+const TICK_PERIOD = 5000           // In-built tick interval
+const POLL_PERIOD = 10000           // Continuous polling function interval
+const TCP_TIMEOUT = 30000          // Will timeout after this length of inactivity
+const TCP_RECONNECT_DELAY = 3000   // How long to wait before attempting to reconnect
+
 let host
 exports.init = _host => {
-    host = _host
+  host = _host
 }
 
 exports.createDevice = base => {
-    const logger = base.logger || host.logger
-    let config
-    let tcpClient
-    let frameParser = host.createFrameParser()
-    frameParser.setSeparator('\r\n')
-    frameParser.on('data', data => onFrame(data))
+  const logger = base.logger || host.logger
+  let config
+  let tcpClient
 
-    base.setTickPeriod(5000)
+  let frameParser = host.createFrameParser()
+  frameParser.setSeparator('\r\n')
+  frameParser.on('data', data => onFrame(data))
 
-    const setup = _config => {
-        config = _config
-        let inputs = 10
-        let outputs = 9
 
-        for (let i = 1; i <= outputs; i++) {
-            base.createVariable({
-              name: `OUT${i}`,
-              type: "enum",
-              enums: ["IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7", "IN8", "IN9", "MV"],
-              perform: {
-                action: 'Set Output',
-                params: {
-                  Output: i,
-                  Input: '$string'
-                }
-              }
-            })
+  // ------------------------------ SETUP FUNCTIONS ------------------------------
+
+  function isConnected() { return base.getVar('Status').string === 'Connected' }
+
+  function setup(_config) {
+    config = _config
+    base.setTickPeriod(TICK_PERIOD)
+
+    // Register polling functions
+    base.setPoll({ action: 'getMultiviewMode', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
+    base.setPoll({ action: 'getSources', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
+    base.setPoll({ action: 'getQuadviewSources', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
+
+    for (let i = 1; i <= 9; i++) {
+      base.createVariable({
+        name: `Sources_Output${i}`,
+        type: 'enum',
+        enums: ["Input1", "Input2", "Input3", "Input4", "Input5", "Input6", "Input7", "Input8", "Input9", "Multiview"],
+        perform: {
+          action: 'selectSource',
+          params: {
+            Channel: i,
+            Name: '$value'
+          }
         }
+      })
     }
 
-    const start = () => {
-        initTcpClient()
-        tcpClient.connect(config.port, config.host)
-    }
-
-    const stop = () => {
-        disconnect()
-    }
-
-    const initTcpClient = () => {
-        if (!tcpClient) {
-            tcpClient = host.createTCPClient()
-
-            tcpClient.on('connect', () => {
-                logger.silly('TCPClient connected')
-                base.getVar('Status').string = 'Connected'
-            })
-
-            tcpClient.on('data', data => {
-                data = data.toString()
-                //logger.silly(`TCPClient data: ${data}`)
-                frameParser.push(data)
-            })
-
-            tcpClient.on('close', () => {
-                logger.silly('TCPClient closed')
-                disconnect()
-            })
-
-            tcpClient.on('error', err => {
-                logger.error(`TCPClient: ${err}`)
-                disconnect()
-            })
+    for (let i = 1; i <= 4; i++) {
+      base.createVariable({
+        name: `Sources_Quadview${i}`,
+        type: 'enum',
+        enums: ["Input1", "Input2", "Input3", "Input4", "Input5", "Input6", "Input7", "Input8", "Input9"],
+        perform: {
+          action: 'selectQuadviewSource',
+          params: {
+            Channel: i,
+            Name: '$value'
+          }
         }
+      })
     }
 
-    const disconnect = () => {
-        base.getVar('Status').string = 'Disconnected'
-        tcpClient && tcpClient.end()
+  }
+
+  function start() {
+    initTcpClient()
+  }
+
+  function stop() {
+    base.getVar('Status').string = 'Disconnected'
+    tcpClient && tcpClient.end()
+    tcpClient = null
+    base.clearPendingCommands()
+  }
+
+  function tick() {
+    if (!tcpClient) initTcpClient()
+  }
+
+  function initTcpClient() {
+    if (tcpClient) return  // Return if tcpClient already exists
+
+    tcpClient = host.createTCPClient()
+    tcpClient.setOptions({
+      receiveTimeout: TCP_TIMEOUT,
+      autoReconnectionAttemptDelay: TCP_RECONNECT_DELAY
+    })
+    tcpClient.connect(config.port, config.host)
+
+    tcpClient.on('connect', () => {
+      logger.silly('TCPClient connected')
+      base.getVar('Status').string = 'Connected'
+      base.startPolling()
+    })
+
+    tcpClient.on('data', data => {
+      frameParser.push(data.toString())
+    })
+
+    tcpClient.on('close', () => {
+      logger.silly('TCPClient closed')
+      base.getVar('Status').string = 'Disconnected'  // Triggered on timeout, this allows auto reconnect
+    })
+
+    tcpClient.on('error', err => {
+      logger.error(`TCPClient: ${err}`)
+      stop()  // Throw out the tcpClient and get a fresh connection
+    })
+  }
+
+
+  // ------------------------------ SEND/RECEIVE HANDLERS ------------------------------
+
+  function send(data) {
+    logger.silly(`TCPClient send: ${data}`)
+    return tcpClient && tcpClient.write(data)
+  }
+
+  function sendDefer(data) {
+    base.commandDefer(CMD_DEFER_TIME)
+    if (!send(data)) base.commandError('Data not sent')
+  }
+
+  function onFrame(data) {
+    let match
+    let pendingCommand = base.getPendingCommand()
+    logger.silly(`onFrame (pending = ${pendingCommand && pendingCommand.action}): ${data}`)
+
+    // Output Source
+    match = data.match(/OUT(\d+) VS IN(\d+)/i)
+    if (match) {
+    //   base.getVar(`Sources_Output${match[1]}`).value = parseInt(match[2]) - 1
+      let b = base.getVar(`Sources_Output${match[1]}`)
+      let n = parseInt(match[2]) - 1
+      b.value = n
+      pendingCommand && base.commandDone()
+      return
     }
 
-    const sendDefer = data => {
-      if (send(data)) {
-        base.commandDefer(1000)
-      } else {
-        base.commandError(`Data not sent`)
+    // Multiview Mode
+    match = data.match(/MVW MODE(\d+)/i)
+    if (match) {
+      base.getVar('MultiviewMode').value = parseInt(match[1])  // 0 = 3x3, 1 = 2x2
+      pendingCommand && base.commandDone()
+      return
+    }
+
+    // Quadview Source
+    match = data.match(/QVW VS (\d+)\.(\d+)\.(\d+)\.(\d+)/i)
+    if (match) {
+      for (let i = 1; i <= 4; i++) {
+        base.getVar(`Sources_Quadview${i}`).value = parseInt(match[i]) - 1
       }
+      pendingCommand && base.commandDone()
+      return
     }
+  }
 
-    const send = data => {
-        logger.silly(`TCPClient send: ${data}`)
-        return tcpClient && tcpClient.write(data)
-    }
 
-    const onFrame = data => {
-        logger.silly(`onFrame ${data}`);
-        
-        let match = data.match(/OUT(\d+).*IN(\d+)/i);
-        if (match) {
-            let input = parseInt(match[2]);
-            base.getVar('OUT' + match[1]).string = (input === 10) ? 'MV' : `IN${input}`;
-        }
+  // ------------------------------ GET FUNCTIONS ------------------------------
 
-        match = data.match(/MVW MODE(\d+)/i);
-        if (match) {
-            let mode = parseInt(match[1]);
-            base.getVar('MVMode').string =  (mode === 0) ? '3x3' : '4x4';
-        }
+  function getMultiviewMode() {
+    sendDefer('GET MVW MODE\r\n')
+  }
 
-        base.commandDone();
-    }
+  function getSources() {
+    sendDefer('GET OUT0 VS\r\n')  // 0 = all
+  }
 
-    const getOutput = params => {
-        let match = params.Output.match(/Out(\d)/i);
-        if (match) {
-            input = parseInt(match[1]);
-        }
-        else if (params.Input.match(/MV/i)) {
-            input = 10;
-        }
-        logger.debug('Connecting Input ' + input + ' to Output ' + params.Output);
-        sendDefer('SET OUT' + params.Output + ' VS IN' + input + '\r\n');
-    }
+  function getQuadviewSources() {
+    sendDefer('GET QVW VS\r\n')
+  }
 
-    const setOutput = params => {
-        let match = params.Input.match(/IN(\d)/i);
-        let input;
-        if (match) {
-            input = parseInt(match[1]);
-        }
-        else if (params.Input.match(/MV/i)) {
-            input = 10;
-        }
-        logger.debug('Connecting Input ' + input + ' to Output ' + params.Output);
-        sendDefer('SET OUT' + params.Output + ' VS IN' + input + '\r\n');
-    }
 
-    const setMultiview = params => {
-        let x;  // Store multiview mode here
-        if (params.Name === '3x3') {
-            x = 0;
-        }
-        else if (params.Name === '4x4') {
-            x = 1;
-        }
-        logger.debug('Setting multiview mode to ' + params.Name);
-        sendDefer('SET MVW MODE' + x + '\r\n');
-    }
+  // ------------------------------ SET FUNCTIONS ------------------------------
 
-    return {
-        setup, start, stop,
-        getOutput, setOutput, setMultiview
-    }
+  function setMultiviewMode(params) {
+    sendDefer(`SET MVW MODE${params.Status}\r\n`)
+  }
+
+  function selectSource(params) {
+    sendDefer(`SET OUT${params.Channel} VS IN${params.Name + 1}\r\n`)
+  }
+
+  function selectQuadviewSource(params) {
+    let sources = [0, 0, 0, 0]  // If left as 0, source is unchanged
+    sources[params.Channel - 1] = params.Name + 1  // Channel = 1-4, chooses quadview to change. Name = 0-8 , add 1 to convert to input number
+    sendDefer(`SET QVW VS ${sources.join('.')}\r\n`)
+  }
+
+
+  // ------------------------------ EXPORTED FUNCTIONS ------------------------------
+  return {
+    setup, start, stop, tick,
+    getMultiviewMode, getSources, getQuadviewSources,
+    setMultiviewMode, selectSource, selectQuadviewSource
+  }
 }
-
-

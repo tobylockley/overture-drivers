@@ -1,13 +1,13 @@
 {
   "name": "avpro_cloud9",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0",
   "description": "Driver for AV Pro Cloud 9 Matrix",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
-  "author": "AVD_Toby",
-  "license": "Unlicensed",
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
   "overture": {
     "brand": "AV Pro Edge",
     "model": "AC-MX9XHDL-HDBT",
@@ -23,24 +23,16 @@
         ]
       },
       {
-        "name": "Power",
-        "type": "enum",
-        "enums": [
-          "Off",
-          "On"
-        ]
-      },
-      {
-        "name": "MV Mode",
+        "name": "MultiviewMode",
         "type": "enum",
         "enums": [
           "3x3",
-          "4x4"
+          "2x2"
         ],
         "perform": {
-          "action": "Set Multiview",
+          "action": "Set Multiview Mode",
           "params": {
-            "Name": "$string"
+            "Status": "$value"
           }
         }
       }
@@ -48,27 +40,23 @@
 
     "commands": [
       {
-        "name": "Set Power",
+        "name": "Set Multiview Mode",
         "params": {
-          "Status": {
-            "type": "enum",
-            "enums": [
-              "Off",
-              "On"
-            ]
-          }
+          "Status": { "type": "integer" }
         }
       },
       {
-        "name": "Set Multiview",
+        "name": "Select Source",
         "params": {
-          "Name": {
-            "type": "enum",
-            "enums": [
-              "3x3",
-              "4x4"
-            ]
-          }
+          "Channel": { "type": "integer" },
+          "Name": { "type": "integer" }
+        }
+      },
+      {
+        "name": "Select Quadview Source",
+        "params": {
+          "Channel": { "type": "integer" },
+          "Name": { "type": "integer" }
         }
       }
     ],
@@ -80,12 +68,13 @@
         "host": {
           "title": "Device IP",
           "type": "string",
-          "default": "192.168.1.126"
+          "default": ""
         },
         "port": {
           "title": "Device TCP port",
           "type": "integer",
-          "default": 23
+          "default": 23,
+          "description": "Default: 23"
         }
       },
       "required": [
