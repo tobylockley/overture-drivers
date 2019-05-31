@@ -1,6 +1,6 @@
 {
   "name": "barco_clickshare",
-  "version": "2.2.2",
+  "version": "2.2.2-hotfix1",
   "description": "Overture Driver for ClickShare monitoring by Barco. Support CSM-1, CSE-200, CSC-1, CSE-800",
   "main": "index.js",
   "scripts": {
@@ -107,6 +107,20 @@
         ]
       },
       {
+        "name": "WallpaperStatus",
+        "type": "enum",
+        "enums": [
+          "Hide",
+          "Show"
+        ],
+        "perform": {
+          "action": "Set Wallpaper Status",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
         "name": "FirmwareVersion",
         "type": "string"
       },
@@ -165,6 +179,14 @@
       {
         "name": "Awake System",
         "description": "Awake the base unit from standby mode"
+      },
+      {
+        "name": "Hide Wallpaper",
+        "description": "Hide wallpaper when idle"
+      },
+      {
+        "name": "Show Wallpaper",
+        "description": "Show wallpaper when idle"
       },
       {
         "name": "Set Display Mode",

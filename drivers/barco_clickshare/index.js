@@ -33,6 +33,7 @@ class DriverDevice {
         this.statusMessage = this.base.getVar('StatusMessage');
         this.sharingStatus = this.base.getVar('SharingStatus');
         this.inUseStatus = this.base.getVar('InUseStatus');
+        this.wallpaperStatus = this.base.getVar('WallpaperStatus');
         this.cpuTemperature = this.base.getVar('CpuTemperature');
         this.firmwareVersion = this.base.getVar('FirmwareVersion');
         this.currentUptime = this.base.getVar('CurrentUptime');
@@ -168,6 +169,39 @@ class DriverDevice {
                 break;
             case 'Disconnected':
                 this.shutdownSystem();
+                break;
+        }
+    }
+    hideWallpaper() {
+        const self = this;
+        this.logger.debug('hideWallpaper()');
+        this.sendRequest('v1.0/Display/ShowWallpaper', 'PUT', { value: false })
+            .then(function (resp) {
+            self.logger.info('ShowWallpaper change to false successful ' + resp);
+        })
+            .catch(function (err) {
+            self.logger.error('Error in ShowWallpaper change to false: ' + err);
+        });
+    }
+    showWallpaper() {
+        const self = this;
+        this.logger.debug('showWallpaper()');
+        this.sendRequest('v1.0/Display/ShowWallpaper', 'PUT', { value: true })
+            .then(function (resp) {
+            self.logger.info('ShowWallpaper change to true successful ' + resp);
+        })
+            .catch(function (err) {
+            self.logger.error('Error in ShowWallpaper change to true: ' + err);
+        });
+    }
+    setWallpaperStatus(params) {
+        this.logger.debug('setWallpaperStatus()');
+        switch (params.Status) {
+            case 'Hide':
+                this.hideWallpaper();
+                break;
+            case 'Show':
+                this.showWallpaper();
                 break;
         }
     }
@@ -318,6 +352,18 @@ class DriverDevice {
                 case false:
                     //self.status.value = 4; //Connected
                     self.status.string = 'Connected';
+                    break;
+            }
+            return self.sendRequest('v1.0/Display/ShowWallpaper');
+        })
+            //Wallpaper State
+            .then(function (wallpaperState) {
+            switch (wallpaperState) {
+                case true:
+                    self.wallpaperStatus.string = 'Show';
+                    break;
+                case false:
+                    self.wallpaperStatus.string = 'Hide';
                     break;
             }
             return self.sendRequest('v1.0/DeviceInfo/StatusMessage');

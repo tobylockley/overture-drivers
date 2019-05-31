@@ -4,6 +4,7 @@
 ClickShare by Barco is a wireless presentation system intended to replace wired setups and enhance meetings, conferences and presentations in a variety of ways.
 USB ClickShare buttons plug into your device, or for mobile devices an app is downloaded.
 Then, by clicking the button, you can wirelessly share your devices display through the central video screen.
+Modified by AVD: Added Show/Hide Wallpaper functionality.
 
 Tested remotely on Clickshare CSE-800, CSC-1, CSE-200 and CSM-1.  
 
@@ -44,6 +45,11 @@ Tested remotely on Clickshare CSE-800, CSC-1, CSE-200 and CSM-1.
 [enum] Indicates if at least one source (Button, Link, mobile app, ...) is currently connected.  
 - `Disconnected`: No one is using the clickshare.  
 - `Connected`: At least one user is connected to the clickshare.  
+
+### WallpaperStatus
+[enum] Controls wallpaper mode.
+- `Hide`: Wallpaper is hidden in idle mode, no hdmi output.
+- `Show`: Wallpaper is shown in idle mode.
 
 ### IsSingleDisplay   
 [String] Shows if more than one display is connected to the base. *Internal use only*
@@ -97,6 +103,9 @@ Lets you show the source content either spread out over two screens (`Extended`)
 - `Clone`
 
 ## Release notes
+
+### 2.2.2-hotfix1
+- Added show/hide wallpaper.
 
 ### 2.2.2
 - Fixed a wrongly formatted setTimeout function call.
