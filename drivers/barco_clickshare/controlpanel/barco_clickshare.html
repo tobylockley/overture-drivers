@@ -1,0 +1,63 @@
+<!--
+Clickshare Template
+
+Control of Clickshare
+-->
+<div ng-init="
+    modelName = findPoint({parent: point, variableName: 'ModelName'});
+    meetingRoomName = findPoint({parent: point, variableName: 'MeetingRoomName'});
+    temp = findPoint({parent: point, variablename: 'CpuTemperature'});
+"></div>
+
+<center>{{meetingRoomName.value}}</center>
+
+<med-led
+    med-point=".Status"
+    med-colors="black, orange, orange, red, green, blue"
+></med-led>
+<med-led
+    med-point=".InUseStatus"
+    med-colors="black, green"
+></med-led>
+<med-led
+    med-point=".SharingStatus"
+    med-colors="black, green"
+></med-led>
+
+<med-button-bar>
+    <med-button
+        med-label="Wake Up"
+        med-click="perform(point, 'Awake System')"
+        med-point=".Status"
+        med-on-state="4"
+    ></med-button>
+    <med-button
+        med-label="Standby"
+        med-click="perform(point, 'Standby System')"
+        med-point=".Status"
+        med-on-state="5"
+    ></med-button>
+</med-button-bar>
+
+<med-point-table
+    med-point="point"
+    med-subpoints=".Status,.InUseStatus,.SharingStatus,.CurrentUptime,.TotalUptime"
+></med-point-table>
+
+<hr>
+
+<med-progress
+  med-label="Temperature"
+  med-point=".CpuTemperature"
+  med-min="{{temp.metadata.min}}"
+  med-max="{{temp.metadata.max}}"
+  med-suffix="{{temp.metadata.driverMetadata.unitSymbol}}"
+  med-icon="glyphicons-temperature"
+></med-progress>
+
+<med-button
+    med-label="Restart"
+    med-click="perform(point, 'Restart System')"
+    med-point=".Status"
+    med-on-state="1"
+></med-button>
