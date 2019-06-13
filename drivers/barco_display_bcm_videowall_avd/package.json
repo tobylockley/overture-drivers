@@ -1,6 +1,6 @@
 {
   "name": "barco_display_bcm_videowall_avd",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Driver For Barco BCM",
   "main": "index.js",
     "scripts": {
@@ -29,31 +29,31 @@
       {
         "name": "Sources",
         "type": "enum",
-        "enums": ["DisplayPort1", "HDMI1", "DVI1", "DVI2", "OPS1"],
+        "enums": ["HDMI1", "HDMI2", "DisplayPort1", "DisplayPort2"],
         "perform":{"action":"Select Source", "params": { "Name":"$string"}}
       },
       {
         "name": "Sources_TopLeft",
         "type": "enum",
-        "enums": ["Idle", "DisplayPort1", "HDMI1", "DVI1", "DVI2", "OPS1"],
+        "enums": ["Idle", "HDMI1", "HDMI2", "DisplayPort1", "DisplayPort2"],
         "perform":{"action":"Select Source TopLeft", "params": { "Name":"$string"}}
       },
       {
         "name": "Sources_TopRight",
         "type": "enum",
-        "enums": ["Idle", "DisplayPort1", "HDMI1", "DVI1", "DVI2", "OPS1"],
+        "enums": ["Idle", "HDMI1", "HDMI2", "DisplayPort1", "DisplayPort2"],
         "perform":{"action":"Select Source TopRight", "params": { "Name":"$string"}}
       },
       {
         "name": "Sources_BottomLeft",
         "type": "enum",
-        "enums": ["Idle", "DisplayPort1", "HDMI1", "DVI1", "DVI2", "OPS1"],
+        "enums": ["Idle", "HDMI1", "HDMI2", "DisplayPort1", "DisplayPort2"],
         "perform":{"action":"Select Source BottomLeft", "params": { "Name":"$string"}}
       },
       {
         "name": "Sources_BottomRight",
         "type": "enum",
-        "enums": ["Idle", "DisplayPort1", "HDMI1", "DVI1", "DVI2", "OPS1"],
+        "enums": ["Idle", "HDMI1", "HDMI2", "DisplayPort1", "DisplayPort2"],
         "perform":{"action":"Select Source BottomRight", "params": { "Name":"$string"}}
       },
       {

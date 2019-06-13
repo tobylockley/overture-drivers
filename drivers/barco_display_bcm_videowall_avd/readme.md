@@ -52,4 +52,8 @@ Changes the input of the display wall.
 ## Release Notes
 ### 1.0.0
 - Initial version.
+### 1.0.1
+- Individual panel source control
+### 1.0.2
+- Added HDMI2, DisplayPort2
 
