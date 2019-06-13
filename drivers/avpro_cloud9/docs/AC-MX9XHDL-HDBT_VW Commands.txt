@@ -1,0 +1,78 @@
+SET OUT2 VW XYZ 0.0.639.359.0
+
+
+
+To set output2 to capture the image from top-left 0,0 to buttom-right 639,359 . 
+
+The last data 0 is for rotation. 0 is no rotation. 
+
+90 is for 90 degree rotation. 
+
+180 or 270 degree
+
+
+
+
+
+Macro to set to normal operating mode
+
+
+
+SET OUT1 VW XYZ 0.0.1919.1079.0
+
+SET OUT2 VW XYZ 0.0.1919.1079.0
+
+SET OUT3 VW XYZ 0.0.1919.1079.0
+
+SET OUT4 VW XYZ 0.0.1919.1079.0
+
+SET OUT5 VW XYZ 0.0.1919.1079.0
+
+SET OUT6 VW XYZ 0.0.1919.1079.0
+
+SET OUT7 VW XYZ 0.0.1919.1079.0
+
+SET OUT8 VW XYZ 0.0.1919.1079.0
+
+SET OUT9 VW XYZ 0.0.1919.1079.0
+
+
+
+
+
+
+0     959 | 960     1919
+
+539
+---
+540
+
+1079
+
+
+0     639 | 640     1279 | 1280     1919
+
+359
+---
+360
+
+719
+---
+720
+
+1079
+
+
+'2x2 - TL': '0.0.959.539.0'
+'2x2 - TR': '960.0.1919.539.0'
+'2x2 - BL': '0.540.959.1079.0'
+'2x2 - BR': '960.540.1919.1079.0'
+'3x3 - TL': '0.0.639.359.0'
+'3x3 - TC': '640.0.1279.359.0'
+'3x3 - TR': '1280.0.1919.359.0'
+'3x3 - ML': '0.360.639.719.0'
+'3x3 - MC': '640.360.1279.719.0'
+'3x3 - MR': '1280.360.1919.719.0'
+'3x3 - BL': '0.720.639.1079.0'
+'3x3 - BC': '640.720.1279.1079.0'
+'3x3 - BR': '1280.720.1919.1079.0'

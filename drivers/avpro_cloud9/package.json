@@ -1,6 +1,6 @@
 {
   "name": "avpro_cloud9",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Driver for AV Pro Cloud 9 Matrix",
   "main": "index.js",
   "scripts": {
@@ -23,7 +23,7 @@
         ]
       },
       {
-        "name": "MultiviewMode",
+        "name": "MultiviewModes",
         "type": "enum",
         "enums": [
           "3x3",
@@ -53,6 +53,13 @@
         }
       },
       {
+        "name": "Set Videowall Mode",
+        "params": {
+          "Channel": { "type": "integer" },
+          "Status": { "type": "string" }
+        }
+      },
+      {
         "name": "Select Quadview Source",
         "params": {
           "Channel": { "type": "integer" },
@@ -76,11 +83,7 @@
           "default": 23,
           "description": "Default: 23"
         }
-      },
-      "required": [
-        "host",
-        "port"
-      ]
+      }
     }
   }
 }

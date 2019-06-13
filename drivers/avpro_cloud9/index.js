@@ -6,6 +6,23 @@ const POLL_PERIOD = 10000           // Continuous polling function interval
 const TCP_TIMEOUT = 30000          // Will timeout after this length of inactivity
 const TCP_RECONNECT_DELAY = 3000   // How long to wait before attempting to reconnect
 
+const VW_LOOKUP = {
+  'None': '0.0.1919.1079.0',
+  '2x2 - TL': '0.0.959.539.0',
+  '2x2 - TR': '960.0.1919.539.0',
+  '2x2 - BL': '0.540.959.1079.0',
+  '2x2 - BR': '960.540.1919.1079.0',
+  '3x3 - TL': '0.0.639.359.0',
+  '3x3 - TC': '640.0.1279.359.0',
+  '3x3 - TR': '1280.0.1919.359.0',
+  '3x3 - ML': '0.360.639.719.0',
+  '3x3 - MC': '640.360.1279.719.0',
+  '3x3 - MR': '1280.360.1919.719.0',
+  '3x3 - BL': '0.720.639.1079.0',
+  '3x3 - BC': '640.720.1279.1079.0',
+  '3x3 - BR': '1280.720.1919.1079.0'
+}
+
 let host
 exports.init = _host => {
   host = _host
@@ -34,11 +51,23 @@ exports.createDevice = base => {
     base.setPoll({ action: 'getSources', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
     base.setPoll({ action: 'getQuadviewSources', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
 
+    // Create source variable for each output
     for (let i = 1; i <= 9; i++) {
       base.createVariable({
         name: `Sources_Output${i}`,
         type: 'enum',
-        enums: ["Input1", "Input2", "Input3", "Input4", "Input5", "Input6", "Input7", "Input8", "Input9", "Multiview"],
+        enums: [
+          'Input1',
+          'Input2',
+          'Input3',
+          'Input4',
+          'Input5',
+          'Input6',
+          'Input7',
+          'Input8',
+          'Input9',
+          'Multiview'
+        ],
         perform: {
           action: 'selectSource',
           params: {
@@ -47,13 +76,52 @@ exports.createDevice = base => {
           }
         }
       })
+      
+      base.createVariable({
+        name: `VideowallMode_Output${i}`,
+        type: 'enum',
+        enums: [
+          'None',
+          '2x2 - TL',
+          '2x2 - TR',
+          '2x2 - BL',
+          '2x2 - BR',
+          '3x3 - TL',
+          '3x3 - TC',
+          '3x3 - TR',
+          '3x3 - ML',
+          '3x3 - MC',
+          '3x3 - MR',
+          '3x3 - BL',
+          '3x3 - BC',
+          '3x3 - BR'
+        ],
+        perform: {
+          action: 'setVideowallMode',
+          params: {
+            Channel: i,
+            Status: '$string'
+          }
+        }
+      })
     }
 
+    // Create source variable for each 2x2 multiview quadrant
     for (let i = 1; i <= 4; i++) {
       base.createVariable({
         name: `Sources_Quadview${i}`,
         type: 'enum',
-        enums: ["Input1", "Input2", "Input3", "Input4", "Input5", "Input6", "Input7", "Input8", "Input9"],
+        enums: [
+          'Input1',
+          'Input2',
+          'Input3',
+          'Input4',
+          'Input5',
+          'Input6',
+          'Input7',
+          'Input8',
+          'Input9'
+        ],
         perform: {
           action: 'selectQuadviewSource',
           params: {
@@ -134,9 +202,9 @@ exports.createDevice = base => {
     match = data.match(/OUT(\d+) VS IN(\d+)/i)
     if (match) {
     //   base.getVar(`Sources_Output${match[1]}`).value = parseInt(match[2]) - 1
-      let b = base.getVar(`Sources_Output${match[1]}`)
+      let v = base.getVar(`Sources_Output${match[1]}`)
       let n = parseInt(match[2]) - 1
-      b.value = n
+      v.value = n
       pendingCommand && base.commandDone()
       return
     }
@@ -144,7 +212,7 @@ exports.createDevice = base => {
     // Multiview Mode
     match = data.match(/MVW MODE(\d+)/i)
     if (match) {
-      base.getVar('MultiviewMode').value = parseInt(match[1])  // 0 = 3x3, 1 = 2x2
+      base.getVar('MultiviewModes').value = parseInt(match[1])  // 0 = 3x3, 1 = 2x2
       pendingCommand && base.commandDone()
       return
     }
@@ -158,6 +226,22 @@ exports.createDevice = base => {
       pendingCommand && base.commandDone()
       return
     }
+
+    // Videowall Mode
+    match = data.match(/OUT(\d+) VW XYZ ([\d\.]+)/i)
+    if (match) {
+      for (let key in VW_LOOKUP) {
+        if (VW_LOOKUP[key] === match[2]) {
+          base.getVar(`VideowallMode_Output${match[1]}`).string = key
+          pendingCommand && base.commandDone()
+          return
+        }
+      }
+      // If we got here, no match was found, so just set to None
+      logger.warning(`Unrecognized Videowall coordinates received, setting videowall mode to 'None'`)
+      base.getVar(`VideowallMode_Output${match[1]}`).value = 0
+      return
+    }
   }
 
 
@@ -169,6 +253,10 @@ exports.createDevice = base => {
 
   function getSources() {
     sendDefer('GET OUT0 VS\r\n')  // 0 = all
+  }
+
+  function getVideowallMode() {
+    sendDefer('GET OUT0 VW XYZ\r\n')  // 0 = all
   }
 
   function getQuadviewSources() {
@@ -186,6 +274,16 @@ exports.createDevice = base => {
     sendDefer(`SET OUT${params.Channel} VS IN${params.Name + 1}\r\n`)
   }
 
+  function setVideowallMode(params) {
+    let coords = VW_LOOKUP[params.Status]
+    if (coords !== undefined) {
+      sendDefer(`SET OUT${params.Channel} VW XYZ ${coords}\r\n`)
+    }
+    else {
+      logger.error(`setVideowallMode(Channel = ${params.Channel}): Invalid enum selected (${params.Status})`)
+    }
+  }
+
   function selectQuadviewSource(params) {
     let sources = [0, 0, 0, 0]  // If left as 0, source is unchanged
     sources[params.Channel - 1] = params.Name + 1  // Channel = 1-4, chooses quadview to change. Name = 0-8 , add 1 to convert to input number
@@ -196,7 +294,7 @@ exports.createDevice = base => {
   // ------------------------------ EXPORTED FUNCTIONS ------------------------------
   return {
     setup, start, stop, tick,
-    getMultiviewMode, getSources, getQuadviewSources,
-    setMultiviewMode, selectSource, selectQuadviewSource
+    getMultiviewMode, getVideowallMode, getSources, getQuadviewSources,
+    setMultiviewMode, setVideowallMode, selectSource, selectQuadviewSource
   }
 }
