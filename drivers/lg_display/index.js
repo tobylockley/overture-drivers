@@ -254,35 +254,32 @@ exports.createDevice = base => {
   }
 
   function setTileMode(params) {
-    let rows = 1
-    let cols = 1
-    let match = params.Status.match(/(\d)x(\d)/)
-    if (match && params.Status !== 'Off') {
-      rows = parseInt(match[1])
-      cols = parseInt(match[2])
-    }
-    checkTileIdMax(rows, cols)
     sendDefer(`dd ${config.setID} ${rows.toString(16)}${cols.toString(16)}\r`)
   }
 
   function setTileId(params) {
-    if (params.Value <= base.getVar('TileId').max) {
+    let idMax = currentTileIdMax()
+    if (params.Value <= idMax) {
       sendDefer(`di ${config.setID} ${params.Value.toString(16)}\r`)
+    }
+    else {
+      let mode = base.getVar('TileMode').string
+      logger.error(`Requested Tile ID (${params.Value}) exceeds Tile Mode maximum (${mode} = ${idMax})`)
     }
   }
 
 
   // ------------------------------ HELPER FUNCTIONS ------------------------------
 
-  function checkTileIdMax(rows, cols) {
+  function currentTileIdMax() {
     // Make sure the current Tile ID is <= rows x cols, otherwise reset to 1
-    let idMax = rows * cols
-    let tileId = base.getVar('TileId')
-    if (tileId.value > idMax) {
-      logger.info(`Current Tile ID (${tileId.value}) exceeds requested Tile Mode maximum (${rows}x${cols} = ${idMax}), resetting to 1`)
-      tileId.value = 1
+    let match = base.getVar('TileMode').string.match(/(\d)x(\d)/)
+    if (match) {
+      return parseInt(match[1]) * parseInt(match[2])
     }
-    tileId.max = idMax
+    else {
+      return 1
+    }
   }
 
 
