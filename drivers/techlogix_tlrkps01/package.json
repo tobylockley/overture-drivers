@@ -1,0 +1,99 @@
+{
+  "name": "techlogix_tlrkps01",
+  "version": "1.0.0",
+  "description": "Driver",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "Techlogix",
+    "models": [
+      "TL-RKPS-01"
+    ],
+    "type": "device",
+    "subtype": "power",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      }
+    ],
+
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Channel": { "type": "integer" },
+          "Status": { "type": "enum", "enums": [ "Off", "On" ] }
+        }
+      }
+    ],
+
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Techlogix TL-RKPS-01 Setup",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address:",
+          "type": "string",
+          "default": ""
+        },
+        "name1": {
+          "title": "Port 1 Nickname",
+          "type": "string"
+        },
+        "name2": {
+          "title": "Port 2 Nickname",
+          "type": "string"
+        },
+        "name3": {
+          "title": "Port 3 Nickname",
+          "type": "string"
+        },
+        "name4": {
+          "title": "Port 4 Nickname",
+          "type": "string"
+        },
+        "name5": {
+          "title": "Port 5 Nickname",
+          "type": "string"
+        },
+        "name6": {
+          "title": "Port 6 Nickname",
+          "type": "string"
+        },
+        "name7": {
+          "title": "Port 7 Nickname",
+          "type": "string"
+        },
+        "name8": {
+          "title": "Port 8 Nickname",
+          "type": "string"
+        },
+        "name9": {
+          "title": "Port 9 Nickname",
+          "type": "string"
+        },
+        "name10": {
+          "title": "Port 10 Nickname",
+          "type": "string"
+        },
+        "name11": {
+          "title": "Port 11 Nickname",
+          "type": "string"
+        },
+        "name12": {
+          "title": "Port 12 Nickname",
+          "type": "string"
+        }
+      }
+    }
+  }
+}
