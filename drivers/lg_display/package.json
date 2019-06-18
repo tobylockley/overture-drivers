@@ -93,6 +93,17 @@
         }
       },
       {
+        "name": "IRCommands",
+        "type": "enum",
+        "enums": [ "Populated during setup" ],
+        "perform": {
+          "action": "Send IR Command",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      },
+      {
         "name": "Temperature",
         "type": "integer"
       }
@@ -147,6 +158,14 @@
         "params": {
           "Level": {
             "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Send IR Command",
+        "params": {
+          "Name": {
+            "type": "string"
           }
         }
       },
@@ -209,7 +228,7 @@
           "title": "Enable Videowall Control",
           "type": "boolean",
           "format": "checkbox",
-          "description": "Enable tile mode and tile ID controls for this display"
+          "description": "If supported, enable tile mode and tile ID controls for this display."
         },
         "inputs": {
           "type": "object",
@@ -217,35 +236,35 @@
           "properties": {
             "hdmi1": {
               "title": "HDMI 1",
-              "hexcode": "0x90",
+              "hexcode": "0xA0",
               "type": "boolean",
               "format": "checkbox",
               "default": true
             },
             "hdmi2": {
               "title": "HDMI 2",
-              "hexcode": "0x91",
+              "hexcode": "0xA1",
               "type": "boolean",
               "format": "checkbox",
               "default": true
             },
             "hdmi3": {
               "title": "HDMI 3",
-              "hexcode": "0x92",
+              "hexcode": "0xA2",
               "type": "boolean",
               "format": "checkbox",
               "default": false
             },
             "hdmi4": {
               "title": "HDMI 4",
-              "hexcode": "0x93",
+              "hexcode": "0xA3",
               "type": "boolean",
               "format": "checkbox",
               "default": false
             },
             "dvi": {
               "title": "DVI",
-              "hexcode": "0x95",
+              "hexcode": "0xA5",
               "type": "boolean",
               "format": "checkbox",
               "default": false
@@ -259,7 +278,7 @@
             },
             "displayport": {
               "title": "Display Port",
-              "hexcode": "0xC0",
+              "hexcode": "0xD0",
               "type": "boolean",
               "format": "checkbox",
               "default": false

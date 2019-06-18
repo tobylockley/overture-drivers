@@ -115,3 +115,10 @@ Set this screens tile ID (position in the videowall, top left = 1)
 
 ### 1.0.5
 - Added an alternative DVI input source for hex code 0x80
+
+### 1.0.6
+- Added IR remote control commands
+- Changed HDMI/DVI to use PC mode instead of DTV mode
+- On power off, polling is stopped immediately to avoid panel coming back online
+- Swapped row/col in api call, as it was backwards
+- Other minor bug fixes

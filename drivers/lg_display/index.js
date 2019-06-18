@@ -17,6 +17,7 @@ exports.createDevice = base => {
   let tcpClient
   let wol = require('wol')  // Used to turn wake from power off, must be enabled in menu
   let sourcesInfo = []  // Used to store inputs sources hex codes
+  let irCodes  // Populated during setup
 
   let frameParser = host.createFrameParser()
   frameParser.setSeparator('x')
@@ -26,7 +27,6 @@ exports.createDevice = base => {
   // ------------------------------ SETUP FUNCTIONS ------------------------------
 
   function isConnected() { return base.getVar('Status').string === 'Connected' }
-  function isInTileMode() { return isConnected && base.getVar('TileMode').value > 0 }
 
   function setup(_config) {
     config = _config
@@ -48,6 +48,10 @@ exports.createDevice = base => {
       }
     }
     base.getVar('Sources').enums = sourcesInfo.map(x => x.title)
+
+    // Create IR Commands enum based on ir_codes.json
+    irCodes = require('./ir_codes.json')
+    base.getVar('IRCommands').enums = ["Choose a Command"].concat(Object.keys(irCodes))
 
     // Create videowall variables and set polls if enabled
     if (config.videowall) {
@@ -78,7 +82,7 @@ exports.createDevice = base => {
         }
       })
       base.setPoll({ action: 'getTileMode', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
-      base.setPoll({ action: 'getTileId', period: POLL_PERIOD, enablePollFn: isInTileMode, startImmediately: true })
+      base.setPoll({ action: 'getTileId', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
     }
   }
 
@@ -87,10 +91,10 @@ exports.createDevice = base => {
   }
 
   function stop() {
-    base.getVar('Status').string = 'Disconnected'
-    base.getVar('Power').string = 'Off'
     tcpClient && tcpClient.end()
     tcpClient = null
+    base.stopPolling()
+    base.clearPendingCommands()
   }
 
   function tick() {
@@ -120,6 +124,7 @@ exports.createDevice = base => {
     tcpClient.on('close', () => {
       logger.silly('TCPClient closed')
       base.getVar('Status').string = 'Disconnected'  // Triggered on timeout, this allows auto reconnect
+      base.getVar('Power').value = 0  // Allow for WOL to be sent
     })
 
     tcpClient.on('error', err => {
@@ -143,7 +148,7 @@ exports.createDevice = base => {
 
   function onFrame(data) {
     const pendingCommand = base.getPendingCommand()
-    logger.silly(`onFrame (pending = ${pendingCommand.action}): ${data}`)
+    logger.silly(`onFrame (pending = ${pendingCommand && pendingCommand.action}): ${data}`)
 
     let match = data.match(/(\w) (\d+) OK([0-9a-fA-F]+)/)
     if (match && pendingCommand) {
@@ -153,14 +158,33 @@ exports.createDevice = base => {
         if (match[1] === 'a') {
           base.getVar('Power').value = val
           base.commandDone()
+          if (val === 0) {
+            // Stop all other polling commands, and set to disconnected
+            // setTimeout is needed to perform at end of event loop
+            setTimeout(() => { base.clearPendingCommands() }, 0)
+            base.getVar('Status').string = 'Disconnected'
+          }
         }
         else if (match[1] === 'd') {
-          base.getVar('ScreenMute').value = val
-          base.commandDone()
+          // Could be screen mute or tile mode set
+          if (pendingCommand.action === 'setTileMode') {
+            base.getVar('TileMode').string = pendingCommand.params.Status
+            base.commandDone()
+          }
+          else {
+            base.getVar('ScreenMute').value = val
+            base.commandDone()
+          }
         }
         else if (match[1] === 'b') {
-          base.getVar('Sources').string = sourcesInfo.find(x => x.hexcode === val).title
-          base.commandDone()
+          let source = sourcesInfo.find(x => x.hexcode === val)
+          if (source) {
+            base.getVar('Sources').string = source.title
+            base.commandDone()
+          }
+          else {
+            base.commandError(`Could not find current source hexcode (${val.toString(16)}) in available sources`)
+          }
         }
         else if (match[1] === 'e') {
           base.getVar('AudioMute').string = ['On', 'Off'][val]  // 0 = Muted, 1 = Unmuted
@@ -170,6 +194,10 @@ exports.createDevice = base => {
           base.getVar('AudioLevel').value = val
           base.commandDone()
         }
+        else if (match[1] === 'c') {
+          base.getVar('IRCommands').value = 0  // Reset to idle state
+          base.commandDone()
+        }
         else if (match[1] === 'n') {
           base.getVar('Temperature').value = val
           base.commandDone()
@@ -177,10 +205,9 @@ exports.createDevice = base => {
         else if (match[1] === 'z' && base.getVar('TileMode')) {
           let bytes = match[3].match(/.{2}/g).map(x => parseInt(x, 16))
           let tileMode = bytes[0]
-          let rows = bytes[1]
-          let cols = bytes[2]
+          let cols = bytes[1]
+          let rows = bytes[2]
           let tileString = (tileMode > 0) ? `${rows}x${cols}` : 'Off'
-          checkTileIdMax(rows, cols)
           base.getVar('TileMode').string = tileString
           base.commandDone()
         }
@@ -214,7 +241,14 @@ exports.createDevice = base => {
   function getAudioLevel() { sendDefer(`kf ${config.setID} FF\r`) }
   function getTemperature() { sendDefer(`dn ${config.setID} FF\r`) }
   function getTileMode() { sendDefer(`dz ${config.setID} FF\r`) }
-  function getTileId() { sendDefer(`di ${config.setID} FF\r`) }
+  function getTileId() {
+    if (base.getVar('TileMode').value > 0) {
+      sendDefer(`di ${config.setID} FF\r`)
+    }
+    else {
+      logger.silly('Skipping getTileId while tile mode is disabled to avoid errors')
+    }
+  }
 
 
   // ------------------------------ SET FUNCTIONS ------------------------------
@@ -253,8 +287,23 @@ exports.createDevice = base => {
     sendDefer(`kf ${config.setID} ${params.Level.toString(16)}\r`)
   }
 
+  function sendIRCommand(params) {
+    base.getVar('IRCommands').string = params.Name  // Set to command name, and reset to idle in frame parser
+    sendDefer(`mc ${config.setID} ${irCodes[params.Name]}\r`)
+  }
+
   function setTileMode(params) {
-    sendDefer(`dd ${config.setID} ${rows.toString(16)}${cols.toString(16)}\r`)
+    let rows, cols
+    let match = params.Status.match(/(\d)x(\d)/)
+    if (match) {
+      rows = match[1]
+      cols = match[2]
+    }
+    else {
+      rows = 0
+      cols = 0
+    }
+    sendDefer(`dd ${config.setID} ${cols.toString(16)}${rows.toString(16)}\r`)
   }
 
   function setTileId(params) {
@@ -286,7 +335,7 @@ exports.createDevice = base => {
   // ------------------------------ EXPORTED FUNCTIONS ------------------------------
   return {
     setup, start, stop, tick,
-    setPower, selectSource, setScreenMute, setAudioMute, setAudioLevel, setTileMode, setTileId,
+    setPower, selectSource, setScreenMute, setAudioMute, setAudioLevel, sendIRCommand, setTileMode, setTileId,
     getPower, getSource, getScreenMute, getAudioMute, getAudioLevel, getTemperature, getTileMode, getTileId
   }
 }
