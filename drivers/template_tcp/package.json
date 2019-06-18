@@ -66,11 +66,7 @@
           "default": 9999,
           "description": "Default: 9999"
         }
-      },
-      "required": [
-        "host",
-        "port"
-      ]
+      }
     }
   }
 }
