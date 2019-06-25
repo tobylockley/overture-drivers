@@ -1,213 +1,308 @@
-'use strict';
+'use strict'
 
-const CMD_DEFER_TIME = 2000;        // Timeout when using commandDefer
-const TICK_PERIOD = 5000;           // In-built tick interval
-const POLL_PERIOD = 7000;           // Continuous polling function interval
-const TELNET_TIMEOUT = 10000;       // Socket will timeout after specified milliseconds of inactivity
-const SEND_TIMEOUT = 1000;          // Timeout when using telnet send function
+const CMD_DEFER_TIME = 3000        // Timeout when using commandDefer
+const TICK_PERIOD = 5000           // In-built tick interval
+const TCP_TIMEOUT = 10000          // Will timeout after this length of inactivity
+const TCP_RECONNECT_DELAY = 3000   // How long to wait before attempting to reconnect
 
-
-let host;
+let host
 exports.init = _host => {
-  host = _host;
-};
+  host = _host
+}
 
 exports.createDevice = base => {
-  const logger = base.logger || host.logger;
-  let config;
+  const logger = base.logger || host.logger
+  let config
+  let tcpClient
 
-  let Telnet = require('telnet-client');
-  let telnetClient;
+  let frameParser = host.createFrameParser()
+  frameParser.setSeparator('\n')
+  frameParser.on('data', data => onFrame(data))
 
-  let frameParser = host.createFrameParser();
-  frameParser.setSeparator('\n');
-  frameParser.on('data', data => onFrame(data));
 
-  const isConnected = () => { return base.getVar('Status').string === 'Connected'; };
+  // ------------------------------ SETUP FUNCTIONS ------------------------------
+
+  function isConnected() { return base.getVar('Status').string === 'Connected' }
 
   function setup(_config) {
-    config = _config;
-    base.setTickPeriod(TICK_PERIOD);
+    config = _config
+    base.setTickPeriod(TICK_PERIOD)
 
-    base.setPoll({ action: 'getAudioLevelAV1', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: false });
-    base.setPoll({ action: 'getAudioLevelMic1', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: false });
-    base.setPoll({ action: 'getAudioMuteAV1', period:POLL_PERIOD, enablePollFn: isConnected, startImmediately: false });
-    base.setPoll({ action: 'getAudioMuteMic1', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: false });
+    // Setup variables based on config
+    if (config.presets) {
+      base.createVariable({
+        name: 'Presets',
+        type: 'enum',
+        enums: ['Choose a preset...'].concat(config.presets),
+        perform: {
+          action: 'recallPreset',
+          params: {
+            Name: '$string'
+          }
+        }
+      })
+    }
+    
+    for (let level of config.levels) {
+      level.varname = level.nickname.replace(/[^A-Za-z0-9_]/g, '')  // Make legal variable name
+      base.createVariable({
+        name: level.varname,
+        type: 'real',
+        min: 0,
+        max: 100,
+        perform: {
+          action: 'setAudioLevel',
+          params: {
+            InstanceTag: level.tag,
+            Channel: level.channel,
+            Level: '$value'
+          }
+        }
+      })
+      // Register polling function
+      base.setPoll({
+        action: 'getAudioLevel',
+        period: config.poll,
+        enablePollFn: isConnected,
+        startImmediately: true,
+        params: {
+          InstanceTag: level.tag,
+          Channel: level.channel
+        }
+      })
+    }
+    
+    for (let mute of config.mutes) {
+      mute.varname = mute.nickname.replace(/[^A-Za-z0-9_]/g, '')  // Make legal variable name
+      base.createVariable({
+        name: mute.varname,
+        type: 'enum',
+        enums: ['Off', 'On'],
+        perform: {
+          action: 'setAudioMute',
+          params: {
+            InstanceTag: mute.tag,
+            Channel: mute.channel,
+            Status: '$value'
+          }
+        }
+      })
+      // Register polling function
+      base.setPoll({
+        action: 'getAudioMute',
+        period: config.poll,
+        enablePollFn: isConnected,
+        startImmediately: true,
+        params: {
+          InstanceTag: mute.tag,
+          Channel: mute.channel
+        }
+      })
+    }
+    
+    for (let state of config.states) {
+      state.varname = state.nickname.replace(/[^A-Za-z0-9_]/g, '')  // Make legal variable name
+      base.createVariable({
+        name: state.varname,
+        type: 'enum',
+        enums: ['False', 'True'],
+        perform: {
+          action: 'setLogicState',
+          params: {
+            InstanceTag: state.tag,
+            Channel: state.channel,
+            Status: '$value'
+          }
+        }
+      })
+      // Register polling function
+      base.setPoll({
+        action: 'getLogicState',
+        period: config.poll,
+        enablePollFn: isConnected,
+        startImmediately: true,
+        params: {
+          InstanceTag: state.tag,
+          Channel: state.channel
+        }
+      })
+    }
+
   }
 
   function start() {
-    initTelnetClient();
+    initTcpClient()
   }
 
   function stop() {
-    disconnect();
-    if (telnetClient) {
-      telnetClient.end();
-      telnetClient = null;
-    }
+    base.getVar('Status').string = 'Disconnected'
+    tcpClient && tcpClient.end()
+    tcpClient = null
+    base.clearPendingCommands()
   }
-
-
-
-
-  function recallPreset(params) {
-    logger.debug(`DEVICE recallPreset ${params.Status}`);
-    base.getVar('Preset').string = params.Status;
-    sendDefer(`DEVICE recallPresetByName ${params.Status}\n`);
-  }
-
-  function setAudioLevelAV1(params) {
-    logger.debug(`LevelAV1 set level 1  ${params.Level}`);
-    base.getVar('AudioLevelAV1').value = params.Level;
-    sendDefer(`LevelAV1 set level 1  ${params.Level}\n`);
-  }
-
-  function setAudioLevelMic1(params) {
-    logger.debug(`LevelMIC1 set level 1 ${params.Level}\n`);
-    base.getVar('AudioLevelMic1').value = params.Level;
-    sendDefer(`LevelMIC1 set level 1 ${params.Level}\n`);
-  }
-
-  function setAudioMuteAV1(params) {
-    logger.debug(`LevelAV1 set mute 1  ${params.Level}`);
-    base.getVar('AudioMuteAV1').string = params.Status;
-    sendDefer(`LevelAV1 set mute 1 ${params.Status}\n`);
-  }
-
-  function setAudioMuteMic1(params) {
-    logger.debug(`LevelMIC1 set mute 1 ${params.Status}\n`);
-    base.getVar('AudioMuteMic1').string = params.Status;
-    sendDefer(`LevelMIC1 set mute 1 ${params.Status}\n`);
-  }
-
-
-  const getAudioLevelAV1 = () => sendDefer('LevelAV1 get level 1\n');
-  const getAudioLevelMic1 = () => sendDefer('LevelMIC1 get level 1\n');
-  const getAudioMuteAV1 = () => sendDefer('LevelAV1 get mute 1\n');
-  const getAudioMuteMic1 = () => sendDefer('LevelMIC1 get mute 1\n');
-
-
-
 
   function tick() {
-    !telnetClient && initTelnetClient();
+    if (!tcpClient) initTcpClient()
   }
 
-  function disconnect() {
-    base.getVar('Status').string = 'Disconnected';
+  function initTcpClient() {
+    if (tcpClient) return  // Return if tcpClient already exists
+
+    tcpClient = host.createTCPClient()
+    tcpClient.setOptions({
+      receiveTimeout: TCP_TIMEOUT,
+      autoReconnectionAttemptDelay: TCP_RECONNECT_DELAY
+    })
+    tcpClient.connect(config.port, config.host)
+
+    tcpClient.on('connect', () => {
+      logger.silly('TCPClient connected')
+      base.getVar('Status').string = 'Connected'
+      base.startPolling()
+    })
+
+    tcpClient.on('data', data => {
+      frameParser.push(data.toString())
+    })
+
+    tcpClient.on('close', () => {
+      logger.silly('TCPClient closed')
+      base.getVar('Status').string = 'Disconnected'  // Triggered on timeout, this allows auto reconnect
+    })
+
+    tcpClient.on('error', err => {
+      logger.error(`TCPClient: ${err}`)
+      stop()  // Throw out the tcpClient and get a fresh connection
+    })
   }
 
-  function initTelnetClient() {
-    if (!telnetClient) {
-      telnetClient = new Telnet();
-      logger.silly(`Attempting telnet connection to: ${config.host}:${config.port}`);
 
-      telnetClient.connect({
-        host: config.host,
-        port: config.port,
-        timeout: TELNET_TIMEOUT,
-        initialLFCR: true,
-        sendTimeout: SEND_TIMEOUT
-      });
+  // ------------------------------ SEND/RECEIVE HANDLERS ------------------------------
 
-      telnetClient.on('connect', function () {
-        logger.silly('Telnet connected!');
-        base.getVar('Status').string = 'Connected';
-        base.startPolling();
-      });
-
-      telnetClient.on('data', (chunk) => {
-        frameParser.push(chunk);
-      });
-
-      telnetClient.on('close', function () {
-        logger.silly('telnet closed');
-        stop();
-      });
-
-      telnetClient.on('error', err => {
-        logger.error(`telnetClient: ${err}`);
-        stop();
-      });
-    }
+  function send(data) {
+    logger.silly(`TCPClient send: ${data}`)
+    return tcpClient && tcpClient.write(data)
   }
-
 
   function sendDefer(data) {
-    base.commandDefer(CMD_DEFER_TIME);
-    telnetClient.send(data).then(() => {
-      // Handled in onFrame
-      logger.silly(`Telnet send OK (${data})`);
-    }, err => {
-      base.commandError(`Telnet send error: ${err}`);
-    });
+    base.commandDefer(CMD_DEFER_TIME)
+    if (!send(data)) base.commandError('Data not sent')
   }
 
   function onFrame(data) {
-    let match;  // Used for regex matching below
-    const pendingCommand = base.getPendingCommand();
+    let match
+    let pendingCommand = base.getPendingCommand()
+    logger.silly(`onFrame (pending = ${pendingCommand && pendingCommand.action}): ${data}`)
 
-    logger.silly(`onFrame: ${data}`);
-    pendingCommand && logger.debug(`pendingCommand: ${pendingCommand.action}`);
-
-    // Response from polling command
-
-
-    if (pendingCommand && pendingCommand.action == 'getAudioLevelAV1') {
-      // Parse response after issueing a SET function
-
-      match = data.match(/\+OK "value":(-\d+|\d+).000000/);
+    if (pendingCommand && pendingCommand.action === 'getAudioLevel') {
+      match = data.match(/\+OK "value":(\-?\d*\.\d*)/)
       if (match) {
-        base.getVar('AudioLevelAV1').value = match[1];
-        base.commandDone();
+        let conf = config.levels.find(x => x.tag === pendingCommand.params.InstanceTag)
+        let val = parseFloat(match[1])
+        base.getVar(conf.varname).value = map(val, conf.min, conf.max, 0, 100)  // Convert value from decibel to percentage
+        base.commandDone()
       }
     }
-    else if (pendingCommand && pendingCommand.action == 'getAudioLevelMic1') {
-      // Parse response after issueing a SET function
-
-
-      match = data.match(/\+OK "value":(-\d+|\d+).000000/);
+    else if (pendingCommand && pendingCommand.action === 'getAudioMute') {
+      match = data.match(/\+OK "value":(false|true)/)
       if (match) {
-        base.getVar('AudioLevelMic1').value = match[1];
-        base.commandDone();
+        let varname = config.mutes.find(x => x.tag === pendingCommand.params.InstanceTag).varname
+        base.getVar(varname).value = {'false': 0, 'true': 1}[match[1]]
+        base.commandDone()
       }
     }
-    else if (pendingCommand && pendingCommand.action == 'getAudioMuteAV1') {
-      // Parse response after issueing a SET function
-
-
-      match = data.match(/\+OK "value":([a-z]+)/);
+    else if (pendingCommand && pendingCommand.action === 'getLogicState') {
+      match = data.match(/\+OK "value":(false|true)/)
       if (match) {
-        base.getVar('AudioMuteAV1').string = match[1];
-        base.commandDone();
-      }
-    }
-
-    else if (pendingCommand && pendingCommand.action == 'getAudioMuteMic1') {
-      // Parse response after issueing a SET function
-
-
-      match = data.match(/\+OK "value":([a-z]+)/);
-      if (match) {
-        base.getVar('AudioMuteMic1').string = match[1];
-        base.commandDone();
+        let varname = config.states.find(x => x.tag === pendingCommand.params.InstanceTag).varname
+        base.getVar(varname).value = {'false': 0, 'true': 1}[match[1]]
+        base.commandDone()
       }
     }
     else {
-      match = data.match(/\+OK/);
-      if (match) {
-        base.commandDone();
+      match = data.match(/\+OK/)
+      if (match && pendingCommand) {
+        base.commandDone()
+      }
+      else {
+        logger.warn(`onFrame data not processed: ${data}`)
       }
     }
   }
 
 
+  // ------------------------------ GET FUNCTIONS ------------------------------
+
+  function getAudioLevel(params) {
+    // params: InstanceTag, Channel
+    sendDefer(`${params.InstanceTag} get level ${params.Channel}\n`)
+  }
+
+  function getAudioMute(params) {
+    // params: InstanceTag, Channel
+    sendDefer(`${params.InstanceTag} get mute ${params.Channel}\n`)
+  }
+
+  function getLogicState(params) {
+    // params: InstanceTag, Channel
+    sendDefer(`${params.InstanceTag} get state ${params.Channel}\n`)
+  }
+
+
+  // ------------------------------ SET FUNCTIONS ------------------------------
+
+  function recallPreset(params) {
+    // params: Name
+    let num = parseInt(params.Name)
+    if (num) {
+      sendDefer(`DEVICE recallPreset ${num}\n`)
+    }
+    else {
+      sendDefer(`DEVICE recallPresetByName ${params.Name}\n`)
+    }
+  }
+
+  function setAudioLevel(params) {
+    // params: InstanceTag, Channel, Level (0-100)
+    let conf = config.levels.find(x => x.tag === params.InstanceTag)
+    let val = map(params.Level, 0, 100, conf.min, conf.max).toFixed(6)  // Convert value from percentage to decibel
+    sendDefer(`${params.InstanceTag} set level ${params.Channel} ${val}\n`)
+  }
+
+  function setAudioMute(params) {
+    // params: InstanceTag, Channel, Status (0/1)
+    let state = ['false', 'true'][params.Status]
+    sendDefer(`${params.InstanceTag} set mute ${params.Channel} ${state}\n`)
+  }
+
+  function setLogicState(params) {
+    // params: InstanceTag, Channel, Status (0/1)
+    let state = ['false', 'true'][params.Status]
+    sendDefer(`${params.InstanceTag} set state ${params.Channel} ${state}\n`)
+  }
+
+
+  // ------------------------------ HELPER FUNCTIONS ------------------------------
+
+  function map(value, in_min, in_max, out_min, out_max) {
+    if (value < in_min) {
+      logger.error(`map value (${value}) out of range (min = ${in_min}), returning min: ${out_min}`)
+      return out_min
+    }
+    else if (value > in_max) {
+      logger.error(`map value (${value}) out of range (max = ${in_max}), returning max: ${out_max}`)
+      return out_max
+    }
+    else {
+      return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+    }
+  }
+
+
+  // ------------------------------ EXPORTED FUNCTIONS ------------------------------
   return {
-    setup, start, stop,
-    setAudioLevelAV1, getAudioLevelAV1,
-    setAudioLevelMic1, getAudioLevelMic1,
-    setAudioMuteAV1, getAudioMuteAV1,
-    setAudioMuteMic1, getAudioMuteMic1,
-    recallPreset,
-  };
-};
+    setup, start, stop, tick,
+    getAudioLevel, getAudioMute, getLogicState,
+    setAudioLevel, setAudioMute, setLogicState, recallPreset
+  }
+}

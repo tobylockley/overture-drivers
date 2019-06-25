@@ -1,6 +1,6 @@
 {
   "name": "biamp_tesira",
-  "version": "1.0.0-beta.7",
+  "version": "1.0.1-beta1",
   "description": "Driver for Biamp Tesira Audio DSP",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
   "overture": {
     "brand": "Biamp",
     "models": [
-      "Tesira CS"
+      "Tesira"
     ],
     "type": "device",
     "subtype": "audiosystem",
@@ -23,158 +23,156 @@
           "Disconnected",
           "Connected"
         ]
-      },
-      {
-        "name": "AudioMuteAV1",
-        "type": "enum",
-        "enums": [
-          "false",
-          "true"
-        ],
-        "perform": {
-          "action": "setAudioMuteAV1",
-          "params": {
-            "Status": "$string"
-          }
-        }
-      },
-      {
-        "name": "AudioMuteMic1",
-        "type": "enum",
-        "enums": [
-          "false",
-          "true"
-        ],
-        "perform": {
-          "action": "setAudioMuteMic1",
-          "params": {
-            "Status": "$string"
-          }
-        }
-      },
-      {
-        "name": "Preset",
-        "type": "enum",
-        "enums": [
-          "Idle",
-          "AudienceMicOFF",
-          "AudienceMicON",
-          "DeskMicOFF",
-          "DeskMicON"
-        ],
-        "perform": {
-          "action": "Recall Preset",
-          "params": {
-            "Status": "$string"
-          }
-        }
-      },
-      {
-        "name": "AudioLevelAV1",
-        "type": "integer",
-        "min": -100,
-        "max": 0,
-        "perform": {
-          "action": "setAudioLevelAV1",
-          "params": {
-            "Level": "$value"
-          }
-        }
-      },
-      {
-        "name": "AudioLevelMic1",
-        "type": "integer",
-        "min": -100,
-        "max": 0,
-        "perform": {
-          "action": "setAudioLevelMic1",
-          "params": {
-            "Level": "$value"
-          }
-        }
       }
     ],
     "commands": [
       {
-        "name": "Set State",
-        "params": {
-          "Status": {
-            "type": "enum",
-            "enums": [
-              "false",
-              "true"
-            ]
-          }
-        }
-      },
-      {
         "name": "Recall Preset",
         "params": {
-          "Status": {
-            "type": "enum",
-            "enums": [
-              "Idle",
-              "AudienceMicOFF",
-              "AudienceMicON",
-              "DeskMicOFF",
-              "DeskMicON"
-            ]
-          }
+          "Name": { "type": "string" }
         }
       },
       {
-        "name": "Set Audio Level AV1",
+        "name": "Set Audio Level",
         "params": {
-          "Level": {
-            "type": "integer"
-          }
-        },
-        "optimize": true
+          "InstanceTag": { "type": "string" },
+          "Channel": { "type": "integer" },
+          "Level": { "type": "real" }
+        }
       },
       {
-        "name": "Set Audio Level Mic1",
+        "name": "Set Audio Mute",
         "params": {
-          "Level": {
-            "type": "integer"
-          }
-        },
-        "optimize": true
+          "InstanceTag": { "type": "string" },
+          "Channel": { "type": "integer" },
+          "Status": { "type": "integer" }
+        }
       },
       {
-        "name": "Toggle Mute",
+        "name": "Set Logic State",
         "params": {
-          "Status": {
-            "type": "enum",
-            "enums": [
-              "toggle"
-            ]
-          }
+          "InstanceTag": { "type": "string" },
+          "Channel": { "type": "integer" },
+          "Status": { "type": "integer" }
         }
       }
     ],
     "pointSetupSchema": {
       "type": "object",
-      "title": "Tesira Forte network information",
+      "title": "Biamp Tesira Settings",
       "properties": {
         "host": {
           "title": "Host name or IP address:",
-          "type": "string",
-          "default": "192.168.1.100"
+          "type": "string"
         },
         "port": {
           "title": "Port:",
           "type": "integer",
           "default": 23,
-          "description": "Default Telnet: 23"
+          "description": "Default: 23"
+        },
+        "poll": {
+          "title": "Polling Interval (milliseconds):",
+          "type": "integer",
+          "default": 5000
+        },
+        "presets": {
+          "title": "Presets",
+          "type": "array",
+          "format": "table",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "levels": {
+          "title": "Levels",
+          "description": "Nickname will be used as overture variable name",
+          "type": "array",
+          "format": "table",
+          "uniqueItems": true,
+          "items": {
+            "title": "Level",
+            "type": "object",
+            "properties": {
+              "nickname": {
+                "title": "Overture Nickname",
+                "type": "string"
+              },
+              "tag": {
+                "title": "Instance Tag",
+                "type": "string"
+              },
+              "channel": {
+                "title": "Channel",
+                "type": "integer",
+                "default": 1
+              },
+              "min": {
+                "title": "Minimum Value (dB)",
+                "type": "number",
+                "default": -100
+              },
+              "max": {
+                "title": "Maximum Value (dB)",
+                "type": "number",
+                "default": 12
+              }
+            }
+          }
+        },
+        "mutes": {
+          "title": "Mutes",
+          "description": "Nickname will be used as overture variable name",
+          "type": "array",
+          "format": "table",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "properties": {
+              "nickname": {
+                "title": "Overture Nickname",
+                "type": "string"
+              },
+              "tag": {
+                "title": "Instance Tag",
+                "type": "string"
+              },
+              "channel": {
+                "title": "Channel",
+                "type": "integer",
+                "default": 1
+              }
+            }
+          }
+        },
+        "states": {
+          "title": "Logic States",
+          "description": "Nickname will be used as overture variable name",
+          "type": "array",
+          "format": "table",
+          "uniqueItems": true,
+          "items": {
+            "title": "State",
+            "type": "object",
+            "properties": {
+              "nickname": {
+                "title": "Overture Nickname",
+                "type": "string"
+              },
+              "tag": {
+                "title": "Instance Tag",
+                "type": "string"
+              },
+              "channel": {
+                "title": "Channel",
+                "type": "integer",
+                "default": 1
+              }
+            }
+          }
         }
-      },
-      "required": [
-        "host",
-        "port"
-      ]
+      }
     }
-  },
-  "dependencies": {
-    "telnet-client": "^0.16.2"
   }
 }
