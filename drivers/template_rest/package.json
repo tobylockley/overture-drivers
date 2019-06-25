@@ -1,0 +1,50 @@
+{
+  "name": "template_rest",
+  "version": "1.0.0-beta.1",
+  "description": "Driver",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "BRAND",
+    "models": [
+      "MODEL"
+    ],
+    "type": "device",
+    "subtype": "generic",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      }
+    ],
+
+    "commands": [
+    ],
+
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Template Setup",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address:",
+          "type": "string",
+          "default": ""
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 9999,
+          "description": "Default: 9999"
+        }
+      }
+    }
+  }
+}
