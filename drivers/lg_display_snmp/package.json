@@ -1,7 +1,7 @@
 {
-  "name": "lg_display",
-  "version": "1.0.6",
-  "description": "Driver for LG display",
+  "name": "lg_display_snmp",
+  "version": "1.0.0",
+  "description": "Driver for LG display using SNMP",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -11,7 +11,7 @@
   "overture": {
     "brand": "LG",
     "models": [
-      "47LV35A"
+      "65UU640C"
     ],
     "type": "device",
     "subtype": "display",
@@ -35,7 +35,7 @@
         "perform": {
           "action": "Set Power",
           "params": {
-            "Status": "$string"
+            "Status": "$value"
           }
         }
       },
@@ -49,7 +49,7 @@
         "perform": {
           "action": "Set Screen Mute",
           "params": {
-            "Status": "$string"
+            "Status": "$value"
           }
         }
       },
@@ -76,7 +76,7 @@
         "perform": {
           "action": "Set Audio Mute",
           "params": {
-            "Status": "$string"
+            "Status": "$value"
           }
         }
       },
@@ -95,17 +95,15 @@
       {
         "name": "IRCommands",
         "type": "enum",
-        "enums": [ "Populated during setup" ],
+        "enums": [
+          "Populated during setup"
+        ],
         "perform": {
           "action": "Send IR Command",
           "params": {
             "Name": "$string"
           }
         }
-      },
-      {
-        "name": "Temperature",
-        "type": "integer"
       }
     ],
     "commands": [
@@ -113,11 +111,7 @@
         "name": "Set Power",
         "params": {
           "Status": {
-            "type": "enum",
-            "enums": [
-              "Off",
-              "On"
-            ]
+            "type": "integer"
           }
         }
       },
@@ -125,11 +119,7 @@
         "name": "Set Screen Mute",
         "params": {
           "Status": {
-            "type": "enum",
-            "enums": [
-              "Off",
-              "On"
-            ]
+            "type": "integer"
           }
         }
       },
@@ -145,11 +135,7 @@
         "name": "Set Audio Mute",
         "params": {
           "Status": {
-            "type": "enum",
-            "enums": [
-              "Off",
-              "On"
-            ]
+            "type": "integer"
           }
         }
       },
@@ -168,30 +154,6 @@
             "type": "string"
           }
         }
-      },
-      {
-        "name": "Set Tile Mode",
-        "params": {
-          "Status": {
-            "type": "enum",
-            "enums": [
-              "Off",
-              "1x2",
-              "2x2",
-              "3x3",
-              "4x4",
-              "5x5"
-            ]
-          }
-        }
-      },
-      {
-        "name": "Set Tile Id",
-        "params": {
-          "Value": {
-            "type": "integer"
-          }
-        }
       }
     ],
     "pointSetupSchema": {
@@ -204,10 +166,10 @@
           "default": ""
         },
         "port": {
-          "title": "Port:",
+          "title": "SNMP Port:",
           "type": "integer",
-          "default": 9761,
-          "description": "Default: 9761"
+          "default": 161,
+          "description": "Default: 161"
         },
         "mac": {
           "title": "MAC Address:",
@@ -216,55 +178,41 @@
           "pattern": "^(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$",
           "description": "Needed for Wake On Lan functionality"
         },
-        "setID": {
-          "title": "Set ID:",
-          "type": "integer",
-          "default": 1,
-          "minimum": 1,
-          "maximum": 255,
-          "description": "Found in General Settings. Default: 1"
-        },
-        "videowall": {
-          "title": "Enable Videowall Control",
-          "type": "boolean",
-          "format": "checkbox",
-          "description": "If supported, enable tile mode and tile ID controls for this display."
-        },
         "inputs": {
           "type": "object",
           "title": "Available Inputs",
           "properties": {
             "hdmi1": {
               "title": "HDMI 1",
-              "hexcode": "0xA0",
+              "hexcode": "0x90",
               "type": "boolean",
               "format": "checkbox",
               "default": true
             },
             "hdmi2": {
               "title": "HDMI 2",
-              "hexcode": "0xA1",
+              "hexcode": "0x91",
               "type": "boolean",
               "format": "checkbox",
               "default": true
             },
             "hdmi3": {
               "title": "HDMI 3",
-              "hexcode": "0xA2",
+              "hexcode": "0x92",
               "type": "boolean",
               "format": "checkbox",
               "default": false
             },
             "hdmi4": {
               "title": "HDMI 4",
-              "hexcode": "0xA3",
+              "hexcode": "0x93",
               "type": "boolean",
               "format": "checkbox",
               "default": false
             },
             "dvi": {
               "title": "DVI",
-              "hexcode": "0xA5",
+              "hexcode": "0x70",
               "type": "boolean",
               "format": "checkbox",
               "default": false
@@ -276,13 +224,6 @@
               "format": "checkbox",
               "default": false
             },
-            "displayport": {
-              "title": "Display Port",
-              "hexcode": "0xD0",
-              "type": "boolean",
-              "format": "checkbox",
-              "default": false
-            },
             "rgb": {
               "title": "RGB",
               "hexcode": "0x60",
@@ -290,58 +231,16 @@
               "format": "checkbox",
               "default": false
             },
-            "comp1": {
-              "title": "Component 1",
+            "comp": {
+              "title": "Component",
               "hexcode": "0x40",
               "type": "boolean",
               "format": "checkbox",
               "default": false
             },
-            "comp2": {
-              "title": "Component 2",
-              "hexcode": "0x41",
-              "type": "boolean",
-              "format": "checkbox",
-              "default": false
-            },
-            "av1": {
-              "title": "AV 1",
+            "av": {
+              "title": "AV",
               "hexcode": "0x20",
-              "type": "boolean",
-              "format": "checkbox",
-              "default": false
-            },
-            "av2": {
-              "title": "AV 2",
-              "hexcode": "0x21",
-              "type": "boolean",
-              "format": "checkbox",
-              "default": false
-            },
-            "dtv": {
-              "title": "Digital TV (Antenna)",
-              "hexcode": "0x00",
-              "type": "boolean",
-              "format": "checkbox",
-              "default": false
-            },
-            "dtvc": {
-              "title": "Digital TV (Cable)",
-              "hexcode": "0x01",
-              "type": "boolean",
-              "format": "checkbox",
-              "default": false
-            },
-            "atv": {
-              "title": "Analogue TV (Antenna)",
-              "hexcode": "0x10",
-              "type": "boolean",
-              "format": "checkbox",
-              "default": false
-            },
-            "atvc": {
-              "title": "Analogue TV (Cable)",
-              "hexcode": "0x11",
               "type": "boolean",
               "format": "checkbox",
               "default": false
@@ -352,6 +251,7 @@
     }
   },
   "dependencies": {
+    "snmp-native": "^1.2.0",
     "wol": "^1.0.6"
   }
 }
