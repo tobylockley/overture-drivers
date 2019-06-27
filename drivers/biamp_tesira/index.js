@@ -195,7 +195,7 @@ exports.createDevice = base => {
     logger.silly(`onFrame (pending = ${pendingCommand && pendingCommand.action}): ${data}`)
 
     if (pendingCommand && pendingCommand.action === 'getAudioLevel') {
-      match = data.match(/\+OK "value":(\-?\d*\.\d*)/)
+      match = data.match(/\+OK "value":(-?\d*\.\d*)/)
       if (match) {
         let conf = config.levels.find(x => x.tag === pendingCommand.params.InstanceTag)
         let val = parseFloat(match[1])
