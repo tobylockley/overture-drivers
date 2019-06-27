@@ -1,0 +1,270 @@
+	LGE-COMMER-TVLINK-MIB DEFINITIONS ::= BEGIN
+ 
+	IMPORTS
+		--MODULE-IDENTITY		FROM RFC1213-MIB
+		OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP	
+					FROM SNMPv2-CONF
+		MODULE-IDENTITY, enterprises, Integer32, OBJECT-TYPE, NOTIFICATION-TYPE			
+				FROM SNMPv2-SMI;
+
+		-- 1.3.6.1.4.1.7824.300.3
+tvlink		MODULE-IDENTITY
+		LAST-UPDATED 	"201310220000Z"
+		ORGANIZATION 	"IFEELNET"
+		CONTACT-INFO 	""
+		DESCRIPTION 	
+		   "LGE Com mertial"
+		::= { lgecommer 3 }
+--
+-- tvlink Node definitions
+--
+		-- 1.3.6.1.4.1.7824
+		lgelectronics OBJECT IDENTIFIER ::= { enterprises 7824 }
+ 
+		-- 1.3.6.1.4.1.7824.300
+		lgecommer OBJECT IDENTIFIER ::= { lgelectronics 300  }
+	
+		-- 1.3.6.1.4.1.7824.300.3.1
+		Power			OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..32))
+						MAX-ACCESS read-write
+					STATUS current
+					DESCRIPTION
+						"Get or Set the TV Power"
+					::= { tvlink 1 }
+				
+		-- 1.3.6.1.4.1.7824.300.3.2
+		InputSelect		OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..32))
+						MAX-ACCESS read-write
+					STATUS current
+					DESCRIPTION
+						"Get or set the Input Select"
+					::= { tvlink 2 }
+				
+		-- 1.3.6.1.4.1.7824.300.3.3
+		AspectRatio		OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..32))
+						MAX-ACCESS read-write
+					STATUS current
+					DESCRIPTION
+						"Get or set the Aspect Ratio"
+					::= { tvlink 3 }
+				
+		-- 1.3.6.1.4.1.7824.300.3.4
+		ScreenMute		OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..32))
+						MAX-ACCESS read-write
+					STATUS current
+					DESCRIPTION
+						"Get or set the Screen Mute"
+					::= { tvlink 4 }
+				
+		-- 1.3.6.1.4.1.7824.300.3.5
+		VolumeMute		OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..32))
+						MAX-ACCESS read-write
+					STATUS current
+					DESCRIPTION
+						"Get or set the Volume Mute"
+					::= { tvlink 5 }
+				
+		-- 1.3.6.1.4.1.7824.300.3.6
+		VolumeControl		OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..64))
+						MAX-ACCESS read-write
+					STATUS current
+					DESCRIPTION
+						"Get or set the Volume Control"
+					::= { tvlink 6 }
+				
+		-- 1.3.6.1.4.1.7824.300.3.7
+		Contrast		OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..64))
+						MAX-ACCESS read-write
+					STATUS current
+					DESCRIPTION
+						"Get or set the Contrast"
+					::= { tvlink 7 }
+				
+		-- 1.3.6.1.4.1.7824.300.3.8
+		Brightness		OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..64))
+						MAX-ACCESS read-write
+					STATUS current
+					DESCRIPTION
+						"Get or set the Brightness"
+					::= { tvlink 8 }
+				
+		-- 1.3.6.1.4.1.7824.300.3.9
+		Color			OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..64))
+						MAX-ACCESS read-write
+					STATUS current
+					DESCRIPTION
+						"Get or set the Color"
+					::= { tvlink 9 }
+				
+		-- 1.3.6.1.4.1.7824.300.3.10
+		Tint			OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..64))
+						MAX-ACCESS read-write
+					STATUS current
+					DESCRIPTION
+						"Get or set the Tint"
+					::= { tvlink 10 }
+				
+		-- 1.3.6.1.4.1.7824.300.3.11
+		Sharpness		OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..32))
+					MAX-ACCESS read-write
+					STATUS current
+					DESCRIPTION
+						"Get or set the Sharpness"
+					::= { tvlink 11 }				
+						
+		-- 1.3.6.1.4.1.7824.300.3.13
+		RemoteContorlLockMode	OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..32))
+						MAX-ACCESS read-write
+					STATUS current
+					DESCRIPTION
+						"Get or set the Remote Contorl Lock Mode"
+					::= { tvlink 13 }
+				
+		-- 1.3.6.1.4.1.7824.300.3.14
+		Balance			OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..64))
+						MAX-ACCESS read-write
+					STATUS current
+					DESCRIPTION
+						"Get or set the Balance"
+					::= { tvlink 14 }				
+					
+		-- 1.3.6.1.4.1.7824.300.3.16
+		ColorTemperature	OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..64))
+						MAX-ACCESS read-write
+					STATUS current
+					DESCRIPTION
+						"Get or set the Color Temperature"
+					::= { tvlink 16 }				
+				
+		-- 1.3.6.1.4.1.7824.300.3.18
+		ISMMethod		OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..32))
+						MAX-ACCESS read-write
+					STATUS current
+					DESCRIPTION
+						"Get or set the ISM Method"
+					::= { tvlink 18 }							
+				
+		-- 1.3.6.1.4.1.7824.300.3.19
+		EnergySaving		OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..32))
+						MAX-ACCESS read-write
+					STATUS current
+					DESCRIPTION
+						"Get or set the Energy Saving"
+					::= { tvlink 19 }
+									
+		-- 1.3.6.1.4.1.7824.300.3.20
+		AutoConfiguration	OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..32))
+						MAX-ACCESS write
+					STATUS current
+					DESCRIPTION
+						"Set the AutoConfiguration"
+					::= { tvlink 20 }
+									
+		-- 1.3.6.1.4.1.7824.300.3.23
+		Key			OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..FF))
+						MAX-ACCESS write
+					STATUS current
+					DESCRIPTION
+						"Set the Key(Remote Control)"
+					::= { tvlink 23 }
+					
+		-- 1.3.6.1.4.1.7824.300.3.24
+		CpuTemperature			OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..32))
+						MAX-ACCESS read
+					STATUS current
+					DESCRIPTION
+						"Get CPU Temperature"
+					::= { tvlink 24 }
+					
+		-- 1.3.6.1.4.1.7824.300.3.25
+		CheckSignalStaus	OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..32))
+						MAX-ACCESS read
+					STATUS current
+					DESCRIPTION
+						"Get Signal Status"
+					::= { tvlink 25 }
+					
+		-- 1.3.6.1.4.1.7824.300.3.26
+		CheckTBMTemp		OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..32))
+						MAX-ACCESS read
+					STATUS current
+					DESCRIPTION
+						"Get Top, Bottom, Main Temperature Status"
+					::= { tvlink 26 }
+					
+		-- 1.3.6.1.4.1.7824.300.3.27
+		CheckPoweroffTemp	OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..32))
+						MAX-ACCESS read
+					STATUS current
+					DESCRIPTION
+						"Get Power off Temperature Status"
+					::= { tvlink 27 }
+					
+		-- 1.3.6.1.4.1.7824.300.3.28
+		FanSpeed		OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..32))
+						MAX-ACCESS read
+					STATUS current
+					DESCRIPTION
+						"Get Fan Speed"
+					::= { tvlink 28 }															
+					
+		-- 1.3.6.1.4.1.7824.300.3.29
+		FanControl		OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..32))
+						MAX-ACCESS write
+					STATUS current
+					DESCRIPTION
+						"Set Fan Control"
+					::= { tvlink 29 }
+					
+		-- 1.3.6.1.4.1.7824.300.3.30
+		FanFaultCheck		OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..32))
+						MAX-ACCESS read
+					STATUS current
+					DESCRIPTION
+						"Get Fan Fault Check"
+					::= { tvlink 30 }
+					
+		-- 1.3.6.1.4.1.7824.300.3.31
+		Luminance		OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..32))
+						MAX-ACCESS read
+					STATUS current
+					DESCRIPTION
+						"Get Luminance"
+					::= { tvlink 31 }
+					
+		-- 1.3.6.1.4.1.7824.300.3.32
+		BLUMaintenance		OBJECT-TYPE
+					SYNTAX OCTET STRING (SIZE (0..32))
+						MAX-ACCESS read-write
+					STATUS current
+					DESCRIPTION
+						"Get or Set BLU Maintenance"
+					::= { tvlink 32 }
+								
+	END
