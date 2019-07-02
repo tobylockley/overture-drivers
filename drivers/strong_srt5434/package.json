@@ -1,0 +1,75 @@
+{
+  "name": "strong_srt5434",
+  "version": "1.0.2",
+  "description": "Driver for Strong SRT5434",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "AudioVisualDistributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "Strong",
+    "models": [
+      "SRT5434"
+    ],
+    "type": "device",
+    "subtype": "player",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "name": "Send Command",
+        "params": {
+          "Index": {
+            "type": "integer"
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Setup for GC IR emitter",
+      "properties": {
+        "host": {
+          "title": "GC IR emitter IP/Hostname",
+          "type": "string",
+          "default": "192.168.1.1"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 4998,
+          "description": "Default: 4998"
+        },
+        "module": {
+          "title": "Module#:",
+          "type": "string",
+          "default": "1",
+          "description": "Module of GC (1 for Itach)"
+        },
+        "ir_port": {
+          "title": "IR Port:",
+          "type": "string",
+          "default": "1",
+          "description": "IR blaster port in use (1-3)"
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "module",
+        "ir_port"
+      ]
+    }
+  },
+  "dependencies": {}
+}
