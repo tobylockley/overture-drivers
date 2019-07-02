@@ -73,3 +73,6 @@ Set Audio level of the device (between 0 and 100)
 
 ### 1.0.1
 - Added channel up/down IR commands
+
+### 1.0.2
+- Added custom input hex code in config

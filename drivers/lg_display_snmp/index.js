@@ -44,6 +44,10 @@ exports.createDevice = base => {
     for (let name in sourcesData) {
       if (config.inputs && config.inputs[name] === true) {  // Enabled in driver config
         let source = sourcesData[name]
+        if (name === 'custom') {
+          source.title = config.custom_title ? config.custom_title : source.title
+          source.hexcode = config.custom_hexcode ? config.custom_hexcode : source.hexcode
+        }
         logger.silly(`Adding input source: ${source.title}, Hex code: ${source.hexcode}`)
         sourcesInfo.push({title: source.title, hexcode: parseInt(source.hexcode, 16)})
       }

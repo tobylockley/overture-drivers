@@ -1,6 +1,6 @@
 {
   "name": "lg_display_snmp",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Driver for LG display using SNMP",
   "main": "index.js",
   "scripts": {
@@ -244,8 +244,25 @@
               "type": "boolean",
               "format": "checkbox",
               "default": false
+            },
+            "custom": {
+              "title": "Custom",
+              "hexcode": "0x00",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
             }
           }
+        },
+        "custom_title": {
+          "title": "Custom Input Title:",
+          "type": "string"
+        },
+        "custom_hexcode": {
+          "title": "Custom Input Hex Code:",
+          "description": "Hex code for custom input, in form '0xFF'",
+          "pattern": "^0x[A-Fa-f0-9]{2}$",
+          "type": "string"
         }
       }
     }
