@@ -70,3 +70,6 @@ Set Audio level of the device (between 0 and 100)
 
 ### 1.0.0
 - Initial version, forked from lg_display
+
+### 1.0.1
+- Added channel up/down IR commands

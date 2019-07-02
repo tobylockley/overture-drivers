@@ -14,6 +14,8 @@
   "Digit 8": "18",
   "Digit 9": "19",
   "Clear": "2F",
+  "Channel Up": "00",
+  "Channel Down": "01",
   "Volume Up": "02",
   "Volume Down": "03",
   "Mute": "09",

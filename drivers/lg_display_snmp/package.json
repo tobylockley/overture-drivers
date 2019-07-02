@@ -1,6 +1,6 @@
 {
   "name": "lg_display_snmp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Driver for LG display using SNMP",
   "main": "index.js",
   "scripts": {
