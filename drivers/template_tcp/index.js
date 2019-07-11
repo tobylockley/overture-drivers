@@ -41,6 +41,7 @@ exports.createDevice = base => {
     base.getVar('Status').string = 'Disconnected'
     tcpClient && tcpClient.end()
     tcpClient = null
+    base.stopPolling()
     base.clearPendingCommands()
   }
 
@@ -94,9 +95,9 @@ exports.createDevice = base => {
 
   function onFrame(data) {
     let pendingCommand = base.getPendingCommand()
+    logger.debug(`onFrame (pending = ${pendingCommand && pendingCommand.action}): ${data}`)
     let match = data.match(/POWR(\d+)/)
     if (match && pendingCommand) {
-      logger.debug(`onFrame (pending = ${pendingCommand.action}): ${data}`)
       if (match && pendingCommand.action == 'getPower') {
         base.getVar('Power').value = parseInt(match[1])  // 0 = off, 1 = on
         base.commandDone()

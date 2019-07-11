@@ -15,6 +15,7 @@
     ],
     "type": "device",
     "subtype": "generic",
+
     "variables": [
       {
         "name": "Status",
