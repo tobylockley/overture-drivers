@@ -1,7 +1,7 @@
 {
-  "name": "tl_4x1_hd2",
-  "version": "1.0.0-beta.7",
-  "description": "Driver for controlling tl-4x1-hd2 switcher with an RS232 interface",
+  "name": "techlogix_tl4x1hd2",
+  "version": "1.0.0-beta.1",
+  "description": "Driver for controlling TL-4x1-HD2 switcher with an RS232 interface (Global Cache or Zyper device)",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -11,7 +11,7 @@
   "overture": {
     "brand": "Techlogix",
     "models": [
-      "tl-4x1-hd2"
+      "TL-4x1-HD2"
     ],
     "type": "device",
     "subtype": "matrix",
@@ -52,63 +52,41 @@
       }
     ],
     "pointSetupSchema": {
-      "title": "Techlogix 4x1-HD2 Switcher RS232 Interface",
+      "title": "Techlogix 4x1-HD2 Settings",
       "oneOf": [
         {
           "title": "Zyper Management Platform",
           "type": "object",
-          "required": [
-            "interface",
-            "host",
-            "port",
-            "zyper_device"
-          ],
           "properties": {
             "interface": {
               "type": "string",
-              "enum": ["rs232_zyper"],
-              "options": {
-                "hidden": true
-              }
+              "enum": ["zyper"],
+              "options": { "hidden": true }
             },
             "host": {
-              "title": "Host name or IP Zyper management platform",
+              "title": "Host name or IP of Zyper Management Platform",
               "type": "string",
-              "default": "192.168.",
               "format": "ipv4"
             },
-            "port": {
-              "title": "Port:",
-              "type": "integer",
-              "default": 23,
-              "description": "Default: 23"
-            },
-            "zyper_device": {
+            "device": {
               "title": "Mac Address or Name of Zyper Encoder/Decoder:",
-              "type": "string",
-              "default": "00:1e:c0:"
+              "type": "string"
             }
           },
           "additionalProperties": false
         },
         {
-          "title": "GlobalCache RS232 Module",
+          "title": "GlobalCache RS232 Device",
           "type": "object",
-          "required": [
-            "interface",
-            "host",
-            "port"
-          ],
           "properties": {
             "interface": {
               "type": "string",
-              "enum": ["rs232_globalcache"],
-              "options": {"hidden": true}
+              "enum": ["globalcache"],
+              "options": { "hidden": true }
             },
             "host": {
-              "title": "Host name or IP of GlobalCache RS232 module",
+              "title": "Host name or IP of Global Cache device",
               "type": "string",
-              "default": "192.168.",
               "format": "ipv4"
             },
             "port": {
@@ -122,8 +100,5 @@
         }
       ]
     }
-  },
-  "dependencies": {
-    "telnet-client": "^0.15.5"
   }
 }
