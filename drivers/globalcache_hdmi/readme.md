@@ -1,4 +1,4 @@
-# Global Cache I/O
+# Global Cache HDMI
 
 ## Overview
 Driver for the Global Cache GCHMX3 HDMI switching module.
