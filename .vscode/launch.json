@@ -4,7 +4,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Toby CS",
+      "name": "Toby CS (macOS)",
       "program": "${workspaceFolder}/OvertureCS/index.js",
       "cwd": "${workspaceFolder}/OvertureCS/",
       "runtimeArgs": ["--nolazy"],
@@ -16,20 +16,13 @@
       "env": {
         "UXURI": "http://203.27.185.62:9950",
         "UID": "TobyCS",
-        "NODE_ENV": "development",
-        "driverPath": "${workspaceRoot}/drivers",
-        "debugDriver": "true",
-        "logLevel": "silly",
+        "DRIVERPATH": "${workspaceRoot}/drivers",
+        "DEBUGDRIVER": "true",
+        "LOGLEVEL": "silly",
         "_IGNOREUXPROJECT": "true"
       },
-      "windows": {
-        "program": "${workspaceFolder}\\..\\index.js",
-        "cwd": "${workspaceFolder}\\..\\",
-        "env": {
-          "DRIVERPATH": "Home / Overture Drivers <-- Needs updating"
-        }
-      },
-      "internalConsoleOptions": "openOnSessionStart"
+      "internalConsoleOptions": "openOnSessionStart",
+      "outputCapture": "std"
     },
     {
         "type": "node",
