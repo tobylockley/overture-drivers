@@ -1,5 +1,5 @@
 {
-  "name": "avpro_connect_switcher",
+  "name": "avproconnect_switcher",
   "version": "1.0.1",
   "description": "Driver for AV Pro Connect Matrix",
   "main": "index.js",
@@ -42,7 +42,7 @@
     ],
     "pointSetupSchema": {
       "type": "object",
-      "title": "AV Pro Connect Matrix Driver",
+      "title": "AV Pro Connect Matrix Switcher",
       "properties": {
         "simulation": {
           "title": "Simulation Mode",
@@ -57,7 +57,7 @@
         "port": {
           "title": "Port:",
           "type": "integer",
-          "default": 21
+          "default": 23
         },
         "model": {
           "title": "Model:",
