@@ -6,9 +6,6 @@ const POLL_PERIOD_FAST = 5000      // Continuous polling function interval
 const POLL_PERIOD_SLOW = 30000     // Continuous polling function interval, for less frequent tasks like updating source list
 const REQUEST_TIMEOUT = 2000       // Timeout for AJAX requests
 
-const VWALL_NAMING_TEMPLATE = 'VW_<vw_name>_<enc_name>'  // Change this to alter the appearance in overture source list
-const MVIEW_NAMING_TEMPLATE = 'MV_<mv_name>'  // Change this to alter the appearance in overture source list
-
 let host
 exports.init = _host => {
   host = _host
@@ -39,7 +36,7 @@ exports.createDevice = base => {
       base.createVariable({
         name: decoder.varname_sources,
         type: 'enum',
-        enums: ['None'],
+        enums: ['See function updateAvailableSources()'],
         perform: {
           action: 'selectSource',
           params: { Channel: decoder.name, Name: '$string' }
@@ -53,10 +50,24 @@ exports.createDevice = base => {
       base.createVariable({
         name: wall.varname_sources,
         type: 'enum',
-        enums: ['None'],
+        enums: ['See function updateAvailableSources()'],
         perform: {
           action: 'selectSource',
           params: { Channel: wall.name, Name: '$string' }
+        }
+      })
+    }
+
+    // Initialise variables for Audio switching
+    for (let decoder of config.decoders) {
+      decoder.varname_audio = `Audio_${decoder.name.replace(/[^A-Za-z0-9_]/g, '')}`  // Make legal variable name
+      base.createVariable({
+        name: decoder.varname_audio,
+        type: 'enum',
+        enums: ['See function updateAvailableSources()'],
+        perform: {
+          action: 'joinAudio',
+          params: { Channel: decoder.name, Name: '$string' }
         }
       })
     }
@@ -68,7 +79,7 @@ exports.createDevice = base => {
         base.createVariable({
           name: decoder.varname_usb,
           type: 'enum',
-          enums: ['None'],
+          enums: ['See function updateAvailableSources()'],
           perform: {
             action: 'joinUSB',
             params: { Channel: decoder.name, Name: '$string' }
@@ -135,98 +146,19 @@ exports.createDevice = base => {
     }
   }
 
-  function onFrame(data) {
-
-    if (pendingCommand && pendingCommand.action == 'getDecoderStatus') {
-      decoder_status = importZyperData(data)
-      if (decoder_status.length == 0) {
-        logger.error('No decoder status information available. Check connection to Zyper MP.')
-        return
-      }
-
-      // Decipher status and update current sources
-      config.decoders.forEach( decoder => {
-        // decoder.model
-        // decoder.name
-        // decoder.varname
-        let this_status = decoder_status.filter(device => device.gen.name == decoder.name)
-        if (this_status.length != 1) {
-          logger.error(`onFrame/getDecoderStatus: Retrieving device status for ${decoder.name} failed. Possible duplicate device names, or incorrect name.`)
-          return
-        }
-        this_status = this_status[0]  // Should be only 1 entry, no need to store in an array
-
-        // Retrieve this decoders source list from overture enum
-        let this_sources = base.getVar(decoder.varname).enums
-
-        // Is decoder showing a video wall?
-        if (this_status.activeVideoWall.name == 'none') {
-          if (this_status.connectedEncoder.mac == 'none') {
-            // DECODER HAS NO SOURCE ATTACHED
-            base.getVar(decoder.varname).string = 'None'
-          }
-          else if (this_status.connectedEncoder.mac == 'multiview') {
-            // MULTIVIEW
-            let mv_sourcename = MVIEW_NAMING_TEMPLATE.replace('<mv_name>', this_status.connectedEncoder.name)
-            let result = this_sources.filter(source => source == mv_sourcename)
-            if (result.length == 1) {
-              // multiview found in source list, set current source
-              base.getVar(decoder.varname).string = result[0]
-            }
-            else {
-              logger.error(`onFrame/getDecoderStatus: Multiview '${this_status.connectedEncoder.name}' not found in source list for ${decoder.name}`)
-            }
-          }
-          else {
-            // REGULAR ENCODER
-            let result = this_sources.filter(source => source == this_status.connectedEncoder.name)
-            if (result.length == 1) {
-              // encoder found in source list, set current source
-              base.getVar(decoder.varname).string = result[0]
-            }
-            else {
-              logger.error(`onFrame/getDecoderStatus: Encoder '${this_status.connectedEncoder.name}' not found in source list for ${decoder.name}`)
-            }
-          }
-        }
-        else {
-          // VIDEOWALL - search source list for videowall name and connected encoder  `VW_${vw_name}_${encoder}`
-          let vw_sourcename = VWALL_NAMING_TEMPLATE.replace('<vw_name>', this_status.activeVideoWall.name).replace('<enc_name>', this_status.connectedEncoder.name)
-          let result = this_sources.filter(source => source == vw_sourcename)
-          if (result.length == 1) {
-            // encoder found in source list, set current source
-            base.getVar(decoder.varname).string = result[0]
-          }
-          else {
-            logger.error(`onFrame/getDecoderStatus: Videowall source '${vw_sourcename}' not found in source list for ${decoder.name}`)
-          }
-        }
-      })
-      base.commandDone()
-    }
-    else if (pendingCommand && pendingCommand.action == 'selectSource') {
-      if (data.includes('Success')) base.commandDone()
-      else base.commandError(`onFrame/selectSource: Unexpected response: ${data}`)
-
-      // Print warning to logs
-      let match = data.match(/Warning.*(?=[\r\n])/)
-      match && logger.error(`selectSource[${pendingCommand.params.Channel}]: ${match[0]}`)
-    }
-
-  }
-
 
   // ------------------------------ GET FUNCTIONS ------------------------------
 
   async function updateDecoders() {
     try {
       let response = await zyperCmd('show device config decoders')
-      let response_status = await zyperCmd('show device status decoders')
+      // let response_status = await zyperCmd('show device status decoders')
       // Process each decoder in response
       for (let decoder of response.text) {
         let decoder_config = config.decoders.find(x => x.name === decoder.gen.name)
         let varname_sources = decoder_config.varname_sources
         let varname_usb = decoder_config.varname_usb
+        let varname_audio = decoder_config.varname_audio
 
         if (decoder.connectedEncoder.name === 'N/A') {
           base.getVar(varname_sources).value = 0  // Set to 'None', first enum entry
@@ -235,12 +167,31 @@ exports.createDevice = base => {
           base.getVar(varname_sources).string = decoder.connectedEncoder.name
         }
 
-        if (decoder_config.usb_enabled) {
+        if (decoder.usbUplink && decoder.usbUplink.name) {
           if (decoder.usbUplink.name === 'none') {
             base.getVar(varname_usb).value = 0  // Set to 'None', first enum entry
           }
           else {
             base.getVar(varname_usb).string = decoder.usbUplink.name
+          }
+        }
+
+        if (decoder.autoAudioConnections && decoder.autoAudioConnections.hdmiAudioFollowVideo === 'true') {
+          base.getVar(varname_audio).value = 0  // Audio follows Video
+        }
+        else if (decoder.audioConnections) {
+          // Determine if analog or hdmi
+          let analogSource = decoder.audioConnections.analogSourceName
+          let hdmiSource = decoder.audioConnections.hdmiAudioSourceName
+          if (analogSource !== 'none') {
+            let re = new RegExp(`ANALOG.*?${analogSource}`, 'i')
+            let s = base.getVar(varname_audio).enums.find(x => re.test(x))
+            base.getVar(varname_audio).string = s
+          }
+          else if (hdmiSource !== 'none') {
+            let re = new RegExp(`HDMI.*?${hdmiSource}`, 'i')
+            let s = base.getVar(varname_audio).enums.find(x => re.test(x))
+            base.getVar(varname_audio).string = s
           }
         }
       }
@@ -267,7 +218,7 @@ exports.createDevice = base => {
       config.encoders = encoders
 
       // Generate a sorted array for each type of encoder
-      let sources = {
+      let sourcesByType = {
         'ZyperUHD': encoders.filter(x => x.gen.model === 'ZyperUHD').map(x => x.gen.name).sort(),
         'Zyper4K': encoders.filter(x => x.gen.model === 'Zyper4K').map(x => x.gen.name).sort(),
         'MV': multiviews.map(x => x.gen.name).sort()
@@ -275,20 +226,30 @@ exports.createDevice = base => {
 
       for (let decoder of config.decoders) {
         let data = decoders.find(x => x.gen.name === decoder.name)
-        let temp = ['None'].concat(sources[data.gen.model])
-        // Init enums for USB variable if enabled
-        if (data.gen.model === 'ZyperUHD' && decoder.usb_enabled) {
-          base.getVar(decoder.varname_usb).enums = temp
+        let sources = ['None'].concat(sourcesByType[data.gen.model])
+        let audioSources = ['Audio Follows Video']
+
+        // For ZyperUHD, add USB and analog audio sources
+        if (data.gen.model === 'ZyperUHD') {
+          base.getVar(decoder.varname_usb).enums = sources
+          audioSources = audioSources.concat(sourcesByType['ZyperUHD'].map(x => `[HDMI] ${x}`))
+          audioSources = audioSources.concat(sourcesByType['ZyperUHD'].map(x => `[ANALOG] ${x}`))
         }
-        // If Zyper4K, add multiviews
-        if (data.gen.model === 'Zyper4K') temp = temp.concat(sources['MV'])
-        base.getVar(decoder.varname_sources).enums = temp
+        
+        // For Zyper4K, add multiviews
+        if (data.gen.model === 'Zyper4K') {
+          sources = sources.concat(sourcesByType['MV'])
+          audioSources = audioSources.concat(sourcesByType['Zyper4K'])
+        }
+
+        base.getVar(decoder.varname_sources).enums = sources
+        base.getVar(decoder.varname_audio).enums = audioSources
       }
 
       for (let wall of config.videowalls) {
         let data = videowalls.find(x => x.gen.name === wall.name)
         let wallModel = decoders.find(x => x.gen.name === data.decodersRow1.col1).gen.model
-        base.getVar(wall.varname_sources).enums = ['None'].concat(sources[wallModel])
+        base.getVar(wall.varname_sources).enums = ['None'].concat(sourcesByType[wallModel])
       }
     }
     catch (error) {
@@ -322,13 +283,13 @@ exports.createDevice = base => {
           params.Name = 'none'
           joinmethod = 'fast-switched'
         }
-        let response = await zyperCmd(`join ${params.Name} ${params.Channel} ${joinmethod}`)
+        await zyperCmd(`join ${params.Name} ${params.Channel} ${joinmethod}`)
         base.getVar(varname_sources).string = params.Name  // No need to pass the response. If no errors, source was set OK
       }
       else if (wall) {
         joinmethod = 'video-wall'
         varname_sources = wall.varname_sources
-        let response = await zyperCmd(`join ${params.Name} ${params.Channel} ${joinmethod}`)
+        await zyperCmd(`join ${params.Name} ${params.Channel} ${joinmethod}`)
         base.getVar(varname_sources).string = params.Name  // No need to pass the response. If no errors, source was set OK
       }
     }
@@ -337,11 +298,36 @@ exports.createDevice = base => {
     }
   }
 
+  async function joinAudio(params) {
+    try {
+      let decoder = config.decoders.find(x => x.name === params.Channel)
+      let varname_audio = decoder.varname_audio
+      if (base.getVar(varname_audio).enums.indexOf(params.Name) === 0) {
+        // Audio Follows Video
+        params.Name = 'video-source'
+      }
+      let jointype = 'audio'
+      if (params.Name.includes('[HDMI] ')) {
+        jointype = 'hdmi-audio'
+        params.Name = params.Name.replace('[HDMI] ', '')
+      }
+      else if (params.Name.includes('[ANALOG] ')) {
+        jointype = 'analog-audio'
+        params.Name = params.Name.replace('[ANALOG] ', '')
+      }
+      await zyperCmd(`join ${params.Name} ${params.Channel} ${jointype}`)
+      base.getVar(varname_audio).string = params.Name  // No need to pass the response. If no errors, source was set OK
+    }
+    catch (error) {
+      logger.error(`joinAudio > ${error.message}`)
+    }
+  }
+
   async function joinUSB(params) {
     try {
       let decoder = config.decoders.find(x => x.name === params.Channel)
       let varname_usb = decoder.varname_usb
-      let response = await zyperCmd(`join ${params.Name} ${params.Channel} usb`)
+      await zyperCmd(`join ${params.Name} ${params.Channel} usb`)
       base.getVar(varname_usb).string = params.Name  // No need to pass the response. If no errors, source was set OK
     }
     catch (error) {
@@ -354,6 +340,6 @@ exports.createDevice = base => {
   return {
     setup, start, stop, tick,
     updateDecoders, updateAvailableSources,
-    selectSource, joinUSB
+    selectSource, joinAudio, joinUSB
   }
 }

@@ -48,3 +48,6 @@ To select the input source to display.
 
 ### 1.0.3
   - Changed to using AJAX requests instead of telnet, in order to use json return data
+
+### 1.0.4
+  - Added audio join functionality

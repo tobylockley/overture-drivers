@@ -1,6 +1,6 @@
 {
   "name": "zeevee_zyper_ajax",
-  "version": "1.0.3-beta.5",
+  "version": "1.0.4-beta.1",
   "description": "Driver for Zyper Management Platform over a TCP Connection",
   "main": "index.js",
   "scripts": {
@@ -47,8 +47,7 @@
       "properties": {
         "host": {
           "title": "Host name or IP address:",
-          "type": "string",
-          "default": "192.168.99.40"
+          "type": "string"
         },
         "decoders": {
           "title": "Decoders",
