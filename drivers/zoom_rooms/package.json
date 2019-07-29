@@ -1,7 +1,7 @@
 {
-  "name": "zoom_rooms",
-  "version": "1.0.0-beta.1",
-  "description": "Driver for Zoom Rooms",
+  "name": "template_tcp",
+  "version": "1.0.0",
+  "description": "Driver",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -9,10 +9,174 @@
   "author": "Audio Visual Distributors",
   "license": "MIT",
   "overture": {
-    "brand": "Zoom",
-    "model": "Zoom Rooms",
+    "brand": "BRAND",
+    "models": [
+      "MODEL"
+    ],
     "type": "device",
     "subtype": "generic",
+
+
+
+    
+      {
+        "name": "CallStatus",
+        "type": "enum",
+        "enums": [
+          "Unknown",
+          "Not In Meeting",
+          "Connecting Meeting",
+          "In Meeting",
+          "Logged Out"
+        ]
+      },
+      {
+        "name": "AddressBook",
+        "type": "enum",
+        "enums": [
+          "Loading the Contact List..."
+        ]
+      },
+      {
+        "name": "Meetings",
+        "type": "enum",
+        "enums": []
+      },
+      {
+        "name": "Callers",
+        "type": "enum",
+        "enums": []
+      },
+      {
+        "name": "Participants",
+        "type": "enum",
+        "enums": []
+      },
+      {
+        "name": "Number",
+        "type": "string"
+      },
+      {
+        "name": "MeetingNumber",
+        "type": "string"
+      },
+      {
+        "name": "VideoMute",
+        "type": "enum",
+        "enums": ["Off","On"],
+        "perform":{"action":"Set Video Mute", "params": { "Status":"$string"}}
+      },
+      {
+        "name": "AudioLevelInput",
+        "type": "integer",
+        "perform":{"action":"Set Audio Level In", "params": { "Level":"$value"}}
+      },
+      {
+        "name": "AudioMuteOutput",
+        "type": "enum",
+        "enums": ["Off","On"],
+        "perform":{"action":"Set Audio Mute", "params": { "Status":"$string"}}
+      },
+      {
+        "name": "AudioLevelOutput",
+        "type": "integer",
+        "perform":{"action":"Set Audio Level Out", "params": { "Level":"$value"}}
+      }
+    ],
+    "commands": [
+      {
+        "name": "Call Number",
+        "params": {
+          "Number": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Join Meeting",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Create Meeting"
+      },
+      {
+        "name": "Call Name",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Answer",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Hang Up"
+      },
+      {
+        "name": "End Meeting"
+      },
+      {
+        "name": "Restart"
+      },
+      {
+        "name": "Reject",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Set Video Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off","On"]
+          }
+        }
+      },
+      {
+        "name": "Set Audio Level In",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        },
+        "optimize": true
+      },
+      {
+        "name": "Set Audio Level Out",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        },
+        "optimize": true
+      },
+      {
+        "name": "Set Audio Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off", "On"]
+          }
+        },
+        "optimize": true
+      }
+    ],
+
+
+
     "variables": [
       {
         "name": "Status",
@@ -35,138 +199,36 @@
             "Status": "$string"
           }
         }
-      },
-      {
-        "name": "Sources",
-        "type": "enum",
-        "enums": [
-          "DTV",
-          "HDMI1",
-          "HDMI2",
-          "HDMI3",
-          "HDMI4"
-        ],
-        "perform": {
-          "action": "Select Source",
-          "params": {
-            "Name": "$string"
-          }
-        }
-      },
-      {
-        "name": "AudioLevel",
-        "type": "integer",
-        "min": 0,
-        "max": 100,
-        "perform": {
-          "action": "Set Audio Level",
-          "params": {
-            "Level": "$value"
-          }
-        }
-      },
-      {
-        "name": "AudioMute",
-        "type": "enum",
-        "enums": [
-          "Off",
-          "On"
-        ],
-        "perform": {
-          "action": "Set Audio Mute",
-          "params": {
-            "Status": "$string"
-          }
-        }
-      },
-      {
-        "name": "Channel",
-        "type": "integer",
-        "min": 1,
-        "max": 99,
-        "perform": {
-          "action": "Set Channel",
-          "params": {
-            "Name": "$value"
-          }
-        }
-      },
-      {
-        "name": "ChannelShift",
-        "type": "enum",
-        "enums": [
-          "",
-          "Up",
-          "Down"
-        ],
-        "perform": {
-          "action": "Shift Channel",
-          "params": {
-            "Name": "$string"
-          }
-        }
       }
     ],
+
     "commands": [
       {
         "name": "Set Power",
         "params": {
-          "Status": { "type": "enum", "enums": [ "Off", "On" ] }
-        }
-      },
-      {
-        "name": "Select Source",
-        "params": {
-          "Name": { "type": "string" }
-        }
-      },
-      {
-        "name": "Set Audio Level",
-        "params": {
-          "Level": { "type": "integer" }
-        },
-        "optimize": true
-      },
-      {
-        "name": "Set Audio Mute",
-        "params": {
-          "Status": { "type": "enum", "enums": [ "Off", "On" ] }
-        }
-      },
-      {
-        "name": "Set Channel",
-        "params": {
-          "Name": { "type": "integer" }
-        },
-        "optimize": true
-      },
-      {
-        "name": "Shift Channel",
-        "params": {
-          "Name": { "type": "enum", "enums": [ "", "Up", "Down" ] }
+          "Status": {
+            "type": "string"
+          }
         }
       }
     ],
+
     "pointSetupSchema": {
       "type": "object",
-      "title": "Sony Bravia IP Settings",
+      "title": "Template Setup",
       "properties": {
         "host": {
           "title": "Host name or IP address:",
           "type": "string",
-          "default": "192.168.3.20"
+          "default": ""
         },
         "port": {
           "title": "Port:",
           "type": "integer",
-          "default": 20060,
-          "description": "Default: 20060"
+          "default": 9999,
+          "description": "Default: 9999"
         }
-      },
-      "required": [
-        "host",
-        "port"
-      ]
+      }
     }
   }
 }
