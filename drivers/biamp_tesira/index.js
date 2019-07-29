@@ -1,8 +1,16 @@
+/*
+TODO
+- Only send keepAlive if data has not been sent in 1/2 tcp timeout
+
+*/
+
+
+
 'use strict'
 
 const CMD_DEFER_TIME = 3000        // Timeout when using commandDefer
 const TICK_PERIOD = 5000           // In-built tick interval
-const TCP_TIMEOUT = 10000          // Will timeout after this length of inactivity
+const TCP_TIMEOUT = 30000          // Will timeout after this length of inactivity
 const TCP_RECONNECT_DELAY = 3000   // How long to wait before attempting to reconnect
 
 let host
@@ -16,7 +24,7 @@ exports.createDevice = base => {
   let tcpClient
 
   let frameParser = host.createFrameParser()
-  frameParser.setSeparator('\n')
+  frameParser.setSeparator('\r')
   frameParser.on('data', data => onFrame(data))
 
 
@@ -27,6 +35,8 @@ exports.createDevice = base => {
   function setup(_config) {
     config = _config
     base.setTickPeriod(TICK_PERIOD)
+
+    base.setPoll({ action: 'keepAlive', period: config.poll, enablePollFn: isConnected, startImmediately: true })
 
     // Setup variables based on config
     if (config.presets) {
@@ -162,7 +172,8 @@ exports.createDevice = base => {
     })
 
     tcpClient.on('data', data => {
-      frameParser.push(data.toString())
+      // logger.info(`RAW > ${data.toString().replace(/\n/g, '{N}').replace(/\r/g, '{R}')}`)
+      if (!checkTelnetNegotiation(data)) frameParser.push(data.toString())
     })
 
     tcpClient.on('close', () => {
@@ -197,7 +208,7 @@ exports.createDevice = base => {
     if (pendingCommand && pendingCommand.action === 'getAudioLevel') {
       match = data.match(/\+OK "value":(-?\d*\.\d*)/)
       if (match) {
-        let conf = config.levels.find(x => x.tag === pendingCommand.params.InstanceTag)
+        let conf = config.levels.find(x => (x.tag === pendingCommand.params.InstanceTag) && (x.channel === pendingCommand.params.Channel))
         let val = parseFloat(match[1])
         base.getVar(conf.varname).value = map(val, conf.min, conf.max, 0, 100)  // Convert value from decibel to percentage
         base.commandDone()
@@ -206,7 +217,7 @@ exports.createDevice = base => {
     else if (pendingCommand && pendingCommand.action === 'getAudioMute') {
       match = data.match(/\+OK "value":(false|true)/)
       if (match) {
-        let varname = config.mutes.find(x => x.tag === pendingCommand.params.InstanceTag).varname
+        let varname = config.mutes.find(x => (x.tag === pendingCommand.params.InstanceTag) && (x.channel === pendingCommand.params.Channel)).varname
         base.getVar(varname).value = {'false': 0, 'true': 1}[match[1]]
         base.commandDone()
       }
@@ -214,7 +225,7 @@ exports.createDevice = base => {
     else if (pendingCommand && pendingCommand.action === 'getLogicState') {
       match = data.match(/\+OK "value":(false|true)/)
       if (match) {
-        let varname = config.states.find(x => x.tag === pendingCommand.params.InstanceTag).varname
+        let varname = config.states.find(x => (x.tag === pendingCommand.params.InstanceTag) && (x.channel === pendingCommand.params.Channel)).varname
         base.getVar(varname).value = {'false': 0, 'true': 1}[match[1]]
         base.commandDone()
       }
@@ -230,8 +241,29 @@ exports.createDevice = base => {
     }
   }
 
+  function checkTelnetNegotiation(data) {
+    let negFlag = false
+    while (data.length > 0 && data.length % 3 === 0) {
+      let chunk = data.slice(0, 3)
+      if (chunk[0] === 0xFF && chunk[1] === 0xFB) {
+        send(Buffer.from([0xFF, 0xFE, chunk[2]]))
+        negFlag = true
+      }
+      else if (chunk[0] === 0xFF && chunk[1] === 0xFD) {
+        send(Buffer.from([0xFF, 0xFC, chunk[2]]))
+        negFlag = true
+      }
+      data = data.slice(3)
+    }
+    return negFlag
+  }
+
 
   // ------------------------------ GET FUNCTIONS ------------------------------
+
+  function keepAlive() {
+    sendDefer('DEVICE get version\n')
+  }
 
   function getAudioLevel(params) {
     // params: InstanceTag, Channel
@@ -301,7 +333,7 @@ exports.createDevice = base => {
 
   // ------------------------------ EXPORTED FUNCTIONS ------------------------------
   return {
-    setup, start, stop, tick,
+    setup, start, stop, tick, keepAlive,
     getAudioLevel, getAudioMute, getLogicState,
     setAudioLevel, setAudioMute, setLogicState, recallPreset
   }

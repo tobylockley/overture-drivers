@@ -1,6 +1,6 @@
 {
-  "name": "biamp_tesira",
-  "version": "1.0.1-beta1",
+  "name": "biamp_tesira_avd",
+  "version": "1.0.1-beta6",
   "description": "Driver for Biamp Tesira Audio DSP",
   "main": "index.js",
   "scripts": {
