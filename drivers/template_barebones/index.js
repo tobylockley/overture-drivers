@@ -1,35 +1,38 @@
-'use strict';   // Must declare variables before use
+'use strict'
 
-var host;
+let host
 exports.init = _host => {
-  host = _host;
-};
+  host = _host
+}
 
 
 exports.createDevice = base => {
-  const logger = base.logger || host.logger;
-  var config;
+  const logger = base.logger || host.logger
+  let config
 
 
-  const setup = _config => {
-    config = _config;
-  };
+  // ------------------------------ BASE FUNCTIONS ------------------------------
+
+  function setup(_config) {
+    config = _config
+    logger.silly(config)  // To remove eslint errors. Should be removed.
+  }
 
 
-  const start = () => {
-    logger.silly(config);  // To remove eslint errors, should be removed.
-  };
+  function start() {
+  }
 
 
-  const stop = () => {
-  };
+  function stop() {
+  }
 
 
-  const tick = () => {
-  };
+  function tick() {
+  }
 
 
+  // ------------------------------ EXPORTED FUNCTIONS ------------------------------
   return {
     setup, start, stop, tick
-  };
-};
+  }
+}
