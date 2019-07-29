@@ -21,17 +21,26 @@ exports.createDevice = base => {
   }
 
   function start() {
+    base.startPolling()
   }
 
   function stop() {
     base.getVar('Status').string = 'Disconnected';
+    base.stopPolling()
   }
 
   function tick() {
-    request(`http://${config.host}/`)
+    request(`http://${config.host}/#`)
       .then( (response, body) => {
         if (response.statusCode == 200) {
           base.getVar('Status').string = 'Connected';
+        }
+        else if (response.includes('GRANDVIEW')) {
+          base.getVar('Status').string = 'Connected';
+        }
+        else {
+          logger.silly('unknown response')
+          logger.silly(response)
         }
       })
       .catch( (err) => {
@@ -50,6 +59,8 @@ exports.createDevice = base => {
           logger.silly('sendRequest response:');
           logger.silly(body);
         }
+        logger.silly('sendRequest response:');
+        logger.silly(response);
       })
       .catch( (err) => {
         logger.error('sendRequest error:');
@@ -63,13 +74,13 @@ exports.createDevice = base => {
   function sendCommand(params) {
     // Commands taken from: https://www.kookaburra.com.au/documents/help/ZATGRIP150V_5.pdf
     if (params.Name == 'Stop') {
-      sendRequest(`http://${config.host}/stop.js`);
+      sendRequest(`http://${config.host}/Stop.js?a=100`);
     }
     else if (params.Name == 'Up') {
-      sendRequest(`http://${config.host}/close.js`);
+      sendRequest(`http://${config.host}/Close.js?a=100`);
     }
     else if (params.Name == 'Down') {
-      sendRequest(`http://${config.host}/open.js`);
+      sendRequest(`http://${config.host}/Open.js?a=100`);
     }
   }
 
