@@ -1,24 +1,26 @@
 {
   "name": "globalcache_io",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "Driver For Global Cache IO Devices",
   "main": "index.js",
     "scripts": {
 	"start": "node index.js"
   },
-  "author": "Medialon",
+  "author": "Audio Visual Distributors",
   "license": "MIT",
   "overture": {
     "brand": "Global Cache",
-    "model": "IO",
-    "models": ["IO","iTach", "iTach Flex", "GC-100"],
+    "models": ["IO", "iTach", "iTach Flex", "GC-100"],
     "type": "device",
     "subtype": "power",
     "variables": [
       {
         "name": "Status",
         "type": "enum",
-        "enums": ["Disconnected","Connected"]
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
       },
       {
         "name": "Error",
@@ -29,13 +31,8 @@
       {
         "name": "Set Power",
         "params": {
-          "Channel":{
-            "type": "integer"
-          },
-          "Status": {
-            "type": "enum",
-            "enums": ["Off","On"]
-          }
+          "Channel":{ "type": "integer" },
+          "Status": { "type": "integer" }
         },
         "optimize": ["Channel"]
       }
@@ -64,7 +61,7 @@
         },
         "modInput": {
           "title": "Input Module:",
-          "description": "The Module # of the relay component. This is 2 for iTach Flex.",
+          "description": "The Module # of the input component. This is 2 for iTach Flex.",
           "type": "integer",
           "default": 2
         },

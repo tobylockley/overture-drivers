@@ -1,162 +1,183 @@
-"use strict"
+'use strict'
 
-const CMD_DEFER_TIME = 2000
-const RELAY_POLL = 3000
-const INPUT_POLL = 1000
-const TICK_PERIOD = 5000
-const TCP_TIMEOUT = 60000
-const TCP_RECONNECT_DELAY = 5000
+const CMD_DEFER_TIME = 2000        // Timeout when using commandDefer
+const TICK_PERIOD = 5000           // In-built tick interval
+const POLL_PERIOD_RELAY = 3000     // Continuous polling function interval for relays
+const POLL_PERIOD_INPUT = 1000     // Continuous polling function interval for inputs
+const TCP_TIMEOUT = 30000          // Will timeout after this length of inactivity
+const TCP_RECONNECT_DELAY = 3000   // How long to wait before attempting to reconnect
 
-// exported init function
-let logger
 let host
-exports.init = function (_host) {
+exports.init = _host => {
   host = _host
-  logger = host.logger
 }
 
-// exported createDevice function
-exports.createDevice = function (base) {
-  return new DriverDevice(base)
-}
+exports.createDevice = base => {
+  const logger = base.logger || host.logger
+  let config
+  let tcpClient
 
-// driver device implementation
-class DriverDevice {
+  let frameParser = host.createFrameParser()
+  frameParser.setSeparator('\r')
+  frameParser.on('data', data => onFrame(data))
 
-  constructor(base) {
-    this.base = base;
-    //BUILD THE FRAME PARSER
-    this.frameParser = host.createFrameParser();
-    this.frameParser.setSeparator('\r');
-    this.frameParser.on('data', (frame) => {
-      this.parse(frame);
-    });
-  }
 
-  //BASE COMMANDS-------------------------------------------------------
-  setup(config) {
-  this.config = config;
+  // ------------------------------ SETUP FUNCTIONS ------------------------------
+
+  function isConnected() { return base.getVar('Status').string === 'Connected' }
+
+  function setup(_config) {
+    config = _config
+    base.setTickPeriod(TICK_PERIOD)
+    
     //CREATE VARIABLES BASED ON RELAYS
-    for (let i = 0; i < this.config.relays; i++) {
-      let num = i + 1;
-      this.base.createEnumVariable('PowerChannel' + num, ["Off", "On"]);
-      this.base.getVar("PowerChannel" + num).smooth = true;
-      this.base.getVar("PowerChannel" + num).perform = { "action": "Set Power", "params": { "Channel": num, "Status": "$string" } }
+    for (let i = 1; i <= config.relays; i++) {
+      base.createVariable({
+        name: `PowerChannel${i}`,
+        type: 'enum',
+        enums: ['Off', 'On'],
+        smooth: true,
+        perform: {
+          action: 'setPower',
+          params: {
+            Channel: i,
+            Status: '$value'
+          }
+        }
+      })
       // Set up polling
-      this.base.setPoll('getPower', RELAY_POLL, { "Channel": num });
+      base.setPoll({
+        action: 'getPower',
+        period: POLL_PERIOD_RELAY,
+        enablePollFn: isConnected,
+        startImmediately: true,
+        params: { Channel: i }
+      })
     }
+
     //CREATE VARIABLES BASED ON INPUTS
-    for (let i = 0; i < this.config.inputs; i++) {
-      let num = i + 1;
-      this.base.createEnumVariable('InputChannel' + num, ["Off", "On"]);
+    for (let i = 1; i <= config.inputs; i++) {
+      base.createVariable({
+        name: `InputChannel${i}`,
+        type: 'enum',
+        enums: ['Off', 'On']
+      })
       // Set up polling
-      this.base.setPoll('getInput', INPUT_POLL, { "Channel": num });
-    }
-    this.base.setTickPeriod(TICK_PERIOD);
-  }
-
-  start() {
-    this.initTcpClient();
-  }
-  stop() {
-    this.disconnect();
-    if (this.tcpClient) {
-      this.tcpClient.end();
-      this.tcpClient = null;
-    }
-  }
-  disconnect() {
-    this.base.getVar('Status').value = 0;
-    this.base.stopPolling();
-    this.base.clearPendingCommands();
-  }
-  tick() {
-    !this.tcpClient && this.initTcpClient();
-  }
-  //END BASE COMMANDS-----------------------------------------------------------
-
-  //DEVICE COMMANDS-------------------------------------------------------------
-  setPower(params) {
-    let num = params.Status === 'On' ? 1 : 0;
-    this.sendDefer(`setstate,${this.config.modRelay}:${params.Channel},${num}\r`);
-  }
-  //END DEVICE COMMANDS--------------------------------------------------------
-
-  //POLL COMMANDS--------------------------------------------------------------
-  getPower(params) {
-    this.sendDefer(`getstate,${this.config.modRelay}:${params.Channel}\r`);
-  }
-  getInput(params) {
-    this.sendDefer(`getstate,${this.config.modInput}:${params.Channel}\r`);
-  }
-  //END POLL COMMANDS---------------------------------------------------------
-
-  //UTIL COMMANDS-------------------------------------------------------------
-  send(data) {
-    logger.silly(`TCPClient send: ${data}`);
-    return this.tcpClient && this.tcpClient.write(data);
-  }
-  sendDefer(data) {
-    this.base.commandDefer(CMD_DEFER_TIME);
-    if (!this.send(data)) this.base.commandError(`Data not sent`);
-  }
-
-  // Create a tcp client and handle events
-  initTcpClient() {
-    if (!this.tcpClient) {
-      logger.debug("TCP Client Created.");
-      this.tcpClient = host.createTCPClient();
-      this.tcpClient.setOptions({
-        receiveTimeout: TCP_TIMEOUT,
-        autoReconnectionAttemptDelay: TCP_RECONNECT_DELAY
-      });
-      this.tcpClient.connect(this.config.port, this.config.host);
-
-      this.tcpClient.on('data', (data) => {
-        let frame = data.toString();
-        logger.silly("Incoming Frame: " + frame);
-        this.frameParser.push(data);
-      });
-
-      this.tcpClient.on('connect', () => {
-        logger.debug("TCP Connection Open");
-        this.base.getVar('Status').value = 1
-        this.base.startPolling();
-      });
-
-      this.tcpClient.on('close', () => {
-        logger.debug("TCP Connection Closed");
-        this.disconnect();
-      });
-
-      this.tcpClient.on('error', (err) => {
-        logger.debug("TCP Connection Error");
-        this.stop();
-      });
+      base.setPoll({
+        action: 'getInput',
+        period: POLL_PERIOD_INPUT,
+        enablePollFn: isConnected,
+        startImmediately: true,
+        params: { Channel: i }
+      })
     }
   }
 
-  parse(frame) {
-    let err = /ERR/;
-    if (err.test(frame)) {
-      this.base.commandError('Error from module, check Error variable');
-      if (frame == "ERR 003\r") this.base.getVar('Error').value = "Bad Module or Channel Number";
-      else if (frame == "ERR RS004\r") this.base.getVar('Error').value = "Logical Relay Disabled or Unavailable";
-      else this.base.getVar('Error').value = "General Error";
-    }
-    else this.base.getVar('Error').value = "";
+  function start() {
+    initTcpClient()
+  }
 
-    let rPower = /state,(\d):(\d),(\d)/;
-    if (rPower.test(frame)) {
-      let mod = Number(rPower.exec(frame)[1]);
-      let channel = Number(rPower.exec(frame)[2]);
-      let value = Number(rPower.exec(frame)[3]);
-      if (mod == this.config.modRelay) this.base.getVar("PowerChannel" + channel).value = value;
-      else if (mod == this.config.modInput) this.base.getVar("InputChannel" + channel).value = value;
-      this.base.commandDone();
+  function stop() {
+    base.getVar('Status').string = 'Disconnected'
+    tcpClient && tcpClient.end()
+    tcpClient = null
+    base.clearPendingCommands()
+  }
+
+  function tick() {
+    if (!tcpClient) initTcpClient()
+  }
+
+  function initTcpClient() {
+    if (tcpClient) return  // Return if tcpClient already exists
+
+    tcpClient = host.createTCPClient()
+    tcpClient.setOptions({
+      receiveTimeout: TCP_TIMEOUT,
+      autoReconnectionAttemptDelay: TCP_RECONNECT_DELAY
+    })
+
+    tcpClient.on('connect', () => {
+      logger.silly('TCPClient connected')
+      base.getVar('Status').string = 'Connected'
+      base.startPolling()
+    })
+
+    tcpClient.on('data', data => {
+      frameParser.push(data.toString())
+    })
+
+    tcpClient.on('close', () => {
+      logger.silly('TCPClient closed')
+      base.getVar('Status').string = 'Disconnected'  // Triggered on timeout, this allows auto reconnect
+    })
+
+    tcpClient.on('error', err => {
+      logger.error(`TCPClient: ${err}`)
+      stop()  // Throw out the tcpClient and get a fresh connection
+    })
+
+    // Finally, initiate connection
+    tcpClient.connect(config.port, config.host)
+  }
+
+
+  // ------------------------------ SEND/RECEIVE HANDLERS ------------------------------
+
+  function send(data) {
+    logger.silly(`TCPClient send: ${data}`)
+    return tcpClient && tcpClient.write(data)
+  }
+
+  function sendDefer(data) {
+    base.commandDefer(CMD_DEFER_TIME)
+    if (!send(data)) base.commandError('Data not sent')
+  }
+
+  function onFrame(data) {
+    if (/ERR/.test(data)) {
+      logger.error(`GC IO error: ${data}`)
+      base.commandError('Error from module, check Error variable')
+      if (data.includes('ERR 003')) base.getVar('Error').string = 'Bad Module or Channel Number'
+      else if (data.includes('ERR RS004')) base.getVar('Error').string = 'Logical Relay Disabled or Unavailable'
+      else base.getVar('Error').string = 'General Error'
+    }
+    else base.getVar('Error').string = ''
+
+    let rPower = /state,(\d):(\d),(\d)/
+    if (rPower.test(data)) {
+      let mod = Number(rPower.exec(data)[1])
+      let channel = Number(rPower.exec(data)[2])
+      let value = Number(rPower.exec(data)[3])
+      if (mod == config.modRelay) base.getVar('PowerChannel' + channel).value = value
+      else if (mod == config.modInput) base.getVar('InputChannel' + channel).value = value
+      base.commandDone()
     }
   }
 
+
+  // ------------------------------ GET FUNCTIONS ------------------------------
+
+  function getPower(params) {
+    sendDefer(`getstate,${config.modRelay}:${params.Channel}\r`)
+  }
+
+  function getInput(params) {
+    sendDefer(`getstate,${config.modInput}:${params.Channel}\r`)
+  }
+
+
+  // ------------------------------ SET FUNCTIONS ------------------------------
+  function setPower(params) {
+    sendDefer(`setstate,${config.modRelay}:${params.Channel},${params.Status}\r`)
+  }
+
+
+  // ------------------------------ EXPORTED FUNCTIONS ------------------------------
+
+  return {
+    setup, start, stop, tick,
+    getPower, getInput,
+    setPower
+  }
 }
-
-

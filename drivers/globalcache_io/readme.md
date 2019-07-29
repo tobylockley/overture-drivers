@@ -55,6 +55,9 @@ Open or close a contact
 
 ## Release Notes
 
+### 1.1.4
+- Updated syntax and tcp reconnect logic
+
 ### 1.1.3
 - Added note in `readme.md` to explain known device bug, causing need to save device config.
 
