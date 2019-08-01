@@ -1,0 +1,65 @@
+{
+  "name": "remote_manager",
+  "version": "1.0.0-beta.1",
+  "description": "Facilitates remote management of overture UX/CX",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "Overture",
+    "models": [],
+    "type": "behaviour",
+    "subtype": "",
+    "variables": [],
+    "commands": [],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Template Setup",
+      "properties": {
+        "host": {
+          "title": "Remote Management Server Hostname or IP address:",
+          "type": "string",
+          "default": "203.27.185.62"
+        },
+        "port": {
+          "title": "Remote Management Server Port:",
+          "type": "integer",
+          "default": 9998
+        },
+        "interfaces": {
+          "title": "Interfaces",
+          "description": "Interfaces accessible from the control server, to forward to the remote server",
+          "type": "array",
+          "format": "table",
+          "uniqueItems": true,
+          "items": {
+            "title": "Interface",
+            "type": "object",
+            "properties": {
+              "host": {
+                "title": "Hostname or IP address:",
+                "type": "string"
+              },
+              "port": {
+                "title": "Port:",
+                "type": "string",
+                "default": "80"
+              },
+              "name": {
+                "title": "Nickname:",
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_]+$"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "socket.io": "^2.2.0"
+  }
+}
