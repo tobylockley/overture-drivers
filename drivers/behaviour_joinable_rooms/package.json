@@ -1,6 +1,6 @@
 {
   "name": "behaviour_joinable_rooms",
-  "version": "1.0.0-beta.6",
+  "version": "1.0.0-beta.7",
   "description": "Provides a JoinStatus variable, to trigger actions and sync UIs between rooms",
   "main": "index.js",
   "scripts": {
@@ -58,8 +58,7 @@
               "name": {
                 "title": "Group Name",
                 "description": "Nickname for this join group. Must be the same across rooms in this group.",
-                "type": "string",
-                "pattern": "^[A-Za-z0-9_]+$"
+                "type": "string"
               },
               "timeout": {
                 "title": "Join Timeout (minutes)",
