@@ -12,6 +12,7 @@ Driver for a Biamp Tesira device over a TCP connection.
 - "Levels": List of all desired level controls.
 - "Mutes": List of all desired mute controls.
 - "Logic States": List of all desired logic state controls.
+- "Custom Commands": List of all desired custom commands to send to the tesira.
 
 
 ## Variables
@@ -39,6 +40,9 @@ Driver for a Biamp Tesira device over a TCP connection.
 - "False": Logic state set to false
 - "True" : Logic state set to true
 
+### Commands
+[enum] The custom commands that can be run, generated from config
+
 
 ## Commands
 
@@ -64,6 +68,10 @@ Set configured logic state to false/true
 - "Channel": [integer] Tesira variable channel number
 - "Status": [integer] Logical state, 0 or 1
 
+### Run Custom Command
+Send a custom command to the tesira device
+- "Command": [string] Name of the configured custom command, or a raw tesira command
+
 
 ## Revisions
 
@@ -72,3 +80,4 @@ Set configured logic state to false/true
 
 ### 1.0.1
 - Updated to a configurable, generic driver for presets, levels, mutes and logic states
+- Added a "custom commands" section, to add any abitrary command that can be recalled at will

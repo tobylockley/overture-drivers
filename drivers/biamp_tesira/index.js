@@ -52,7 +52,7 @@ exports.createDevice = base => {
         }
       })
     }
-    
+
     for (let level of config.levels) {
       level.varname = level.nickname.replace(/[^A-Za-z0-9_]/g, '')  // Make legal variable name
       base.createVariable({
@@ -81,7 +81,7 @@ exports.createDevice = base => {
         }
       })
     }
-    
+
     for (let mute of config.mutes) {
       mute.varname = mute.nickname.replace(/[^A-Za-z0-9_]/g, '')  // Make legal variable name
       base.createVariable({
@@ -109,7 +109,7 @@ exports.createDevice = base => {
         }
       })
     }
-    
+
     for (let state of config.states) {
       state.varname = state.nickname.replace(/[^A-Za-z0-9_]/g, '')  // Make legal variable name
       base.createVariable({
@@ -134,6 +134,24 @@ exports.createDevice = base => {
         params: {
           InstanceTag: state.tag,
           Channel: state.channel
+        }
+      })
+    }
+
+    if (config.commands) {
+      let enums = ['Choose a command...']
+      for (let c of config.commands) {
+        enums.push(c.nickname)
+      }
+      base.createVariable({
+        name: 'Commands',
+        type: 'enum',
+        enums: enums,
+        perform: {
+          action: 'runCustomCommand',
+          params: {
+            Command: '$string'
+          }
         }
       })
     }
@@ -313,6 +331,16 @@ exports.createDevice = base => {
     sendDefer(`${params.InstanceTag} set state ${params.Channel} ${state}\n`)
   }
 
+  function runCustomCommand(params) {
+    // Search custom commands config for supplied command, and retrieve actual command, otherwise send as is
+    let cmd = config.commands.find(x => x.nickname === params.Command)
+    if (cmd) {
+      sendDefer(`${cmd.command}\n`)
+    }
+    else {
+      sendDefer(`${params.Command}\n`)
+    }
+  }
 
   // ------------------------------ HELPER FUNCTIONS ------------------------------
 
@@ -335,6 +363,6 @@ exports.createDevice = base => {
   return {
     setup, start, stop, tick, keepAlive,
     getAudioLevel, getAudioMute, getLogicState,
-    setAudioLevel, setAudioMute, setLogicState, recallPreset
+    setAudioLevel, setAudioMute, setLogicState, recallPreset, runCustomCommand
   }
 }

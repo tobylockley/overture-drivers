@@ -1,6 +1,6 @@
 {
   "name": "biamp_tesira_avd",
-  "version": "1.0.1-beta6",
+  "version": "1.0.1-beta7",
   "description": "Driver for Biamp Tesira Audio DSP",
   "main": "index.js",
   "scripts": {
@@ -54,6 +54,12 @@
           "InstanceTag": { "type": "string" },
           "Channel": { "type": "integer" },
           "Status": { "type": "integer" }
+        }
+      },
+      {
+        "name": "Run Custom Command",
+        "params": {
+          "Command": { "type": "string" }
         }
       }
     ],
@@ -168,6 +174,27 @@
                 "title": "Channel",
                 "type": "integer",
                 "default": 1
+              }
+            }
+          }
+        },
+        "commands": {
+          "title": "Custom Commands",
+          "description": "Any custom commands that do not fit in to the above block types",
+          "type": "array",
+          "format": "table",
+          "uniqueItems": true,
+          "items": {
+            "title": "Command",
+            "type": "object",
+            "properties": {
+              "nickname": {
+                "title": "Command Nickname",
+                "type": "string"
+              },
+              "command": {
+                "title": "Command String",
+                "type": "string"
               }
             }
           }
