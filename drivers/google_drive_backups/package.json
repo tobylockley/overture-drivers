@@ -1,6 +1,6 @@
 {
   "name": "google_drive_backups",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.4",
   "description": "Sync Overture backups to a google drive folder",
   "main": "index.js",
   "scripts": {
@@ -8,6 +8,10 @@
   },
   "author": "Audio Visual Distributors",
   "license": "MIT",
+  "dependencies": {
+    "googleapis": "^42.0.0",
+    "util.promisify": "^1.0.0"
+  },
   "overture": {
     "brand": "overture",
     "models": [],
@@ -21,33 +25,16 @@
           "Disconnected",
           "Connected"
         ]
-      },
-      {
-        "name": "Reset",
-        "type": "enum",
-        "enums": [
-          "Idle...",
-          "Reset Credentials"
-        ],
-        "perform": {
-          "action": "Reset Credentials",
-          "params": {
-            "Status": "$value"
-          }
-        }
       }
     ],
-
-    "commands": [
-    ],
-
+    "commands": [],
     "pointSetupSchema": {
       "type": "object",
       "title": "Template Setup",
       "properties": {
         "authCode": {
           "title": "Google Authentication Code:",
-          "description": "Please view control server logs and open authentication URL",
+          "description": "To generate authentication code, please check control server logs.",
           "type": "string",
           "default": ""
         },

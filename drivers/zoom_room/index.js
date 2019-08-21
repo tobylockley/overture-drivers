@@ -30,6 +30,12 @@ exports.createDevice = base => {
     config = _config
     base.setTickPeriod(TICK_PERIOD)
 
+if (DEBUG_MODE > 0) {
+  meeting_status = findPoint({parent: point, variablename:'.MeetingStatus'})
+  join_number = {value:''}
+  advanced_view = false
+}
+
     // Register polling functions
     base.setPoll({
       action: 'getMeetingStatus',

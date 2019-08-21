@@ -9,6 +9,7 @@
   "author": "Toby Lockley",
   "license": "MIT",
   "dependencies": {
-    "archiver": "^3.0.0"
+    "archiver": "^3.0.0",
+    "glob": "^7.1.4"
   }
 }

@@ -46,11 +46,15 @@
       },
       "protocol": "inspector",
       "env": {
-        "data": "C:\\Program Files\\Barco\\Barco Overture Control Server\\data\\",
-        "driverPath": "${workspaceRoot}",
-        "debugDriver": "true",
-        "logLevel": "silly"
+        "UXURI": "http://203.27.185.62:9950",
+        "UID": "TobyCS",
+        "DRIVERPATH": "${workspaceRoot}\\drivers",
+        "DEBUGDRIVER": "true",
+        "LOGLEVEL": "silly",
+        "_IGNOREUXPROJECT": "true",
+        "data": "C:\\Program Files\\Barco\\Barco Overture Control Server\\data\\"
       },
+      "internalConsoleOptions": "openOnSessionStart",
       "outputCapture": "std"
     }
   ]

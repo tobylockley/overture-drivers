@@ -2,10 +2,8 @@
 
 // Put some instructions here about how to generate credentials and enable google API
 
-const CMD_DEFER_TIME = 3000        // Timeout when using commandDefer
-const TICK_PERIOD = 5000           // In-built tick interval
-const POLL_PERIOD = 5000           // Continuous polling function interval
-const REQUEST_TIMEOUT = 3000       // Timeout for AJAX requests
+const TICK_PERIOD = 10000           // In-built tick interval
+const POLL_PERIOD = 10000           // Continuous polling function interval
 
 let host
 exports.init = _host => {
@@ -15,16 +13,18 @@ exports.init = _host => {
 exports.createDevice = base => {
   const logger = base.logger || host.logger
   let config
-  let googleAuth
+  let googleAuth = null
 
   const fs = require('fs')
+  const path = require('path')
   const {google} = require('googleapis')
-  // If modifying these scopes, delete token.json.
   const SCOPES = ['https://www.googleapis.com/auth/drive.file']
+  const PKG_PATH = path.join(__dirname, 'package.json')
+  const CRED_PATH = path.join(__dirname, 'credentials.json')
+  const TOKEN_PATH = path.join(__dirname, 'token.json')
+  // If modifying SCOPES, delete token.json.
   // The file token.json stores the user's access and refresh tokens, and is
-  // created automatically when the authorization flow completes for the first
-  // time.
-  const TOKEN_PATH = 'token.json'
+  // created automatically when the authorization flow completes for the first time
 
   // ------------------------------ SETUP FUNCTIONS ------------------------------
 
@@ -34,16 +34,17 @@ exports.createDevice = base => {
     config = _config
     base.setTickPeriod(TICK_PERIOD)
     // Register polling functions
-    // base.setPoll({ action: 'getPower', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
-    if (!config.authCode) {
-      logger.info('Authorize this module by visiting this url:', authUrl)
-      logger.info('Paste the supplied code into this modules setup')
-    }
+    // base.setPoll({ action: 'listFiles', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
+    console.log(host)
+    fs.readdir(path.join(__dirname, '../'), (err, files) => {
+      if (err) return console.error(err)
+      console.log(files)
+    })
   }
 
   function start() {
     // base.startPolling()
-    // tick()  // Get the connection state straight away
+    tick()  // Get the connection state straight away
   }
 
   function stop() {
@@ -54,6 +55,7 @@ exports.createDevice = base => {
   }
 
   async function tick() {
+    console.log('tick')
     !googleAuth && initGoogleAuth()
   }
 
@@ -62,56 +64,43 @@ exports.createDevice = base => {
 
   function initGoogleAuth() {
     // Load client secrets from a local file.
-    fs.readFile('credentials.json', (err, content) => {
+    fs.readFile(CRED_PATH, (err, content) => {
       if (err) return logger.error('Error loading client secret file:', err.message)
-      // Authorize a client with credentials, then call the Google Drive API.
-      // authorize(JSON.parse(content), listFiles)
-      authorize(JSON.parse(content), (auth) => {
+      // Authorize a client with credentials, and initialize status and auth object
+      let credentials = JSON.parse(content)
+      authorize(credentials, (auth) => {
         googleAuth = auth
+        logger.debug('Google authentication successful')
         base.getVar('Status').string = 'Connected'
         base.startPolling()
       })
     })
   }
 
-  async function req(cmdString) {
-    base.commandDefer(CMD_DEFER_TIME)
-    try {
-      logger.silly(`Running REST request > ${cmdString}`)
-      const options = {
-        method: 'POST',
-        uri: `http://${config.host}/rcCmd.php`,
-        timeout: REQUEST_TIMEOUT,
-        form: {
-          commands: cmdString
-        }
-      }
-      let response = await host.request(options)
-      response = JSON.parse(response)
-      let zyperResponse = response.responses[0]
-      for (let warning of zyperResponse.warnings) logger.warn(`zyperCmd warning > ${warning}`)
-      if (zyperResponse.errors.length > 0) throw new Error(zyperResponse.errors[0])
-      base.commandDone()
-      return zyperResponse
-    }
-    catch (error) {
-      base.commandError(error.message)
-      throw new Error(`zyperCmd failed > ${error.message}`)
-    }
+
+  // ------------------------------ DRIVER FUNCTIONS ----------------------------------
+
+  function syncBackups() {
   }
 
-
-  // ------------------------------ DRIVER FUNCTIONS ------------------------------
-
-  function resetCredentials(params) {
-    if (params.Status === 1) {
-      logger.debug('Resetting Google Drive credentials...')
-      fs.unlink(TOKEN_PATH, (err) => {
-        if (err) throw err
-        logger.debug('Google credentials successfully deleted!')
-        stop()
-      })
-    }
+  function listFiles() {
+    if (!googleAuth) return logger.error('Module not authenticated with google.')
+    
+    const drive = google.drive({version: 'v3', auth: googleAuth})
+    drive.files.list({
+      fields: '*'
+    }, (err, res) => {
+      if (err) return logger.error('The Google API returned an error:', err.message)
+      const files = res.data.files
+      if (files.length) {
+        console.log('Files:')
+        files.map((file) => {
+          console.log(`${file.name} (${file.id})`)
+        })
+      } else {
+        console.log('No files found.')
+      }
+    })
   }
 
 
@@ -127,29 +116,31 @@ exports.createDevice = base => {
   function authorize(credentials, callback) {
     const {client_secret, client_id, redirect_uris} = credentials.installed
     const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0])
+    
+    if (config.authCode) {
+      // Auth code exists in config. Check for existing token, otherwise generate one.
+      fs.readFile(TOKEN_PATH, (err, token) => {
+        if (err) return getAccessToken(oAuth2Client, config.authCode, callback)
+        oAuth2Client.setCredentials(JSON.parse(token))
+        callback(oAuth2Client)
+      })
+    }
+    else {
+      // No auth code supplied, or it has been deleted. If token.json exists, delete it
+      fs.unlink(TOKEN_PATH, (err) => {
+        if (err && err.code !== 'ENOENT') logger.error(err.message)
+      })
 
-    // Check if we have previously stored a token.
-    fs.readFile(TOKEN_PATH, (err, token) => {
-      if (err) return getAccessToken(oAuth2Client, callback)
-      oAuth2Client.setCredentials(JSON.parse(token))
-      callback(oAuth2Client)
-    })
-  }
-
-
-  /**
-   * Create an OAuth2 client with the given credentials, and then execute the
-   * given callback function.
-   * @param {Object} credentials The authorization client credentials.
-   * @param {function} callback The callback to call with the authorized client.
-   */
-  function generateAuthUrl(credentials) {
-    const {client_secret, client_id, redirect_uris} = credentials.installed
-    const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0])
-    return oAuth2Client.generateAuthUrl({
-      access_type: 'offline',
-      scope: SCOPES,
-    })
+      // Display auth URL in logs for user
+      let authUrl = oAuth2Client.generateAuthUrl({
+        access_type: 'offline',
+        scope: SCOPES,
+      })
+      let text = `To generate an authentication code, <b><a href='${authUrl}'>CLICK HERE</a></b>.`
+      // updateConfigDescription('authCode', text)
+      logger.info('Authorization required, please open this url:', authUrl)
+      logger.info('Paste the generated code into this modules setup, under "Google Authentication Code"')
+    }
   }
 
   /**
@@ -158,20 +149,43 @@ exports.createDevice = base => {
    * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
    * @param {getEventsCallback} callback The callback for the authorized client.
    */
-  function getAccessToken(oAuth2Client, callback) {
-    const authUrl = oAuth2Client.generateAuthUrl({
-      access_type: 'offline',
-      scope: SCOPES,
-    })
+  function getAccessToken(oAuth2Client, code,  callback) {
     oAuth2Client.getToken(code, (err, token) => {
-      if (err) return console.error('Error retrieving access token', err)
+      if (err) return logger.error('Error retrieving access token:', err.message)
       oAuth2Client.setCredentials(token)
       // Store the token to disk for later program executions
-      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-        if (err) return console.error(err)
-        console.log('Token stored to', TOKEN_PATH)
+      fs.writeFile(TOKEN_PATH, JSON.stringify(token, null, 2), (err) => {
+        if (err) return logger.error(err.message)
+        logger.info('Google authentication token stored in', TOKEN_PATH)
       })
       callback(oAuth2Client)
+    })
+  }
+
+  /**
+   * Update config properties description.
+   * @param {string} configProp Name of config property
+   * @param {string} description Description text, can be html
+   */
+  function updateConfigDescription(configProp, description) {
+
+    fs.readFile(PKG_PATH, (err, content) => {
+      if (err) return logger.error('Error opening package.json file:', err.message)
+      // Authorize a client with credentials, and initialize status and auth object
+      let pkg = JSON.parse(content)
+      let thisConfig = pkg.overture.pointSetupSchema.properties[configProp]
+      if (thisConfig) {
+        if (thisConfig.description && thisConfig.description !== description) {
+          thisConfig.description = description
+          fs.writeFile(PKG_PATH, JSON.stringify(pkg, null, 2), (err) => {
+            if (err) logger.error(err.message)
+            else logger.silly('Updated description of config property', configProp, 'to:', description)
+          })
+        }
+      }
+      else {
+        logger.error('Could not find config property', configProp)
+      }
     })
   }
 
@@ -179,6 +193,6 @@ exports.createDevice = base => {
   // ------------------------------ EXPORTED FUNCTIONS ------------------------------
   return {
     setup, start, stop, tick,
-    resetCredentials
+    syncBackups, listFiles
   }
 }
