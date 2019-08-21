@@ -27,3 +27,7 @@ Can be chained with Overture alarms to automatically inform network managers/IT 
 
 ### 1.0.0
   - Initial version
+
+### 1.0.1
+  - Added "Status" to device variable names to conform with overture standard
+  - Moved ping checks into poll function that will stop when driver is disabled

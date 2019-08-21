@@ -24,7 +24,7 @@
         "timeout": {
           "title": "Ping Timeout (in milliseconds):",
           "type": "integer",
-          "default": 1000
+          "default": 2000
         },
         "frequency": {
           "title": "Ping Frequency (in milliseconds):",
@@ -47,28 +47,19 @@
             "title": "Device",
             "type": "object",
             "properties": {
-              "host": {
-                "title": "Hostname or IP Address",
-                "type": "string"
-              },
               "name": {
                 "title": "Friendly Name",
                 "type": "string",
                 "pattern": "^[A-Za-z][A-Za-z0-9_]+$"
+              },
+              "host": {
+                "title": "Hostname or IP Address",
+                "type": "string"
               }
-            },
-            "required": [
-              "host",
-              "name"
-            ]
+            }
           }
         }
-      },
-      "required": [
-        "frequency",
-        "debounce",
-        "devices"
-      ]
+      }
     }
   }
 }
