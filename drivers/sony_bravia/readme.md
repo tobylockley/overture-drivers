@@ -110,3 +110,9 @@ Only available in DTV mode. Shift the DTV channel of the display up or down.
 
 ### 1.0.6
   - Removed nickname feature. Can use overtures in-built enum labels instead.
+
+### 1.0.7
+  - Clear pending commands when driver stops or loses connection.
+
+### 1.0.8
+  - Attempting to hold a queue of commands for when device goes offline momentarily

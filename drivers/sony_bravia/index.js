@@ -1,9 +1,10 @@
 'use strict'
 
-const CMD_DEFER_TIME = 1000        // Timeout when using commandDefer
+const CMD_DEFER_TIME = 30000       // Timeout when using commandDefer
+const CMD_RETRY_TIME = 1000        // Time between retries if TCP send fails
 const TICK_PERIOD = 5000           // In-built tick interval
 const POLL_PERIOD = 5000           // Continuous polling function interval
-const TCP_TIMEOUT = 30000          // Will timeout after this length of inactivity
+const TCP_TIMEOUT = 10000          // Will timeout after this length of inactivity
 const TCP_RECONNECT_DELAY = 3000   // How long to wait before attempting to reconnect
 
 let host
@@ -33,10 +34,10 @@ exports.createDevice = base => {
 
     // Register polling functions
     base.setPoll({ action: 'getPower', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
-    base.setPoll({ action: 'getSource', period: POLL_PERIOD, enablePollFn: isPoweredOn, startImmediately: true })
+    // base.setPoll({ action: 'getSource', period: POLL_PERIOD, enablePollFn: isPoweredOn, startImmediately: true })
     base.setPoll({ action: 'getAudioLevel', period: POLL_PERIOD, enablePollFn: isPoweredOn, startImmediately: true })
-    base.setPoll({ action: 'getAudioMute', period: POLL_PERIOD, enablePollFn: isPoweredOn, startImmediately: true })
-    base.setPoll({ action: 'getChannel', period: POLL_PERIOD, enablePollFn: isDTVMode, startImmediately: true })
+    // base.setPoll({ action: 'getAudioMute', period: POLL_PERIOD, enablePollFn: isPoweredOn, startImmediately: true })
+    // base.setPoll({ action: 'getChannel', period: POLL_PERIOD, enablePollFn: isDTVMode, startImmediately: true })
   }
 
   function start() {
@@ -48,8 +49,13 @@ exports.createDevice = base => {
     if (!config.simulation && !tcpClient) initTcpClient()
   }
 
-  function stop() {
+  function disconnect() {
     base.getVar('Status').string = 'Disconnected'
+    base.stopPolling()
+  }
+
+  function stop() {
+    disconnect()
     tcpClient && tcpClient.end()
     tcpClient = null
   }
@@ -76,7 +82,13 @@ exports.createDevice = base => {
 
     tcpClient.on('close', () => {
       logger.silly('TCPClient closed')
-      base.getVar('Status').string = 'Disconnected'  // Triggered on timeout, this allows auto reconnect
+      disconnect()  // Triggered on timeout, this allows auto reconnect
+      
+      let pending = base.getPendingCommand()
+      if (pending) {
+        base.commandError('Lost Connection')
+        base.perform(pending.action, pending.params)
+      }
     })
 
     tcpClient.on('error', err => {
@@ -94,16 +106,36 @@ exports.createDevice = base => {
   }
 
   function sendDefer(data) {
-    if (send(data)) base.commandDefer(CMD_DEFER_TIME)
-    else base.commandError('Data not sent')
+    base.commandDefer(CMD_DEFER_TIME)
+    if (!send(data)) {
+      // Retry until defer time is over
+      let retryCountMax = Math.floor(CMD_DEFER_TIME / CMD_RETRY_TIME)
+      logger.debug(`TCP send failed, retrying (max attempts = ${retryCountMax}) ...`)
+      let retryCount = 0
+      let retryTask = () => {
+        retryCount++
+        if (send(data)) {
+          logger.debug(`TCP send retry attempt ${retryCount}: Success!`)
+        }
+        else {
+          logger.debug(`TCP send retry attempt ${retryCount}: Failed`)
+          if (retryCount < retryCountMax) {
+            setTimeout(retryTask, CMD_RETRY_TIME)
+          }
+          else {
+            base.commandError('Max TCP send retries reached')
+          }
+        }
+      }
+      setTimeout(retryTask, CMD_RETRY_TIME)
+    }
   }
 
   function onFrame(data) {
     let match  // Used for regex matching below
     const pendingCommand = base.getPendingCommand()
 
-    logger.silly(`onFrame: ${data}`)
-    pendingCommand && logger.debug(`pendingCommand: ${pendingCommand.action}`)
+    logger.silly(`onFrame (pending = ${pendingCommand && pendingCommand.action}): ${data}`)
 
     // Use arrays to match pending command action to expected response
     const setFns = [ 'setPower', 'selectSource', 'setAudioLevel', 'setAudioMute', 'setChannel', 'shiftChannel' ]
@@ -153,9 +185,10 @@ exports.createDevice = base => {
       // Parse response after issueing a GET function, OR after a "notify" frame
       // Notify frames are received after changing something, either from the CS or an IR remote
 
-      match = data.match(/POWR(\d+)/)
+      match = data.match(/POWR(.{16})/)
       if (match) {
-        base.getVar('Power').value = parseInt(match[1])  // 0 = off, 1 = on
+        let val = parseInt(match[1])
+        val && (base.getVar('Power').value = val)  // 0 = off, 1 = on
         pendingCommand && base.commandDone()
       }
 
@@ -171,15 +204,17 @@ exports.createDevice = base => {
         pendingCommand && base.commandDone()
       }
 
-      match = data.match(/VOLU(\d+)/)
+      match = data.match(/VOLU(.{16})/)
       if (match) {
-        base.getVar('AudioLevel').value = parseInt(match[1])
+        let val = parseInt(match[1])
+        val && (base.getVar('AudioLevel').value = val)
         pendingCommand && base.commandDone()
       }
 
-      match = data.match(/AMUT(\d+)/)
+      match = data.match(/AMUT(.{16})/)
       if (match) {
-        base.getVar('AudioMute').value = parseInt(match[1])  // 0 = unmute, 1 = mute
+        let val = parseInt(match[1])
+        val && (base.getVar('AudioMute').value = val)  // 0 = unmute, 1 = mute
         pendingCommand && base.commandDone()
       }
 
