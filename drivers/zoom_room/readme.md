@@ -1,13 +1,14 @@
 # Zoom Rooms
 
 ## Overview
-Driver to act as a zoom room controller. Documentation here: https://marketplace.zoom.us/docs/guides/zoom-rooms/zoom-rooms-api
-Only one zoom room controller can be connected to a zoom room at a time, which means you cannot run this driver AND a tablet application, for example.
+Driver to act as a zoom room controller.
+Only one zoom room controller can be connected to a zoom room at a time, which means you cannot run this driver AND a tablet application.
 
 
 ## Setup
-- "Host": The IP address or host name of the device.
-- "Port": The port of TCP communication. (Default 20060)
+- "Host": The IP address or host name of the zoom room device.
+- "Port": The port for SSH communication. (Default 2244)
+- "SSH Passcode": Passcode for SSH connection. (Found in Zoom Rooms admin portal)
 
 
 ## Variables

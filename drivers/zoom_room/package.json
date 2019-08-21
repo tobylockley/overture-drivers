@@ -1,0 +1,299 @@
+{
+  "name": "zoom_room",
+  "version": "1.0.0-beta.1",
+  "description": "Driver for controlling a zoom room",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "Zoom",
+    "models": [
+      "Zoom Room"
+    ],
+    "type": "device",
+    "subtype": "avconference",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "MeetingStatus",
+        "type": "enum",
+        "enums": [
+          "Unknown",
+          "Not In Meeting",
+          "Connecting Meeting",
+          "In Meeting"
+        ]
+      },
+      {
+        "name": "MeetingId",
+        "type": "string"
+      },
+      {
+        "name": "VideoMute",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "perform": {
+          "action": "Set Video Mute",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "AudioMuteInput",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "perform": {
+          "action": "Set Audio Mute In",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "AudioLevelOutput",
+        "type": "integer",
+        "perform": {
+          "action": "Set Audio Level Out",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      },
+      {
+        "name": "RecordStatus",
+        "type": "enum",
+        "enums": [
+          "Not Recording",
+          "Recording"
+        ],
+        "perform": {
+          "action": "Set Recording",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Get Meeting Status"
+      },
+      {
+        "name": "Get Bookings"
+      },
+      {
+        "name": "Get Phonebook"
+      },
+      {
+        "name": "Get Call Info"
+      },
+      {
+        "name": "Get Participants"
+      },
+      {
+        "name": "Start Meeting",
+        "params": {
+          "MeetingNumber": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Start Instant Meeting",
+        "params": {
+          "Duration": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Join Meeting",
+        "params": {
+          "MeetingNumber": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "End Meeting"
+      },
+      {
+        "name": "Set Recording",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Not Recording",
+              "Recording"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Set Video Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Set Audio Level In",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        },
+        "optimize": true
+      },
+      {
+        "name": "Set Audio Mute In",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Set Audio Level Out",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        },
+        "optimize": true
+      },
+      {
+        "name": "Set Audio Mute Out",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Set Participant Audio Mute",
+        "params": {
+          "Id": {
+            "type": "integer"
+          },
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Set Participant Video Mute",
+        "params": {
+          "Id": {
+            "type": "integer"
+          },
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Invite Participant",
+        "params": {
+          "Id": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Remove Participant",
+        "params": {
+          "Id": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Control Camera",
+        "params": {
+          "State": {
+            "type": "enum",
+            "enums": [
+              "Start",
+              "Stop"
+            ]
+          },
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Left",
+              "Right",
+              "Up",
+              "Down",
+              "In",
+              "Out"
+            ]
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Template Setup",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address:",
+          "type": "string",
+          "default": ""
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 2244,
+          "description": "Port for SSH connection. Default: 2244"
+        },
+        "password": {
+          "title": "SSH Password:",
+          "type": "string",
+          "description": "This can be found in admin portal, under Room Management > Room Settings > Control System API"
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "ssh2": "^0.8.5"
+  }
+}
