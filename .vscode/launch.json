@@ -25,6 +25,29 @@
       "outputCapture": "std"
     },
     {
+      "type": "node",
+      "request": "launch",
+      "name": "Toby CS (macOS) - Local UX",
+      "program": "${workspaceFolder}/OvertureCS/index.js",
+      "cwd": "${workspaceFolder}/OvertureCS/",
+      "runtimeArgs": ["--nolazy"],
+      "skipFiles": [
+        "<node_internals>/**/*.js",
+        "${workspaceFolder}/OvertureCS/node_modules/**/*.js",
+        "${workspaceFolder}/OvertureCS/core/*.js"
+      ],
+      "env": {
+        "UXURI": "http://localhost:8000/",
+        "UID": "TobyCS",
+        "DRIVERPATH": "${workspaceRoot}/drivers",
+        "DEBUGDRIVER": "true",
+        "LOGLEVEL": "silly",
+        "_IGNOREUXPROJECT": "true"
+      },
+      "internalConsoleOptions": "openOnSessionStart",
+      "outputCapture": "std"
+    },
+    {
         "type": "node",
         "request": "attach",
         "name": "OvertureCS Docker",
