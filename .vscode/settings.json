@@ -3,5 +3,16 @@
   "editor.insertSpaces": true,
   "editor.detectIndentation": true,
   "debug.inlineValues": true,
-  "debug.toolBarLocation": "floating"
+  "debug.toolBarLocation": "floating",
+  "editor.rulers": [100],
+
+  "maptz.regionfolder": {
+      "[javascript]": {  // Language selector
+          "foldEnd": "/* #endregion */",
+          "foldStart": "/* #region [NAME] *******************************************************************/",
+          // Use the `[NAME]` placeholder to indicate cursor position after insertion
+          "foldStartRegex": "[\\s]*#region[\\s]*(.*)",
+          "foldEndRegex": "[\\s]*#endregion"
+    }
+  }
 }

@@ -6,7 +6,10 @@
     {
       "label": "Package Driver",
       "type": "shell",
-      "command": "node ${workspaceFolder}/scripts/zip.js ${fileDirname} ${workspaceFolder}\\zip"
+      "command": "node ${workspaceFolder}/scripts/zip.js ${fileDirname} ${workspaceFolder}/zip",
+      "windows": {
+          "command": "node ${workspaceFolder}\\scripts\\zip.js ${fileDirname} ${workspaceFolder}\\zip"
+      },
     }
   ]
 }

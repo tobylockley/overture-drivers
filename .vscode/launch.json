@@ -37,8 +37,8 @@
         "${workspaceFolder}/OvertureCS/core/*.js"
       ],
       "env": {
-        "UXURI": "http://localhost:8000/",
         "UID": "TobyCS",
+        "UXURI": "http://localhost:8000/",
         "DRIVERPATH": "${workspaceRoot}/drivers",
         "DEBUGDRIVER": "true",
         "LOGLEVEL": "silly",
