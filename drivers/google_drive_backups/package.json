@@ -1,10 +1,11 @@
 {
   "name": "google_drive_backups",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0-alpha.12",
   "description": "Sync Overture backups to a google drive folder",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "mocha"
   },
   "author": "Audio Visual Distributors",
   "license": "MIT",
@@ -25,16 +26,37 @@
           "Disconnected",
           "Connected"
         ]
+      },
+      {
+        "name": "SyncCommand",
+        "type": "enum",
+        "enums": [
+          "Idle",
+          "Sync"
+        ],
+        "perform": {
+          "action": "Sync Backups"
+        }
       }
     ],
-    "commands": [],
+    "commands": [
+      {
+        "name": "Sync Backups"
+      }
+    ],
     "pointSetupSchema": {
       "type": "object",
-      "title": "Template Setup",
+      "title": "Google Drive Backups Settings",
       "properties": {
+        "uxToken": {
+          "title": "Overture User Token:",
+          "description": "Please retrieve from Configurator > Users. Ensure permanent token.",
+          "type": "string",
+          "default": ""
+        },
         "authCode": {
           "title": "Google Authentication Code:",
-          "description": "To generate authentication code, please check control server logs.",
+          "description": "To generate authentication code, please <b><a href='https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.file&response_type=code&client_id=676304292786-ercrrkr6aqd9hv1fu36n3n1rmlht7095.apps.googleusercontent.com&redirect_uri=urn%3Aietf%3Awg%3Aoauth%3A2.0%3Aoob'>CLICK HERE</a></b>.",
           "type": "string",
           "default": ""
         },
