@@ -81,7 +81,8 @@ function zipDriver(inputPath, outputPath, moveToArchive = true) {
     cwd: inputPath,
     ignore: [
       'docs/**/*.*',
-      '**/*.zip'
+      '**/*.zip',
+      '_*.*'
     ]
   })
    
