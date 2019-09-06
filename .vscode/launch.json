@@ -4,6 +4,14 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Extension: GUI Creator",
+      "cwd": "${workspaceFolder}/extensions/overture-gui-creator",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "dev-start"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Toby CS (macOS)",
       "program": "${workspaceFolder}/OvertureCS/index.js",
       "cwd": "${workspaceFolder}/OvertureCS/",
@@ -48,16 +56,16 @@
       "outputCapture": "std"
     },
     {
-        "type": "node",
-        "request": "attach",
-        "name": "OvertureCS Docker",
-        "restart": true,
-        "sourceMaps": true,
-        "protocol": "inspector",
-        "address": "127.0.0.1",
-        "port": 9229,
-        "localRoot": "${workspaceRoot}/",
-        "remoteRoot": "/data/controlserver/drivers"
+      "type": "node",
+      "request": "attach",
+      "name": "OvertureCS Docker",
+      "restart": true,
+      "sourceMaps": true,
+      "protocol": "inspector",
+      "address": "127.0.0.1",
+      "port": 9229,
+      "localRoot": "${workspaceRoot}/",
+      "remoteRoot": "/data/controlserver/drivers"
     },
     {
       "type": "node",

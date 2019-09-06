@@ -5,12 +5,17 @@
   },
   "extends": "eslint:recommended",
   "parserOptions": {
+    "ecmaVersion": 2019,
     "sourceType": "module",
-    "ecmaVersion": 2018
+    "ecmaFeatures": {
+      "jsx": true,
+      "impliedStrict": true
+    }
   },
   "rules": {
     "indent": ["error", 2],
     "quotes": ["warn", "single"],
-    "semi": ["warn", "never"]
+    // "semi": ["warn", "never", { "beforeStatementContinuationChars": "always" }],
+    "semi": ["warn", "always"]
   }
 }
