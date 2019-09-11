@@ -6,13 +6,19 @@
   "debug.toolBarLocation": "floating",
   "editor.rulers": [100],
 
+  // "eslint.alwaysShowStatus": true,
+  // "editor.formatOnSave": true,
+  "eslint.autoFixOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
   "maptz.regionfolder": {
-      "[javascript]": {  // Language selector
-          "foldEnd": "/* #endregion */",
-          "foldStart": "/* #region [NAME] *******************************************************************/",
-          // Use the `[NAME]` placeholder to indicate cursor position after insertion
-          "foldStartRegex": "[\\s]*#region[\\s]*(.*)",
-          "foldEndRegex": "[\\s]*#endregion"
+    "[javascript]": {
+      // Language selector
+      "foldEnd": "/* #endregion */",
+      "foldStart": "/* #region [NAME] *******************************************************************/",
+      // Use the `[NAME]` placeholder to indicate cursor position after insertion
+      "foldStartRegex": "[\\s]*#region[\\s]*(.*)",
+      "foldEndRegex": "[\\s]*#endregion"
     }
   }
 }
