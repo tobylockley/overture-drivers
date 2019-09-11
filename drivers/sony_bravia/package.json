@@ -4,9 +4,10 @@
   "description": "Driver for Sony Bravia TCP Connection",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "mocha"
   },
-  "author": "AudioVisualDistributors",
+  "author": "Audio Visual Distributors",
   "license": "MIT",
   "overture": {
     "brand": "Sony",
@@ -111,39 +112,64 @@
       {
         "name": "Set Power",
         "params": {
-          "Status": { "type": "enum", "enums": [ "Off", "On" ] }
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
         }
       },
       {
         "name": "Select Source",
         "params": {
-          "Name": { "type": "string" }
+          "Name": {
+            "type": "string"
+          }
         }
       },
       {
         "name": "Set Audio Level",
         "params": {
-          "Level": { "type": "integer" }
+          "Level": {
+            "type": "integer"
+          }
         },
         "optimize": true
       },
       {
         "name": "Set Audio Mute",
         "params": {
-          "Status": { "type": "enum", "enums": [ "Off", "On" ] }
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
         }
       },
       {
         "name": "Set Channel",
         "params": {
-          "Name": { "type": "integer" }
+          "Name": {
+            "type": "integer"
+          }
         },
         "optimize": true
       },
       {
         "name": "Shift Channel",
         "params": {
-          "Name": { "type": "enum", "enums": [ "", "Up", "Down" ] }
+          "Name": {
+            "type": "enum",
+            "enums": [
+              "",
+              "Up",
+              "Down"
+            ]
+          }
         }
       }
     ],
@@ -153,14 +179,20 @@
       "properties": {
         "host": {
           "title": "Host name or IP address:",
-          "type": "string",
-          "default": "192.168.3.20"
+          "type": "string"
         },
         "port": {
           "title": "Port:",
           "type": "integer",
           "default": 20060,
           "description": "Default: 20060"
+        },
+        "polltime": {
+          "title": "Polling Interval:",
+          "type": "integer",
+          "minimum": 1,
+          "default": 5,
+          "description": "Time between polling updates in seconds."
         },
         "simulation": {
           "title": "Simulation Mode",
