@@ -1,6 +1,6 @@
 {
   "name": "sony_bravia",
-  "version": "1.0.8-beta.2",
+  "version": "1.0.8-beta.4",
   "description": "Driver for Sony Bravia TCP Connection",
   "main": "index.js",
   "scripts": {
@@ -199,11 +199,7 @@
           "type": "checkbox",
           "description": "Simulate device, mainly for use with UI development"
         }
-      },
-      "required": [
-        "host",
-        "port"
-      ]
+      }
     }
   }
 }

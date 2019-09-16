@@ -326,9 +326,7 @@ exports.createDevice = base => {
   }
 
   function isDTVMode() {
-    return (
-      isConnected() && isPoweredOn() && base.getVar('Sources').string === 'DTV'
-    );
+    return isPoweredOn() && base.getVar('Sources').string === 'DTV';
   }
 
   function setPoll(action, period, enableFn) {
