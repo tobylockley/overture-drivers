@@ -1,42 +1,46 @@
 /*
 TODO
 - Only send keepAlive if data has not been sent in 1/2 tcp timeout
-
+- Smooth level changes (reduce queueing)
 */
 
+'use strict';
 
+const CMD_DEFER_TIME = 3000; // Timeout when using commandDefer
+const TICK_PERIOD = 5000; // In-built tick interval
+const TCP_TIMEOUT = 30000; // Will timeout after this length of inactivity
+const TCP_RECONNECT_DELAY = 3000; // How long to wait before attempting to reconnect
 
-'use strict'
-
-const CMD_DEFER_TIME = 3000        // Timeout when using commandDefer
-const TICK_PERIOD = 5000           // In-built tick interval
-const TCP_TIMEOUT = 30000          // Will timeout after this length of inactivity
-const TCP_RECONNECT_DELAY = 3000   // How long to wait before attempting to reconnect
-
-let host
+let host;
 exports.init = _host => {
-  host = _host
-}
+  host = _host;
+};
 
 exports.createDevice = base => {
-  const logger = base.logger || host.logger
-  let config
-  let tcpClient
+  const logger = base.logger || host.logger;
+  let config;
+  let tcpClient;
 
-  let frameParser = host.createFrameParser()
-  frameParser.setSeparator('\r')
-  frameParser.on('data', data => onFrame(data))
-
+  let frameParser = host.createFrameParser();
+  frameParser.setSeparator('\r');
+  frameParser.on('data', data => onFrame(data));
 
   // ------------------------------ SETUP FUNCTIONS ------------------------------
 
-  function isConnected() { return base.getVar('Status').string === 'Connected' }
+  function isConnected() {
+    return base.getVar('Status').string === 'Connected';
+  }
 
   function setup(_config) {
-    config = _config
-    base.setTickPeriod(TICK_PERIOD)
+    config = _config;
+    base.setTickPeriod(TICK_PERIOD);
 
-    base.setPoll({ action: 'keepAlive', period: config.poll, enablePollFn: isConnected, startImmediately: true })
+    base.setPoll({
+      action: 'keepAlive',
+      period: config.poll,
+      enablePollFn: isConnected,
+      startImmediately: true
+    });
 
     // Setup variables based on config
     if (config.presets) {
@@ -50,11 +54,11 @@ exports.createDevice = base => {
             Name: '$string'
           }
         }
-      })
+      });
     }
 
     for (let level of config.levels) {
-      level.varname = level.nickname.replace(/[^A-Za-z0-9_]/g, '')  // Make legal variable name
+      level.varname = level.nickname.replace(/[^A-Za-z0-9_]/g, ''); // Make legal variable name
       base.createVariable({
         name: level.varname,
         type: 'real',
@@ -68,7 +72,7 @@ exports.createDevice = base => {
             Level: '$value'
           }
         }
-      })
+      });
       // Register polling function
       base.setPoll({
         action: 'getAudioLevel',
@@ -79,11 +83,11 @@ exports.createDevice = base => {
           InstanceTag: level.tag,
           Channel: level.channel
         }
-      })
+      });
     }
 
     for (let mute of config.mutes) {
-      mute.varname = mute.nickname.replace(/[^A-Za-z0-9_]/g, '')  // Make legal variable name
+      mute.varname = mute.nickname.replace(/[^A-Za-z0-9_]/g, ''); // Make legal variable name
       base.createVariable({
         name: mute.varname,
         type: 'enum',
@@ -96,7 +100,7 @@ exports.createDevice = base => {
             Status: '$value'
           }
         }
-      })
+      });
       // Register polling function
       base.setPoll({
         action: 'getAudioMute',
@@ -107,11 +111,11 @@ exports.createDevice = base => {
           InstanceTag: mute.tag,
           Channel: mute.channel
         }
-      })
+      });
     }
 
     for (let state of config.states) {
-      state.varname = state.nickname.replace(/[^A-Za-z0-9_]/g, '')  // Make legal variable name
+      state.varname = state.nickname.replace(/[^A-Za-z0-9_]/g, ''); // Make legal variable name
       base.createVariable({
         name: state.varname,
         type: 'enum',
@@ -124,7 +128,7 @@ exports.createDevice = base => {
             Status: '$value'
           }
         }
-      })
+      });
       // Register polling function
       base.setPoll({
         action: 'getLogicState',
@@ -135,13 +139,13 @@ exports.createDevice = base => {
           InstanceTag: state.tag,
           Channel: state.channel
         }
-      })
+      });
     }
 
     if (config.commands) {
-      let enums = ['Choose a command...']
+      let enums = ['Choose a command...'];
       for (let c of config.commands) {
-        enums.push(c.nickname)
+        enums.push(c.nickname);
       }
       base.createVariable({
         name: 'Commands',
@@ -153,192 +157,195 @@ exports.createDevice = base => {
             Command: '$string'
           }
         }
-      })
+      });
     }
-
   }
 
   function start() {
-    initTcpClient()
+    initTcpClient();
   }
 
   function stop() {
-    base.getVar('Status').string = 'Disconnected'
-    tcpClient && tcpClient.end()
-    tcpClient = null
-    base.clearPendingCommands()
+    base.getVar('Status').string = 'Disconnected';
+    tcpClient && tcpClient.end();
+    tcpClient = null;
+    base.clearPendingCommands();
   }
 
   function tick() {
-    if (!tcpClient) initTcpClient()
+    if (!tcpClient) initTcpClient();
   }
 
   function initTcpClient() {
-    if (tcpClient) return  // Return if tcpClient already exists
+    if (tcpClient) return; // Return if tcpClient already exists
 
-    tcpClient = host.createTCPClient()
+    tcpClient = host.createTCPClient();
     tcpClient.setOptions({
       receiveTimeout: TCP_TIMEOUT,
       autoReconnectionAttemptDelay: TCP_RECONNECT_DELAY
-    })
-    tcpClient.connect(config.port, config.host)
+    });
+    tcpClient.connect(config.port, config.host);
 
     tcpClient.on('connect', () => {
-      logger.silly('TCPClient connected')
-      base.getVar('Status').string = 'Connected'
-      base.startPolling()
-    })
+      logger.silly('TCPClient connected');
+      base.getVar('Status').string = 'Connected';
+      base.startPolling();
+    });
 
     tcpClient.on('data', data => {
       // logger.info(`RAW > ${data.toString().replace(/\n/g, '{N}').replace(/\r/g, '{R}')}`)
-      if (!checkTelnetNegotiation(data)) frameParser.push(data.toString())
-    })
+      if (!checkTelnetNegotiation(data)) frameParser.push(data.toString());
+    });
 
     tcpClient.on('close', () => {
-      logger.silly('TCPClient closed')
-      base.getVar('Status').string = 'Disconnected'  // Triggered on timeout, this allows auto reconnect
-    })
+      logger.silly('TCPClient closed');
+      base.getVar('Status').string = 'Disconnected'; // Triggered on timeout, this allows auto reconnect
+    });
 
     tcpClient.on('error', err => {
-      logger.error(`TCPClient: ${err}`)
-      stop()  // Throw out the tcpClient and get a fresh connection
-    })
+      logger.error(`TCPClient: ${err}`);
+      stop(); // Throw out the tcpClient and get a fresh connection
+    });
   }
-
 
   // ------------------------------ SEND/RECEIVE HANDLERS ------------------------------
 
   function send(data) {
-    logger.silly(`TCPClient send: ${data}`)
-    return tcpClient && tcpClient.write(data)
+    logger.silly(`TCPClient send: ${data}`);
+    return tcpClient && tcpClient.write(data);
   }
 
   function sendDefer(data) {
-    base.commandDefer(CMD_DEFER_TIME)
-    if (!send(data)) base.commandError('Data not sent')
+    base.commandDefer(CMD_DEFER_TIME);
+    if (!send(data)) base.commandError('Data not sent');
   }
 
   function onFrame(data) {
-    let match
-    let pendingCommand = base.getPendingCommand()
-    logger.silly(`onFrame (pending = ${pendingCommand && pendingCommand.action}): ${data}`)
+    let match;
+    let pendingCommand = base.getPendingCommand();
+    logger.silly(
+      `onFrame (pending = ${pendingCommand && pendingCommand.action}): ${data}`
+    );
 
     if (pendingCommand && pendingCommand.action === 'getAudioLevel') {
-      match = data.match(/\+OK "value":(-?\d*\.\d*)/)
+      match = data.match(/\+OK "value":(-?\d*\.\d*)/);
       if (match) {
-        let conf = config.levels.find(x => (x.tag === pendingCommand.params.InstanceTag) && (x.channel === pendingCommand.params.Channel))
-        let val = parseFloat(match[1])
-        base.getVar(conf.varname).value = map(val, conf.min, conf.max, 0, 100)  // Convert value from decibel to percentage
-        base.commandDone()
+        let conf = config.levels.find(
+          x =>
+            x.tag === pendingCommand.params.InstanceTag &&
+            x.channel === pendingCommand.params.Channel
+        );
+        let val = parseFloat(match[1]);
+        base.getVar(conf.varname).value = map(val, conf.min, conf.max, 0, 100); // Convert value from decibel to percentage
+        base.commandDone();
       }
-    }
-    else if (pendingCommand && pendingCommand.action === 'getAudioMute') {
-      match = data.match(/\+OK "value":(false|true)/)
+    } else if (pendingCommand && pendingCommand.action === 'getAudioMute') {
+      match = data.match(/\+OK "value":(false|true)/);
       if (match) {
-        let varname = config.mutes.find(x => (x.tag === pendingCommand.params.InstanceTag) && (x.channel === pendingCommand.params.Channel)).varname
-        base.getVar(varname).value = {'false': 0, 'true': 1}[match[1]]
-        base.commandDone()
+        let varname = config.mutes.find(
+          x =>
+            x.tag === pendingCommand.params.InstanceTag &&
+            x.channel === pendingCommand.params.Channel
+        ).varname;
+        base.getVar(varname).value = { false: 0, true: 1 }[match[1]];
+        base.commandDone();
       }
-    }
-    else if (pendingCommand && pendingCommand.action === 'getLogicState') {
-      match = data.match(/\+OK "value":(false|true)/)
+    } else if (pendingCommand && pendingCommand.action === 'getLogicState') {
+      match = data.match(/\+OK "value":(false|true)/);
       if (match) {
-        let varname = config.states.find(x => (x.tag === pendingCommand.params.InstanceTag) && (x.channel === pendingCommand.params.Channel)).varname
-        base.getVar(varname).value = {'false': 0, 'true': 1}[match[1]]
-        base.commandDone()
+        let varname = config.states.find(
+          x =>
+            x.tag === pendingCommand.params.InstanceTag &&
+            x.channel === pendingCommand.params.Channel
+        ).varname;
+        base.getVar(varname).value = { false: 0, true: 1 }[match[1]];
+        base.commandDone();
       }
-    }
-    else {
-      match = data.match(/\+OK/)
+    } else {
+      match = data.match(/\+OK/);
       if (match && pendingCommand) {
-        base.commandDone()
-      }
-      else {
-        logger.warn(`onFrame data not processed: ${data}`)
+        base.commandDone();
+      } else {
+        logger.warn(`onFrame data not processed: ${data}`);
       }
     }
   }
 
   function checkTelnetNegotiation(data) {
-    let negFlag = false
+    let negFlag = false;
     while (data.length > 0 && data.length % 3 === 0) {
-      let chunk = data.slice(0, 3)
-      if (chunk[0] === 0xFF && chunk[1] === 0xFB) {
-        send(Buffer.from([0xFF, 0xFE, chunk[2]]))
-        negFlag = true
+      let chunk = data.slice(0, 3);
+      if (chunk[0] === 0xff && chunk[1] === 0xfb) {
+        send(Buffer.from([0xff, 0xfe, chunk[2]]));
+        negFlag = true;
+      } else if (chunk[0] === 0xff && chunk[1] === 0xfd) {
+        send(Buffer.from([0xff, 0xfc, chunk[2]]));
+        negFlag = true;
       }
-      else if (chunk[0] === 0xFF && chunk[1] === 0xFD) {
-        send(Buffer.from([0xFF, 0xFC, chunk[2]]))
-        negFlag = true
-      }
-      data = data.slice(3)
+      data = data.slice(3);
     }
-    return negFlag
+    return negFlag;
   }
-
 
   // ------------------------------ GET FUNCTIONS ------------------------------
 
   function keepAlive() {
-    sendDefer('DEVICE get version\n')
+    sendDefer('DEVICE get version\n');
   }
 
   function getAudioLevel(params) {
     // params: InstanceTag, Channel
-    sendDefer(`${params.InstanceTag} get level ${params.Channel}\n`)
+    sendDefer(`${params.InstanceTag} get level ${params.Channel}\n`);
   }
 
   function getAudioMute(params) {
     // params: InstanceTag, Channel
-    sendDefer(`${params.InstanceTag} get mute ${params.Channel}\n`)
+    sendDefer(`${params.InstanceTag} get mute ${params.Channel}\n`);
   }
 
   function getLogicState(params) {
     // params: InstanceTag, Channel
-    sendDefer(`${params.InstanceTag} get state ${params.Channel}\n`)
+    sendDefer(`${params.InstanceTag} get state ${params.Channel}\n`);
   }
-
 
   // ------------------------------ SET FUNCTIONS ------------------------------
 
   function recallPreset(params) {
     // params: Name
-    let num = parseInt(params.Name)
+    let num = parseInt(params.Name);
     if (num) {
-      sendDefer(`DEVICE recallPreset ${num}\n`)
-    }
-    else {
-      sendDefer(`DEVICE recallPresetByName ${params.Name}\n`)
+      sendDefer(`DEVICE recallPreset ${num}\n`);
+    } else {
+      sendDefer(`DEVICE recallPresetByName ${params.Name}\n`);
     }
   }
 
   function setAudioLevel(params) {
     // params: InstanceTag, Channel, Level (0-100)
-    let conf = config.levels.find(x => x.tag === params.InstanceTag)
-    let val = map(params.Level, 0, 100, conf.min, conf.max).toFixed(6)  // Convert value from percentage to decibel
-    sendDefer(`${params.InstanceTag} set level ${params.Channel} ${val}\n`)
+    let conf = config.levels.find(x => x.tag === params.InstanceTag);
+    let val = map(params.Level, 0, 100, conf.min, conf.max).toFixed(6); // Convert value from percentage to decibel
+    sendDefer(`${params.InstanceTag} set level ${params.Channel} ${val}\n`);
   }
 
   function setAudioMute(params) {
     // params: InstanceTag, Channel, Status (0/1)
-    let state = ['false', 'true'][params.Status]
-    sendDefer(`${params.InstanceTag} set mute ${params.Channel} ${state}\n`)
+    let state = ['false', 'true'][params.Status];
+    sendDefer(`${params.InstanceTag} set mute ${params.Channel} ${state}\n`);
   }
 
   function setLogicState(params) {
     // params: InstanceTag, Channel, Status (0/1)
-    let state = ['false', 'true'][params.Status]
-    sendDefer(`${params.InstanceTag} set state ${params.Channel} ${state}\n`)
+    let state = ['false', 'true'][params.Status];
+    sendDefer(`${params.InstanceTag} set state ${params.Channel} ${state}\n`);
   }
 
   function runCustomCommand(params) {
     // Search custom commands config for supplied command, and retrieve actual command, otherwise send as is
-    let cmd = config.commands.find(x => x.nickname === params.Command)
+    let cmd = config.commands.find(x => x.nickname === params.Command);
     if (cmd) {
-      sendDefer(`${cmd.command}\n`)
-    }
-    else {
-      sendDefer(`${params.Command}\n`)
+      sendDefer(`${cmd.command}\n`);
+    } else {
+      sendDefer(`${params.Command}\n`);
     }
   }
 
@@ -346,23 +353,36 @@ exports.createDevice = base => {
 
   function map(value, in_min, in_max, out_min, out_max) {
     if (value < in_min) {
-      logger.error(`map value (${value}) out of range (min = ${in_min}), returning min: ${out_min}`)
-      return out_min
-    }
-    else if (value > in_max) {
-      logger.error(`map value (${value}) out of range (max = ${in_max}), returning max: ${out_max}`)
-      return out_max
-    }
-    else {
-      return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+      logger.error(
+        `map value (${value}) out of range (min = ${in_min}), returning min: ${out_min}`
+      );
+      return out_min;
+    } else if (value > in_max) {
+      logger.error(
+        `map value (${value}) out of range (max = ${in_max}), returning max: ${out_max}`
+      );
+      return out_max;
+    } else {
+      return (
+        ((value - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min
+      );
     }
   }
-
 
   // ------------------------------ EXPORTED FUNCTIONS ------------------------------
   return {
-    setup, start, stop, tick, keepAlive,
-    getAudioLevel, getAudioMute, getLogicState,
-    setAudioLevel, setAudioMute, setLogicState, recallPreset, runCustomCommand
-  }
-}
+    setup,
+    start,
+    stop,
+    tick,
+    keepAlive,
+    getAudioLevel,
+    getAudioMute,
+    getLogicState,
+    setAudioLevel,
+    setAudioMute,
+    setLogicState,
+    recallPreset,
+    runCustomCommand
+  };
+};
