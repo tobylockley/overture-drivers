@@ -1,5 +1,4 @@
 const CMD_DEFER_TIME = 30000; // Timeout when using commandDefer
-const CMD_RETRY_TIME = 1000; // Time between retries if TCP send fails
 const TICK_PERIOD = 5000; // In-built tick interval
 const TCP_TIMEOUT = 10000; // Will timeout after this length of inactivity
 const TCP_RECONNECT_DELAY = 3000; // How long to wait before attempting to reconnect
@@ -98,26 +97,7 @@ exports.createDevice = base => {
   function sendDefer(data) {
     base.commandDefer(CMD_DEFER_TIME);
     if (!send(data)) {
-      // Retry until defer time is over
-      let retryCountMax = Math.floor(CMD_DEFER_TIME / CMD_RETRY_TIME);
-      logger.debug(
-        `TCP send failed, retrying (max attempts = ${retryCountMax}) ...`
-      );
-      let retryCount = 0;
-      let retryTask = () => {
-        retryCount++;
-        if (send(data)) {
-          logger.debug(`TCP send retry attempt ${retryCount}: Success!`);
-        } else {
-          logger.debug(`TCP send retry attempt ${retryCount}: Failed`);
-          if (retryCount < retryCountMax) {
-            setTimeout(retryTask, CMD_RETRY_TIME);
-          } else {
-            base.commandError('Max TCP send retries reached');
-          }
-        }
-      };
-      setTimeout(retryTask, CMD_RETRY_TIME);
+      base.commandError('Data not sent');
     }
   }
 
