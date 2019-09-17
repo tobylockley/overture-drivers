@@ -1,7 +1,7 @@
 {
   "name": "techlogix_tl4x1hd2",
-  "version": "1.0.0-beta.7",
-  "description": "Driver for controlling TL-4x1-HD2 switcher with an RS232 -> TCP interface",
+  "version": "1.0.0-beta.8",
+  "description": "Driver for a Techlogix TL-4x1-HD2 switcher",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -60,14 +60,13 @@
       "properties": {
         "host": {
           "title": "Host name or IP address:",
-          "type": "string",
-          "format": "ipv4",
-          "default": ""
+          "type": "string"
         },
         "port": {
           "title": "Port:",
           "type": "integer",
-          "default": 4999
+          "default": 4999,
+          "description": "Default: 4999"
         }
       }
     }
