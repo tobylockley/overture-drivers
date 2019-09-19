@@ -1,12 +1,12 @@
 {
   "name": "wintal_stb14hd",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Driver for Wintal STB14HD",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
-  "author": "AudioVisualDistributors",
+  "author": "Audio Visual Distributors",
   "license": "MIT",
   "overture": {
     "brand": "Wintal",
@@ -23,6 +23,19 @@
           "Disconnected",
           "Connected"
         ]
+      },
+      {
+        "name": "IR_Commands",
+        "type": "enum",
+        "enums": [
+          "Populated during device setup"
+        ],
+        "perform": {
+          "action": "Send Command",
+          "params": {
+            "Index": "$value"
+          }
+        }
       }
     ],
     "commands": [
@@ -37,12 +50,11 @@
     ],
     "pointSetupSchema": {
       "type": "object",
-      "title": "Setup for GC IR emitter",
+      "title": "Setup for GlobalCache IR emitter",
       "properties": {
         "host": {
-          "title": "GC IR emitter IP/Hostname",
-          "type": "string",
-          "default": "192.168.1.1"
+          "title": "GlobalCache Device IP/Hostname",
+          "type": "string"
         },
         "port": {
           "title": "Port:",
@@ -51,25 +63,21 @@
           "description": "Default: 4998"
         },
         "module": {
-          "title": "Module#:",
-          "type": "string",
-          "default": "1",
-          "description": "Module of GC (1 for Itach)"
+          "title": "GlobalCache Module:",
+          "type": "integer",
+          "minimum": 1,
+          "default": 1,
+          "description": "iTach = 1"
         },
         "ir_port": {
           "title": "IR Port:",
-          "type": "string",
-          "default": "1",
-          "description": "IR blaster port in use (1-3)"
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3,
+          "default": 1,
+          "description": "IR emitter port to use (1-3)"
         }
-      },
-      "required": [
-        "host",
-        "port",
-        "module",
-        "ir_port"
-      ]
+      }
     }
-  },
-  "dependencies": {}
+  }
 }
