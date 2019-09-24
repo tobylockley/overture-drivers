@@ -1,5 +1,5 @@
 {
-  "name": "avproconnect_switcher",
+  "name": "avpro_matrix",
   "version": "1.0.1",
   "description": "Driver for AV Pro Connect Matrix",
   "main": "index.js",
@@ -44,15 +44,9 @@
       "type": "object",
       "title": "AV Pro Connect Matrix Switcher",
       "properties": {
-        "simulation": {
-          "title": "Simulation Mode",
-          "type": "checkbox",
-          "description": "Simulate device, mainly for use with UI development"
-        },
         "host": {
           "title": "Host name or IP address:",
-          "type": "string",
-          "default": "localhost"
+          "type": "string"
         },
         "port": {
           "title": "Port:",
@@ -152,6 +146,11 @@
               }
             }
           ]
+        },
+        "simulation": {
+          "title": "Simulation Mode",
+          "type": "checkbox",
+          "description": "Simulate device, mainly for use with UI development"
         }
       }
     }

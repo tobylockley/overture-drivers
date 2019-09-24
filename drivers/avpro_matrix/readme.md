@@ -1,4 +1,4 @@
-# AV Pro Connect Switcher Driver
+# AV Pro Connect Matrix Switcher Driver
 
 ## Overview
 

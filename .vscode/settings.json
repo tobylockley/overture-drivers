@@ -4,7 +4,7 @@
   "editor.detectIndentation": true,
   "debug.inlineValues": true,
   "debug.toolBarLocation": "floating",
-  "editor.rulers": [100],
+  // "editor.rulers": [100],
 
   "eslint.alwaysShowStatus": true,
   "eslint.autoFixOnSave": true,
