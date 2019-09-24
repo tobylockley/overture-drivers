@@ -51,6 +51,7 @@ exports.createDevice = base => {
     tcpClient = null
   }
 
+  //-------------------------------------------------------------------------- SEND/RECEIVE HANDLERS
   function initTcpClient() {
     if (tcpClient) return // Return if tcpClient already exists
 
@@ -73,9 +74,8 @@ exports.createDevice = base => {
 
     tcpClient.on('close', () => {
       logger.silly('TCPClient closed')
-      disconnect() // Triggered on timeout, this allows auto reconnect
-
       let pending = base.getPendingCommand()
+      disconnect() // Triggered on timeout, this allows auto reconnect
       if (pending) {
         base.commandError('Lost Connection')
         base.perform(pending.action, pending.params)
@@ -88,7 +88,6 @@ exports.createDevice = base => {
     })
   }
 
-  //-------------------------------------------------------------------------- SEND/RECEIVE HANDLERS
   function send(data) {
     logger.silly(`TCPClient send: ${data}`)
     return tcpClient && tcpClient.write(data)
@@ -96,18 +95,13 @@ exports.createDevice = base => {
 
   function sendDefer(data) {
     base.commandDefer(CMD_DEFER_TIME)
-    if (!send(data)) {
-      base.commandError('Data not sent')
-    }
+    if (!send(data)) base.commandError('Data not sent')
   }
 
   function onFrame(data) {
     let match // Used for regex matching below
     const pendingCommand = base.getPendingCommand()
-
-    logger.silly(
-      `onFrame (pending = ${pendingCommand && pendingCommand.action}): ${data}`
-    )
+    logger.silly(`onFrame (pending = ${pendingCommand && pendingCommand.action}): ${data}`)
 
     // Use arrays to match pending command action to expected response
     const setFns = [
