@@ -225,7 +225,8 @@ exports.createDevice = base => {
     snmpSession.set({ oid: oids[varname], value: value.toString(16), type: 4 }, function (error) {
       if (error) {
         logger.error(`set ${varname} error: ${error.message}`)
-      } else {
+      }
+      else {
         if (varname === 'Power' || varname === 'ScreenMute' || varname === 'AudioLevel') {
           base.getVar(varname).value = value  // Simple integer value
         }

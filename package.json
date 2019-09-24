@@ -4,10 +4,7 @@
   "description": "Repository of Overture Drivers by AVD",
   "dependencies": {},
   "devDependencies": {
-    "eslint": "^6.3.0",
-    "eslint-config-prettier": "^6.2.0",
-    "eslint-plugin-prettier": "^3.1.0",
-    "prettier": "^1.18.2"
+    "eslint": "^6.3.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

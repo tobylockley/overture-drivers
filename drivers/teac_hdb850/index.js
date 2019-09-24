@@ -41,11 +41,11 @@ exports.createDevice = base => {
       sendDefer(`sendir,${config.module}:${config.ir_port},${ircode}\r`)
     }
     else {
-      logger.debug("Wrong command variable sent to function Send Command()")
+      logger.debug('Wrong command variable sent to function Send Command()')
     }
   }
 
-  const keepAlive = () => sendDefer("A\r")
+  const keepAlive = () => sendDefer('A\r')
 
   const onFrame = data => {
     logger.silly(`onFrame ${data}`)
@@ -57,7 +57,7 @@ exports.createDevice = base => {
       tcpClient = host.createTCPClient()
 
       tcpClient.on('connect', () => {
-        logger.silly(`TCPClient connected`)
+        logger.silly('TCPClient connected')
         base.getVar('Status').string = 'Connected'
       })
 
@@ -68,7 +68,7 @@ exports.createDevice = base => {
       })
 
       tcpClient.on('close', () => {
-        logger.silly(`TCPClient closed`)
+        logger.silly('TCPClient closed')
         disconnect()
       })
 
@@ -82,8 +82,9 @@ exports.createDevice = base => {
   const sendDefer = data => {
     if (send(data)) {
       base.commandDefer()
-    } else {
-      base.commandError(`Data not sent`)
+    }
+    else {
+      base.commandError('Data not sent')
     }
   }
 

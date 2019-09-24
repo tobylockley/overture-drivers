@@ -51,7 +51,7 @@ exports.createDevice = base => {
 
     // Create IR Commands enum based on ir_codes.json
     irCodes = require('./ir_codes.json')
-    base.getVar('IRCommands').enums = ["Choose a Command"].concat(Object.keys(irCodes))
+    base.getVar('IRCommands').enums = ['Choose a Command'].concat(Object.keys(irCodes))
 
     // Create videowall variables and set polls if enabled
     if (config.videowall) {
@@ -59,12 +59,12 @@ exports.createDevice = base => {
         name: 'TileMode',
         type: 'enum',
         enums: [
-          "Off",
-          "1x2",
-          "2x2",
-          "3x3",
-          "4x4",
-          "5x5"
+          'Off',
+          '1x2',
+          '2x2',
+          '3x3',
+          '4x4',
+          '5x5'
         ],
         perform: {
           action: 'setTileMode',
@@ -227,7 +227,7 @@ exports.createDevice = base => {
       logger.warn(`Received data but no pending command: ${data}`)
     }
     else {
-      logger.warn(`onFrame data not processed`)
+      logger.warn('onFrame data not processed')
     }
   }
 
@@ -259,7 +259,7 @@ exports.createDevice = base => {
     }
     else if (params.Status == 'On') {
       wol.wake(config.mac).then(
-        resolved => {
+        () => {
           logger.silly(`setPower: WOL sent to ${config.mac}`)
         },
         error => {

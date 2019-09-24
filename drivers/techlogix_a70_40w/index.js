@@ -41,7 +41,7 @@ exports.createDevice = base => {
       tcpClient = host.createTCPClient()
 
       tcpClient.on('connect', () => {
-        logger.silly(`TCPClient connected`)
+        logger.silly('TCPClient connected')
         base.getVar('Status').string = 'Connected'
       })
 
@@ -50,7 +50,7 @@ exports.createDevice = base => {
       })
 
       tcpClient.on('close', () => {
-        logger.silly(`TCPClient closed`)
+        logger.silly('TCPClient closed')
         disconnect()
       })
 
@@ -69,8 +69,9 @@ exports.createDevice = base => {
   const sendDefer = data => {
     if (send(data)) {
       base.commandDefer(1000)
-    } else {
-      base.commandError(`Data not sent`)
+    }
+    else {
+      base.commandError('Data not sent')
     }
   }
 

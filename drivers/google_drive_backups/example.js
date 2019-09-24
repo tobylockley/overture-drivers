@@ -83,7 +83,8 @@ function listFiles(auth) {
       files.map((file) => {
         console.log(`${file.name} (${file.id})`)
       })
-    } else {
+    }
+    else {
       console.log('No files found.')
     }
   })
@@ -111,7 +112,8 @@ function uploadTest(auth) {
     if (err) {
       // Handle error
       console.error(err)
-    } else {
+    }
+    else {
       console.log('success\n', file)
     }
   })

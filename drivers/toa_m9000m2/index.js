@@ -25,7 +25,7 @@ exports.createDevice = base => {
             Level: '$value'
           }
         }
-      });
+      })
     }
 
     // OUTPUT FADER GAINS
@@ -42,7 +42,7 @@ exports.createDevice = base => {
             Level: '$value'
           }
         }
-      });
+      })
     }
 
     // CROSSPOINT GAINS
@@ -61,7 +61,7 @@ exports.createDevice = base => {
               Level: '$value'
             }
           }
-        });
+        })
       }
     }
 
@@ -78,7 +78,7 @@ exports.createDevice = base => {
             Status: '$string'
           }
         }
-      });
+      })
     }
 
     // AUDIO MUTE OUTPUT
@@ -94,7 +94,7 @@ exports.createDevice = base => {
             Status: '$string'
           }
         }
-      });
+      })
     }
     
     base.setPoll({
@@ -130,11 +130,11 @@ exports.createDevice = base => {
 
   function bufferToString(thebuffer) {
     // Small helper functions to make hex buffer easier to read
-    let str = "["
+    let str = '['
     thebuffer.forEach(element => {
-      str += '0x' + element.toString(16) + ", "
-    });
-    return str.slice(0, -2) + "]"
+      str += '0x' + element.toString(16) + ', '
+    })
+    return str.slice(0, -2) + ']'
   }
 
   const initTcpClient = () => {
@@ -146,7 +146,7 @@ exports.createDevice = base => {
       })
 
       tcpClient.on('connect', () => {
-        logger.silly(`TCPClient connected`)
+        logger.silly('TCPClient connected')
         base.getVar('Status').string =  'Connected'
       })
 
@@ -156,7 +156,7 @@ exports.createDevice = base => {
       })
 
       tcpClient.on('close', () => {
-        logger.silly(`TCPClient closed`)
+        logger.silly('TCPClient closed')
         disconnect()
       })
 
@@ -175,8 +175,9 @@ exports.createDevice = base => {
   const sendDefer = data => {
     if (send(data)) {
       base.commandDefer(1000)
-    } else {
-      base.commandError(`Data not sent`)
+    }
+    else {
+      base.commandError('Data not sent')
     }
   }
 
@@ -196,7 +197,7 @@ exports.createDevice = base => {
     if (valid_data) {  // Recall Preset
       base.commandDone()
       validated = true
-      base.getVar(`Preset`).string = `Preset ${valid_data[3] + 1}`
+      base.getVar('Preset').string = `Preset ${valid_data[3] + 1}`
     }
 
     valid_data = validateResponse(data, 0x92)
@@ -237,7 +238,7 @@ exports.createDevice = base => {
     }
 
     if (!validated) {
-      logger.error(`onFrame: Unrecognised data packet`)
+      logger.error('onFrame: Unrecognised data packet')
     }
   }
   
@@ -254,12 +255,12 @@ exports.createDevice = base => {
           return temp
         }
         else {
-          logger.error(`onFrame: Response does not match expected format`)
+          logger.error('onFrame: Response does not match expected format')
           return undefined
         }
       }
       else {
-        logger.error(`onFrame: Packet length not as expected`)
+        logger.error('onFrame: Packet length not as expected')
         return undefined
       }
     }
@@ -268,7 +269,7 @@ exports.createDevice = base => {
     }
   }
   
-  const keepAlive = () => { sendDefer(Buffer.from([0xF0, 0x03, 0x40, 0x00, 0x00])); }  // Get Input1 Name
+  const keepAlive = () => { sendDefer(Buffer.from([0xF0, 0x03, 0x40, 0x00, 0x00])) }  // Get Input1 Name
   
   const setPower = params => {
     if (params.Status == 'Off') sendDefer(Buffer.from([0xF4, 0x01, 0x00]))
@@ -276,30 +277,30 @@ exports.createDevice = base => {
   }
 
   const recallPreset = params => {
-    let value = parseInt(params.Name.replace(/\D/g , '')) - 1;  // Extract number, convert to 0 index
-    sendDefer(Buffer.from([0xF1, 0x02, 0x00, value]));
+    let value = parseInt(params.Name.replace(/\D/g , '')) - 1  // Extract number, convert to 0 index
+    sendDefer(Buffer.from([0xF1, 0x02, 0x00, value]))
   }
 
   const setAudioLevel = params => {
-    sendDefer(Buffer.from([0x91, 0x03, 0x01, params.Channel-1, params.Level]));
+    sendDefer(Buffer.from([0x91, 0x03, 0x01, params.Channel-1, params.Level]))
   }
 
   const setAudioLevelIn = params => {
-    sendDefer(Buffer.from([0x91, 0x03, 0x00, params.Channel-1, params.Level]));
+    sendDefer(Buffer.from([0x91, 0x03, 0x00, params.Channel-1, params.Level]))
   }
 
   const setAudioMute = params => {
     let mute_val = params.Status == 'On' ? 0 : 1
-    sendDefer(Buffer.from([0x92, 0x03, 0x01, params.Channel-1, mute_val]));
+    sendDefer(Buffer.from([0x92, 0x03, 0x01, params.Channel-1, mute_val]))
   }
 
   const setAudioMuteIn = params => {
     let mute_val = params.Status == 'On' ? 0 : 1
-    sendDefer(Buffer.from([0x92, 0x03, 0x00, params.Channel-1, mute_val]));
+    sendDefer(Buffer.from([0x92, 0x03, 0x00, params.Channel-1, mute_val]))
   }
 
   const setCrosspointGain = params => {
-    sendDefer(Buffer.from([0x95, 0x05, 0x00, params.Input-1, 0x01, params.Output-1, params.Level]));
+    sendDefer(Buffer.from([0x95, 0x05, 0x00, params.Input-1, 0x01, params.Output-1, params.Level]))
   }
 
   return {

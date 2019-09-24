@@ -6,10 +6,8 @@
   "debug.toolBarLocation": "floating",
   "editor.rulers": [100],
 
-  // "eslint.alwaysShowStatus": true,
-  // "editor.formatOnSave": true,
+  "eslint.alwaysShowStatus": true,
   "eslint.autoFixOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
 
   "maptz.regionfolder": {
     "[javascript]": {

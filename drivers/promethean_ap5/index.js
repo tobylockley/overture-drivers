@@ -1,11 +1,11 @@
 let host
 
 function bufferToString(thebuffer) {
-  let str = "["
+  let str = '['
   thebuffer.forEach(element => {
-    str += '0x' + element.toString(16) + ", "
-  });
-  return str.slice(0, -2) + "]"
+    str += '0x' + element.toString(16) + ', '
+  })
+  return str.slice(0, -2) + ']'
 }
 
 exports.init = _host => {
@@ -71,7 +71,7 @@ exports.createDevice = base => {
       tcpClient = host.createTCPClient()
 
       tcpClient.on('connect', () => {
-        logger.silly(`TCPClient connected`)
+        logger.silly('TCPClient connected')
         base.getVar('Status').string = 'Connected'
       })
 
@@ -82,7 +82,7 @@ exports.createDevice = base => {
       })
 
       tcpClient.on('close', () => {
-        logger.silly(`TCPClient closed`)
+        logger.silly('TCPClient closed')
         disconnect()
       })
 
@@ -101,8 +101,9 @@ exports.createDevice = base => {
   const sendDefer = data => {
     if (send(data)) {
       base.commandDefer(1000)
-    } else {
-      base.commandError(`Data not sent`)
+    }
+    else {
+      base.commandError('Data not sent')
     }
   }
 
@@ -163,7 +164,7 @@ exports.createDevice = base => {
         base.getVar(var_name).value = val
       }
       else {
-        logger.error(`onFrame: var_name not recognised`)
+        logger.error('onFrame: var_name not recognised')
       }
     }
 

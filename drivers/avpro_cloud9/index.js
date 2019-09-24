@@ -228,7 +228,7 @@ exports.createDevice = base => {
     }
 
     // Videowall Mode
-    match = data.match(/OUT(\d+) VW XYZ ([\d\.]+)/i)
+    match = data.match(/OUT(\d+) VW XYZ ([\d.]+)/i)
     if (match) {
       for (let key in VW_LOOKUP) {
         if (VW_LOOKUP[key] === match[2]) {
@@ -238,7 +238,7 @@ exports.createDevice = base => {
         }
       }
       // If we got here, no match was found, so just set to None
-      logger.warning(`Unrecognized Videowall coordinates received, setting videowall mode to 'None'`)
+      logger.warning('Unrecognized Videowall coordinates received, setting videowall mode to \'None\'')
       base.getVar(`VideowallMode_Output${match[1]}`).value = 0
       return
     }

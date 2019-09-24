@@ -88,12 +88,14 @@ exports.createDevice = base => {
 
       if (uploadList.length === 0) {
         logger.info('All Overture backups have been synced to Google Drive.')
-      } else {
+      }
+      else {
         for (let filename of uploadList) {
           syncFile(filename) // Download from UX, then upload to cloud
         }
       }
-    } catch (err) {
+    }
+    catch (err) {
       logger.error('Error syncing backups:', err.message)
     }
   }
@@ -110,7 +112,8 @@ exports.createDevice = base => {
       let content = fs.readFileSync(path.join(__dirname, '../../config.json'))
       uxUrl = JSON.parse(content).UXURI
       logger.silly('uxUrl:', uxUrl)
-    } catch (err) {
+    }
+    catch (err) {
       uxUrl = DEBUG_URL
       logger.error('Error loading config.json, using DEBUG_URL:', DEBUG_URL)
     }
@@ -133,7 +136,8 @@ exports.createDevice = base => {
       }
       let response = await host.request(options)
       return response
-    } catch (err) {
+    }
+    catch (err) {
       logger.error('apiCall error:', err.message)
     }
   }
@@ -220,7 +224,8 @@ exports.createDevice = base => {
           }
           if (file.status == 200) {
             logger.debug(`File uploaded to Google Drive: ${filename}`)
-          } else {
+          }
+          else {
             logger.error(
               `Error uploading backup (${filename}): ${file.statusText}`
             )
@@ -285,7 +290,8 @@ exports.createDevice = base => {
         oAuth2Client.setCredentials(JSON.parse(token))
         callback(oAuth2Client)
       })
-    } else {
+    }
+    else {
       // No auth code supplied, or it has been deleted. If token.json exists, delete it
       fs.unlink(TOKEN_PATH, err => {
         if (err && err.code !== 'ENOENT') logger.error(err.message)
