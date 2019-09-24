@@ -41,11 +41,11 @@
         "name": "Sources",
         "type": "enum",
         "enums": [
-          "DTV",
           "HDMI1",
           "HDMI2",
           "HDMI3",
-          "HDMI4"
+          "HDMI4",
+          "DTV"
         ],
         "perform": {
           "action": "Select Source",
