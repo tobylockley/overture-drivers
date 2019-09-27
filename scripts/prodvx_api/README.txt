@@ -1,1 +1,1 @@
-Type this into browser on ProDVX tablet: tiny.cc/g6phdz
+Type this into browser on ProDVX tablet: tiny.cc/prodvx
