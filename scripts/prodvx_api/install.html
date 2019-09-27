@@ -17,13 +17,13 @@
   <p>
     <b>SLB</b>
     <textarea id="slb-cmd" onclick="this.focus();this.select()"></textarea>
-    <button onclick="copyText(document.getElementById('slb-cmd').value)">COPY</button>
+    <button onclick="copyText(document.getElementById('slb-cmd').value)">COPY SLB INSTALL COMMAND</button>
   </p>
 
   <p>
     <b>DSKPL</b>
     <textarea id="dskpl-cmd" onclick="this.focus();this.select()"></textarea>
-    <button onclick="copyText(document.getElementById('dskpl-cmd').value)">COPY</button>
+    <button onclick="copyText(document.getElementById('dskpl-cmd').value)">COPY DSKPL INSTALL COMMAND</button>
   </p>
 
   <div id="notice">
@@ -80,6 +80,11 @@
   <style>
     html {
       font-family: Arial;
+    }
+    button {
+      height: 40px;
+      padding: 0 20px;
+      margin: 5px 0;
     }
     textarea {
       width: 100%;
