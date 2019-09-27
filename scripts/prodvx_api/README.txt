@@ -1,0 +1,1 @@
+Type this into browser on ProDVX tablet: tiny.cc/g6phdz
