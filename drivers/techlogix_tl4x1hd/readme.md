@@ -1,13 +1,10 @@
 # Techlogix TL-4x1-HD HDMI Switcher
 
-
 ## Overview
-
 Driver for a Techlogix TL-4x1-HD HDMI switcher
 
 
 ## Setup
-
 - "Host": The IP address or host name of the globalcache device.
 - "Port": The port of TCP communication. (Default 4999)
 
@@ -15,13 +12,11 @@ Driver for a Techlogix TL-4x1-HD HDMI switcher
 ## Variables
 
 ### Status
-
 [enum] The current connection status of the device.
   - "Disconnected" : The device is not connected.
   - "Connected" : The device is connected, and able to receive commands.
 
 ### Sources
-
 [enum] List of input sources user can select from.
   - "HDMI1": Change input source to HDMI1
   - "HDMI2": Change input source to HDMI2
@@ -29,7 +24,6 @@ Driver for a Techlogix TL-4x1-HD HDMI switcher
   - "HDMI4": Change input source to HDMI4
 
 ### Mute
-
 [enum] The mute status of the switchers output.
 - "Off": Switch off output
 - "On" : Switch on output
@@ -55,3 +49,7 @@ Mute or unmute the output.
 - Small update, changed reconnection logic slightly to avoid possible socket timeouts
 - Removed power variable/command as it is not documented and not supported in API
 - Updated readme
+
+### 1.0.2
+- Changed name from "tl_4x1_hd" to "techlogix_tl4x1hd"
+- Updated syntax, eslint

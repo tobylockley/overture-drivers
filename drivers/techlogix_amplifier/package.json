@@ -120,8 +120,7 @@
       "properties": {
         "host": {
           "title": "IP Address/Hostname:",
-          "type": "string",
-          "default": "192.168.1.1"
+          "type": "string"
         },
         "port": {
           "title": "Port:",
@@ -138,12 +137,7 @@
             "TL-A8O-50W"
           ]
         }
-      },
-      "required": [
-        "host",
-        "port",
-        "model"
-      ]
+      }
     }
   }
 }
