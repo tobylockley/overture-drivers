@@ -1,6 +1,6 @@
 {
   "name": "lg_display",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Driver for LG display",
   "main": "index.js",
   "scripts": {

@@ -90,19 +90,25 @@ exports.createDevice = base => {
     initTcpClient()
   }
 
-  function stop() {
-    tcpClient && tcpClient.end()
-    tcpClient = null
-    base.stopPolling()
-    base.clearPendingCommands()
-  }
-
   function tick() {
     if (!tcpClient) initTcpClient()
   }
 
+  function disconnect() {
+    base.getVar('Status').string = 'Disconnected'
+    base.stopPolling()
+    base.clearPendingCommands()
+  }
+
+  function stop() {
+    disconnect()
+    tcpClient && tcpClient.end()
+    tcpClient = null
+  }
+
+  //-------------------------------------------------------------------------- SEND/RECEIVE HANDLERS
   function initTcpClient() {
-    if (tcpClient) return  // Return if tcpClient already exists
+    if (tcpClient) return // Return if tcpClient already exists
 
     tcpClient = host.createTCPClient()
     tcpClient.setOptions({
@@ -123,18 +129,15 @@ exports.createDevice = base => {
 
     tcpClient.on('close', () => {
       logger.silly('TCPClient closed')
-      base.getVar('Status').string = 'Disconnected'  // Triggered on timeout, this allows auto reconnect
+      disconnect() // Triggered on timeout, this allows auto reconnect
       base.getVar('Power').value = 0  // Allow for WOL to be sent
     })
 
     tcpClient.on('error', err => {
       logger.error(`TCPClient: ${err}`)
-      stop()  // Throw out the tcpClient and get a fresh connection
+      stop() // Throw out the tcpClient and get a fresh connection
     })
   }
-
-
-  // ------------------------------ SEND/RECEIVE HANDLERS ------------------------------
 
   function send(data) {
     logger.silly(`TCPClient send: ${data}`)
@@ -149,8 +152,14 @@ exports.createDevice = base => {
   function onFrame(data) {
     const pendingCommand = base.getPendingCommand()
     logger.silly(`onFrame (pending = ${pendingCommand && pendingCommand.action}): ${data}`)
+    
+    let match = data.match(/(\w) (\d+) NG/)
+    if (match && pendingCommand) {
+      base.commandError('Device returned error')
+      return
+    }
 
-    let match = data.match(/(\w) (\d+) OK([0-9a-fA-F]+)/)
+    match = data.match(/(\w) (\d+) OK([0-9a-fA-F]+)/)
     if (match && pendingCommand) {
       let id = parseInt(match[2], 16)
       let val = parseInt(match[3], 16)

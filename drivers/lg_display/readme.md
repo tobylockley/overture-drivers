@@ -122,3 +122,6 @@ Set this screens tile ID (position in the videowall, top left = 1)
 - On power off, polling is stopped immediately to avoid panel coming back online
 - Swapped row/col in api call, as it was backwards
 - Other minor bug fixes
+
+### 1.0.7
+- Added detection of error from device
