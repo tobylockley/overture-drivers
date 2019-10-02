@@ -1,8 +1,17 @@
-const CMD_DEFER_TIME = 30000 // Timeout when using commandDefer
+const CMD_DEFER_TIME = 3000 // Timeout when using commandDefer
 const TICK_PERIOD = 5000 // In-built tick interval
 const TCP_TIMEOUT = 10000 // Will timeout after this length of inactivity
 const TCP_RECONNECT_DELAY = 3000 // How long to wait before attempting to reconnect
 
+const GET_PWR = String.fromCharCode(0x6C)
+const GET_SRC = String.fromCharCode(0x6A)
+const GET_VOL = String.fromCharCode(0x66)
+const GET_MUT = String.fromCharCode(0x67)
+const SET_PWR = String.fromCharCode(0x21)
+const SET_SRC = String.fromCharCode(0x22)
+const SET_VOL = String.fromCharCode(0x35)
+const SET_MUT = String.fromCharCode(0x36)
+  
 let host
 exports.init = _host => {
   host = _host
@@ -21,7 +30,6 @@ exports.createDevice = base => {
   function setup(_config) {
     config = _config
     base.setTickPeriod(TICK_PERIOD)
-
     // Register polling functions
     let poll_ms = config.polltime * 1000 // Convert from seconds to milliseconds
     setPoll('getPower', poll_ms, isConnected)
@@ -42,6 +50,7 @@ exports.createDevice = base => {
   function disconnect() {
     base.getVar('Status').string = 'Disconnected'
     base.stopPolling()
+    base.clearPendingCommands()
   }
 
   function stop() {
@@ -73,12 +82,6 @@ exports.createDevice = base => {
     tcpClient.on('close', () => {
       logger.silly('TCPClient closed')
       disconnect() // Triggered on timeout, this allows auto reconnect
-
-      let pending = base.getPendingCommand()
-      if (pending) {
-        base.commandError('Lost Connection')
-        base.perform(pending.action, pending.params)
-      }
     })
 
     tcpClient.on('error', err => {
@@ -102,126 +105,91 @@ exports.createDevice = base => {
 
   function onFrame(data) {
     let match // Used for regex matching below
-    const pendingCommand = base.getPendingCommand()
+    const pending = base.getPendingCommand()
+    logger.silly(`onFrame (pending = ${pending && pending.action}): ${data}`)
 
-    logger.silly(
-      `onFrame (pending = ${pendingCommand && pendingCommand.action}): ${data}`
-    )
+    if ((match = data.match(/.(\d\d)(.)(.?)(\d*?)\r/))) {
+      const id = parseInt(match[1])
+      const type = match[2]
+      const cmd = match[3]
+      const val = parseInt(match[4])
 
-    // Use arrays to match pending command action to expected response
-    const setFns = [
-      'setPower',
-      'selectSource',
-      'setAudioLevel',
-      'setAudioMute',
-      'setChannel',
-      'shiftChannel'
-    ]
-
-    if (pendingCommand && setFns.includes(pendingCommand.action)) {
-      // Parse response after issueing a SET function
-
-      match = data.match(/POWR0{16}/)
-      if (match) {
-        base.getVar('Power').string = pendingCommand.params.Status
-        base.commandDone()
+      // DO SOME BASIC ERROR CHECKING
+      if (id != config.id) {
+        logger.error('Device response does not match configured TV ID')
+      }
+      else if (pending && type === '-') {
+        base.commandError('Device responded with error')
+      }
+      else if (!pending) {
+        logger.warn('onFrame: No pending command, data not processed')
       }
 
-      match = data.match(/INPT0{16}/)
-      if (match) {
-        base.getVar('Sources').string = pendingCommand.params.Name
-        base.commandDone()
-        if (pendingCommand.params.Name === 'DTV') getChannel() // Get channel when set to DTV mode
+      // GET RESPONSES
+      else if (pending.action === 'getPower' && cmd === GET_PWR && type === 'r') {
+        base.getVar('Power').value = val
+      }
+      else if (pending.action === 'getSource' && cmd === GET_SRC && type === 'r') {
+        switch (val) {
+        case 0:
+          base.getVar('Sources').string = 'VGA'; break
+        case 1:
+          base.getVar('Sources').string = 'HDMI1'; break
+        case 2:
+          base.getVar('Sources').string = 'HDMI2'; break
+        case 21:
+          base.getVar('Sources').string = 'HDMI3'; break
+        case 22:
+          base.getVar('Sources').string = 'HDMI4'; break
+        default:
+          logger.warn('onFrame: Unrecognised source value')
+        }
+      }
+      else if (pending.action === 'getAudioLevel' && cmd === GET_VOL && type === 'r') {
+        base.getVar('AudioLevel').value = val
+      }
+      else if (pending.action === 'getAudioMute' && cmd === GET_MUT && type === 'r') {
+        base.getVar('AudioMute').value = val
       }
 
-      match = data.match(/VOLU0{16}/)
-      if (match) {
-        base.getVar('AudioLevel').value = parseInt(pendingCommand.params.Level)
-        base.commandDone()
+      // SET RESPONSES
+      else if (pending.action === 'setPower' && cmd === SET_PWR && type === '+') {
+        base.getVar('Power').string = pending.params.Status
+      }
+      else if (pending.action === 'selectSource' && cmd === SET_SRC && type === '+') {
+        base.getVar('Sources').string = pending.params.Name
+      }
+      else if (pending.action === 'setAudioLevel' && cmd === SET_VOL && type === '+') {
+        base.getVar('AudioLevel').value = pending.params.Level
+      }
+      else if (pending.action === 'setAudioMute' && cmd === SET_MUT && type === '+') {
+        base.getVar('AudioMute').string = pending.params.Status
       }
 
-      match = data.match(/AMUT0{16}/)
-      if (match) {
-        base.getVar('AudioMute').string = pendingCommand.params.Status
-        base.commandDone()
-      }
-
-      match = data.match(/CHNN0{16}/)
-      if (match) {
-        base.getVar('Channel').value = parseInt(pendingCommand.params.Name)
-        base.commandDone()
-      }
-
-      match = data.match(/IRCC0{16}/)
-      if (match) {
-        base.getVar('ChannelShift').value = 0 // Reset to 'idle'
-        base.commandDone()
+      else {
+        logger.warn('onFrame: Unable to process data')
       }
     }
     else {
-      // Parse response after issueing a GET function, OR after a "notify" frame
-      // Notify frames are received after changing something, either from the CS or an IR remote
-
-      match = data.match(/POWR(.{16})/)
-      if (match) {
-        let val = parseInt(match[1])
-        val && (base.getVar('Power').value = val) // 0 = off, 1 = on
-        pendingCommand && base.commandDone()
-      }
-
-      match = data.match(/INPT0{16}/)
-      if (match) {
-        base.getVar('Sources').string = 'DTV'
-        pendingCommand && base.commandDone()
-      }
-
-      match = data.match(/INPT0{7}1(\d+)/)
-      if (match) {
-        base.getVar('Sources').string = `HDMI${parseInt(match[1])}`
-        pendingCommand && base.commandDone()
-      }
-
-      match = data.match(/VOLU(.{16})/)
-      if (match) {
-        let val = parseInt(match[1])
-        val && (base.getVar('AudioLevel').value = val)
-        pendingCommand && base.commandDone()
-      }
-
-      match = data.match(/AMUT(.{16})/)
-      if (match) {
-        let val = parseInt(match[1])
-        val && (base.getVar('AudioMute').value = val) // 0 = unmute, 1 = mute
-        pendingCommand && base.commandDone()
-      }
-
-      match = data.match(/CHNN(\d+)\./) // Ignores values after decimal point
-      if (match) {
-        base.getVar('Channel').value = parseInt(match[1])
-        pendingCommand && base.commandDone()
-      }
+      logger.warn('Unrecognised response from device')
     }
   }
 
   //---------------------------------------------------------------------------------- GET FUNCTIONS
   function getPower() {
-    sendDefer('*SEPOWR################\n')
+    benqGet(GET_PWR)
   }
 
   function getSource() {
-    sendDefer('*SEINPT################\n')
+    benqGet(GET_SRC)
   }
 
   function getAudioLevel() {
-    sendDefer('*SEVOLU################\n')
+    benqGet(GET_VOL)
   }
 
   function getAudioMute() {
-    sendDefer('*SEAMUT################\n')
-  }
-
-  function getChannel() {
-    sendDefer('*SECHNN################\n')
+    benqGet(GET_MUT)
   }
 
   //---------------------------------------------------------------------------------- SET FUNCTIONS
@@ -231,8 +199,8 @@ exports.createDevice = base => {
       return
     }
 
-    if (params.Status == 'Off') sendDefer('*SCPOWR0000000000000000\n')
-    else if (params.Status == 'On') sendDefer('*SCPOWR0000000000000001\n')
+    if (params.Status == 'Off') benqSet(SET_PWR, 0)
+    else if (params.Status == 'On') benqSet(SET_PWR, 1)
   }
 
   function selectSource(params) {
@@ -241,11 +209,11 @@ exports.createDevice = base => {
       return
     }
 
-    if (params.Name == 'DTV') sendDefer('*SCINPT0000000000000000\n')
-    else {
-      let match = params.Name.match(/HDMI(\d)/)
-      match && sendDefer(`*SCINPT000000010000000${match[1]}\n`)
-    }
+    if (params.Name === 'VGA') benqSet(SET_SRC, 0)
+    else if (params.Name === 'HDMI1') benqSet(SET_SRC, 1)
+    else if (params.Name === 'HDMI2') benqSet(SET_SRC, 2)
+    else if (params.Name === 'HDMI3') benqSet(SET_SRC, 21)
+    else if (params.Name === 'HDMI4') benqSet(SET_SRC, 22)
   }
 
   function setAudioLevel(params) {
@@ -254,8 +222,7 @@ exports.createDevice = base => {
       return
     }
 
-    let vol = params.Level.toString().padStart(3, '0') // Formats the integer with leading zeroes, e.g. 53 = '053'
-    sendDefer(`*SCVOLU0000000000000${vol}\n`)
+    benqSet(SET_VOL, params.Level)
   }
 
   function setAudioMute(params) {
@@ -264,8 +231,8 @@ exports.createDevice = base => {
       return
     }
 
-    if (params.Status == 'Off') sendDefer('*SCAMUT0000000000000000\n')
-    else if (params.Status == 'On') sendDefer('*SCAMUT0000000000000001\n')
+    if (params.Status == 'Off') benqSet(SET_MUT, 0)
+    else if (params.Status == 'On') benqSet(SET_MUT, 1)
   }
 
   //------------------------------------------------------------------------------- HELPER FUNCTIONS
@@ -286,20 +253,32 @@ exports.createDevice = base => {
     })
   }
 
+  function benqGet(cmd) {
+    // Send get request to BenQ panel, only works for 3 byte responses
+    if (!(host.lodash.isString(cmd) && cmd.length === 1)) {
+      throw new TypeError('cmd must be a single character')
+    }
+    let id = config.id.toString().padStart(2, '0')
+    sendDefer(`8${id}g${cmd}000\r`)
+  }
+
+  function benqSet(cmd, val) {
+    if (!(host.lodash.isString(cmd) && cmd.length === 1)) {
+      throw new TypeError('cmd must be a single character')
+    }
+    if (!host.lodash.isInteger(val)) {
+      throw new TypeError('val must be an integer')
+    }
+    val = val.toString().padStart(3, '0')
+    let id = config.id.toString().padStart(2, '0')
+    let msg = `${id}s${cmd}${val}`
+    sendDefer(`${msg.length}${msg}\r`)
+  }
+
   //----------------------------------------------------------------------------- EXPORTED FUNCTIONS
   return {
-    setup,
-    start,
-    stop,
-    tick,
-    getPower,
-    getSource,
-    getAudioLevel,
-    getAudioMute,
-    getChannel,
-    setPower,
-    selectSource,
-    setAudioLevel,
-    setAudioMute
+    setup, start, stop, tick,
+    getPower, getSource, getAudioLevel, getAudioMute,
+    setPower, selectSource, setAudioLevel, setAudioMute
   }
 }
