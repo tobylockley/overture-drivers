@@ -101,7 +101,7 @@ exports.createDevice = base => {
   function onFrame(data) {
     let match // Used for regex matching below
     const pendingCommand = base.getPendingCommand()
-    logger.silly(`onFrame (pending = ${pendingCommand && pendingCommand.action}): ${data}`)
+    logger.debug(`onFrame (pending = ${pendingCommand && pendingCommand.action}): ${data}`)
 
     // Use arrays to match pending command action to expected response
     const setFns = [
@@ -116,38 +116,38 @@ exports.createDevice = base => {
     if (pendingCommand && setFns.includes(pendingCommand.action)) {
       // Parse response after issueing a SET function
 
-      match = data.match(/POWR0{16}/)
+      match = data.match(/APOWR0{16}/)
       if (match) {
         base.getVar('Power').string = pendingCommand.params.Status
         base.commandDone()
       }
 
-      match = data.match(/INPT0{16}/)
+      match = data.match(/AINPT0{16}/)
       if (match) {
         base.getVar('Sources').string = pendingCommand.params.Name
         base.commandDone()
         if (pendingCommand.params.Name === 'DTV') getChannel() // Get channel when set to DTV mode
       }
 
-      match = data.match(/VOLU0{16}/)
+      match = data.match(/AVOLU0{16}/)
       if (match) {
         base.getVar('AudioLevel').value = parseInt(pendingCommand.params.Level)
         base.commandDone()
       }
 
-      match = data.match(/AMUT0{16}/)
+      match = data.match(/AAMUT0{16}/)
       if (match) {
         base.getVar('AudioMute').string = pendingCommand.params.Status
         base.commandDone()
       }
 
-      match = data.match(/CHNN0{16}/)
+      match = data.match(/ACHNN0{16}/)
       if (match) {
         base.getVar('Channel').value = parseInt(pendingCommand.params.Name)
         base.commandDone()
       }
 
-      match = data.match(/IRCC0{16}/)
+      match = data.match(/AIRCC0{16}/)
       if (match) {
         base.getVar('ChannelShift').value = 0 // Reset to 'idle'
         base.commandDone()
@@ -157,40 +157,40 @@ exports.createDevice = base => {
       // Parse response after issueing a GET function, OR after a "notify" frame
       // Notify frames are received after changing something, either from the CS or an IR remote
 
-      match = data.match(/POWR(.{16})/)
+      match = data.match(/APOWR(.{16})/)
       if (match) {
         let val = parseInt(match[1])
         val && (base.getVar('Power').value = val) // 0 = off, 1 = on
         pendingCommand && base.commandDone()
       }
 
-      match = data.match(/INPT0{16}/)
+      match = data.match(/AINPT0{16}/)
       if (match) {
         base.getVar('Sources').string = 'DTV'
         pendingCommand && base.commandDone()
       }
 
-      match = data.match(/INPT0{7}1(\d+)/)
+      match = data.match(/AINPT0{7}1(\d+)/)
       if (match) {
         base.getVar('Sources').string = `HDMI${parseInt(match[1])}`
         pendingCommand && base.commandDone()
       }
 
-      match = data.match(/VOLU(.{16})/)
+      match = data.match(/AVOLU(.{16})/)
       if (match) {
         let val = parseInt(match[1])
         val && (base.getVar('AudioLevel').value = val)
         pendingCommand && base.commandDone()
       }
 
-      match = data.match(/AMUT(.{16})/)
+      match = data.match(/AAMUT(.{16})/)
       if (match) {
         let val = parseInt(match[1])
         val && (base.getVar('AudioMute').value = val) // 0 = unmute, 1 = mute
         pendingCommand && base.commandDone()
       }
 
-      match = data.match(/CHNN(\d+)\./) // Ignores values after decimal point
+      match = data.match(/ACHNN(\d+)\./) // Ignores values after decimal point
       if (match) {
         base.getVar('Channel').value = parseInt(match[1])
         pendingCommand && base.commandDone()
