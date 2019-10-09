@@ -1,0 +1,83 @@
+{
+  "name": "roku_2",
+  "version": "1.0.0",
+  "description": "Driver for Roku 2",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "Roku",
+    "models": [
+      "2"
+    ],
+    "type": "device",
+    "subtype": "player",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "IR_Commands",
+        "type": "enum",
+        "enums": [
+          "Populated during device setup"
+        ],
+        "perform": {
+          "action": "Send Command",
+          "params": {
+            "Index": "$value"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Send Command",
+        "params": {
+          "Index": {
+            "type": "integer"
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Setup for GlobalCache IR emitter",
+      "properties": {
+        "host": {
+          "title": "GlobalCache Device IP/Hostname",
+          "type": "string"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 4998,
+          "description": "Default: 4998"
+        },
+        "module": {
+          "title": "GlobalCache Module:",
+          "type": "integer",
+          "minimum": 1,
+          "default": 1,
+          "description": "iTach = 1"
+        },
+        "ir_port": {
+          "title": "IR Port:",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3,
+          "default": 1,
+          "description": "IR emitter port to use (1-3)"
+        }
+      }
+    }
+  }
+}
