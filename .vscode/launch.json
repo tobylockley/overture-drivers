@@ -22,7 +22,7 @@
         "${workspaceFolder}/OvertureCS/core/*.js"
       ],
       "env": {
-        "UXURI": "http://203.27.185.62:9950",
+        "UXURI": "https://avd.overture.barco.com",
         "UID": "TobyCS",
         "DRIVERPATH": "${workspaceRoot}/drivers",
         "DEBUGDRIVER": "true",
