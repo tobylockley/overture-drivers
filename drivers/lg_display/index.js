@@ -15,7 +15,7 @@ exports.createDevice = base => {
   const logger = base.logger || host.logger
   let config
   let tcpClient
-  let wol = require('wol')  // Used to turn wake from power off, must be enabled in menu
+  let networkUtilities = host.createNetworkUtilities()
   let sourcesInfo = []  // Used to store inputs sources hex codes
   let irCodes  // Populated during setup
 
@@ -267,7 +267,7 @@ exports.createDevice = base => {
       sendDefer(`ka ${config.setID} 00\r`)
     }
     else if (params.Status == 'On') {
-      wol.wake(config.mac).then(
+      networkUtilities.wakeOnLan({mac: config.mac}).then(
         () => {
           logger.silly(`setPower: WOL sent to ${config.mac}`)
         },

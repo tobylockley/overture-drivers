@@ -1,6 +1,6 @@
 {
   "name": "lg_display",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Driver for LG display",
   "main": "index.js",
   "scripts": {
@@ -95,7 +95,9 @@
       {
         "name": "IRCommands",
         "type": "enum",
-        "enums": [ "Populated during setup" ],
+        "enums": [
+          "Populated during setup"
+        ],
         "perform": {
           "action": "Send IR Command",
           "params": {
@@ -159,7 +161,8 @@
           "Level": {
             "type": "integer"
           }
-        }
+        },
+        "optimize": true
       },
       {
         "name": "Send IR Command",
@@ -351,7 +354,5 @@
       }
     }
   },
-  "dependencies": {
-    "wol": "^1.0.6"
-  }
+  "dependencies": {}
 }

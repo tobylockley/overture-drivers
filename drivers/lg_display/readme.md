@@ -1,8 +1,9 @@
 # LG Display
 
-
 ## Overview
 Driver for an LG display, with optional videowall capability.
+Be aware that Wake On Lan is required for "Power On" functionality.
+If the control server is on a computer with more than one NIC, the priority must be correct for WOL to work. (See here for more details)[https://docs.microsoft.com/en-us/windows-server/networking/technologies/network-subsystem/net-sub-interface-metric].
 
 
 ## Setup
@@ -125,3 +126,7 @@ Set this screens tile ID (position in the videowall, top left = 1)
 
 ### 1.0.7
 - Added detection of error from device
+
+### 1.0.8
+- Moved WOL to in-built networkUtilities
+- Added "optimize" to volume command
