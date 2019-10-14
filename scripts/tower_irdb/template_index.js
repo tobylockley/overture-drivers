@@ -1,10 +1,7 @@
 'use strict'
 
-const CMD_DEFER_TIME = 3000 // Timeout when using commandDefer
-const TICK_PERIOD = 5000 // In-built tick interval
-const POLL_PERIOD = 20000 // Continuous polling interval used for keepAlive
-const TCP_TIMEOUT = 30000 // Will timeout after this length of inactivity
-const TCP_RECONNECT_DELAY = 3000 // How long to wait before attempting to reconnect
+const POLL_PERIOD = 30000 // Continuous polling interval used for checkStatus
+const TCP_TIMEOUT = 2000 // Will timeout after this length of inactivity
 
 let host
 exports.init = _host => {
@@ -14,86 +11,73 @@ exports.init = _host => {
 exports.createDevice = base => {
   const logger = base.logger || host.logger
   let config
-  let tcpClient
   const ir_codes = require('./ir_codes.json')
 
-  // ------------------------------ SETUP FUNCTIONS ------------------------------
-
-  function isConnected() {
-    return base.getVar('Status').string === 'Connected'
-  }
-
+  // ------------------------------ BASE FUNCTIONS ------------------------------
   function setup(_config) {
     config = _config
-    base.setTickPeriod(TICK_PERIOD)
-
     // Register polling functions
     base.setPoll({
-      action: 'keepAlive',
+      action: 'checkStatus',
       period: POLL_PERIOD,
-      enablePollFn: isConnected,
-      startImmediately: true
+      startImmediately: false
     })
-
     base.getVar('IR_Commands').enums = ['Idle'].concat(Object.keys(ir_codes))
   }
 
   function start() {
-    initTcpClient()
+    base.startPolling()
   }
 
   function stop() {
     base.clearPendingCommands()
+    base.stopPolling()
     base.getVar('Status').string = 'Disconnected'
-    tcpClient && tcpClient.end()
-    tcpClient = null
-  }
-
-  function tick() {
-    if (!tcpClient) initTcpClient()
-  }
-
-  function initTcpClient() {
-    if (tcpClient) return // Return if tcpClient already exists
-
-    tcpClient = host.createTCPClient()
-    tcpClient.setOptions({
-      receiveTimeout: TCP_TIMEOUT,
-      autoReconnectionAttemptDelay: TCP_RECONNECT_DELAY
-    })
-    tcpClient.connect(config.port, config.host)
-
-    tcpClient.on('connect', () => {
-      logger.silly('TCPClient connected')
-      base.getVar('Status').string = 'Connected'
-      base.startPolling()
-    })
-
-    tcpClient.on('data', data => {
-      onFrame(data.toString())
-    })
-
-    tcpClient.on('close', () => {
-      logger.silly('TCPClient closed')
-      base.getVar('Status').string = 'Disconnected' // Triggered on timeout, this allows auto reconnect
-    })
-
-    tcpClient.on('error', err => {
-      logger.error(`TCPClient: ${err}`)
-      stop() // Throw out the tcpClient and get a fresh connection
-    })
   }
 
   // ------------------------------ SEND/RECEIVE HANDLERS ------------------------------
 
-  function send(data) {
-    logger.silly(`TCPClient send: ${data}`)
-    return tcpClient && tcpClient.write(data)
-  }
+  function connectThenSend(data) {
+    // Open a TCP connection, send data, and wait for response.
+    // If connection fails, retry 3 times before admitting defeat.
+    
+    return new Promise((resolve, reject) => {
+      let success = false
+      let tcpClient = host.createTCPClient()
+      tcpClient.setOptions({
+        receiveTimeout: TCP_TIMEOUT
+      })
 
-  function sendDefer(data) {
-    base.commandDefer(CMD_DEFER_TIME)
-    if (!send(data)) base.commandError('Data not sent')
+      let frameParser = host.createFrameParser()
+      frameParser.setSeparator('\r')
+      // If we receive a complete frame, resolve the promise
+      frameParser.on('data', data => {
+        success = true
+        tcpClient.end()
+        resolve(data)
+      })
+      
+      tcpClient.on('connect', () => {
+        base.getVar('Status').string = 'Connected'
+        logger.silly(`tcpClient connected. Writing... ${tcpClient.write(data)}`)
+      })
+      
+      tcpClient.on('data', data => {
+        frameParser.push(data.toString())
+      })
+      
+      tcpClient.on('close', () => {
+        logger.silly('tcpClient closed')
+        if (!success) reject('TCP connection closed before frame received')
+      })
+      
+      tcpClient.on('error', err => {
+        logger.error(`tcpClient error: ${err}`)
+        reject(err)
+      })
+      
+      tcpClient.connect(config.port, config.host)
+    })
   }
 
   function onFrame(data) {
@@ -111,18 +95,50 @@ exports.createDevice = base => {
     }
   }
 
+  function send(data) {
+    base.commandDefer(CMD_DEFER_TIME)
+    let success = false
+    let attempts = 0
+    while (attempts < 3 && !success) {
+      connectThenSend(data)
+        .then(res => {
+          //
+          success = true
+          base.commandDone()
+        })
+        .catch(error => {
+          base.getVar('Status').string = 'Disconnected'
+          base.commandError(error)
+        })
+    }
+  }
+
   // ------------------------------ DEVICE FUNCTIONS ------------------------------
 
-  function sendCommand(params) {
+  async function sendCommand(params) {
     let name = base.getVar('IR_Commands').enums[params.Index]
     let code = ir_codes[name]
     if (code) {
       base.getVar('IR_Commands').value = params.Index
-      sendDefer(`sendir,${config.module}:${config.ir_port},${code}\r`)
       setTimeout(function() {
-        let v = base.getVar('IR_Commands')
-        if (v.value !== 0) v.value = 0 // Set back to idle
-      }, 1)
+        base.getVar('IR_Commands').value = 0 // Set back to idle
+      }, 10)
+      base.commandDefer()
+      let success = false
+      let attempts = 0
+      // Make 3 attempts to send data
+      while (attempts < 3 && !success) {
+        attempts += 1
+        let response = await connectThenSend(`sendir,${config.module}:${config.ir_port},${code}\r`)
+        if (response.includes(`completeir,${config.module}:${config.ir_port}`)) {
+          success = true
+          base.commandDone()
+        }
+      }
+      if (!success) {
+        base.getVar('Status').string = 'Disconnected'
+        base.commandError('Could not send IR command')
+      }
     }
     else {
       logger.error(
@@ -131,17 +147,29 @@ exports.createDevice = base => {
     }
   }
 
-  function keepAlive() {
-    sendDefer('getversion\r')
+  function checkStatus() {
+    // sendDefer('getversion\r')
+    base.commandDefer()
+    let success = false
+    let attempts = 0
+    // Make 3 attempts to send data
+    while (attempts < 3 && !success) {
+      attempts += 1
+      let response = await connectThenSend(`sendir,${config.module}:${config.ir_port},${code}\r`)
+      if (response.includes(`completeir,${config.module}:${config.ir_port}`)) {
+        success = true
+        base.commandDone()
+      }
+    }
+    if (!success) {
+      base.getVar('Status').string = 'Disconnected'
+      base.commandError('Could not send IR command')
+    }
   }
 
   // ------------------------------ EXPORTED FUNCTIONS ------------------------------
   return {
-    setup,
-    start,
-    stop,
-    tick,
-    sendCommand,
-    keepAlive
+    setup, start, stop,
+    sendCommand, checkStatus
   }
 }
