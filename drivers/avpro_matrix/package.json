@@ -1,6 +1,6 @@
 {
   "name": "avpro_matrix",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Driver for AV Pro Connect Matrix",
   "main": "index.js",
   "scripts": {
@@ -46,7 +46,8 @@
       "properties": {
         "host": {
           "title": "Host name or IP address:",
-          "type": "string"
+          "type": "string",
+          "default": "192.168.1.239"
         },
         "port": {
           "title": "Port:",
@@ -55,96 +56,14 @@
         },
         "model": {
           "title": "Model:",
-          "type": "object",
-          "oneOf": [
-            {
-              "title": "Select your model...",
-              "type": "null"
-            },
-            {
-              "title": "MX42",
-              "type": "object",
-              "properties": {
-                "input_names": {
-                  "title": "Input Nicknames (Optional)",
-                  "type": "object",
-                  "properties": {
-                    "1": { "title": "Input 1", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "2": { "title": "Input 2", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "3": { "title": "Input 3", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "4": { "title": "Input 4", "type": "string", "pattern": "^[0-9A-Za-z_]*$" }
-                  }
-                },
-                "output_names": {
-                  "title": "Output Nicknames (Optional)",
-                  "type": "object",
-                  "properties": {
-                    "1": { "title": "Output 1", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "2": { "title": "Output 2", "type": "string", "pattern": "^[0-9A-Za-z_]*$" }
-                  }
-                }
-              }
-            },
-            {
-              "title": "MX44",
-              "type": "object",
-              "properties": {
-                "input_names": {
-                  "title": "Input Nicknames (Optional)",
-                  "type": "object",
-                  "properties": {
-                    "1": { "title": "Input 1", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "2": { "title": "Input 2", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "3": { "title": "Input 3", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "4": { "title": "Input 4", "type": "string", "pattern": "^[0-9A-Za-z_]*$" }
-                  }
-                },
-                "output_names": {
-                  "title": "Output Nicknames (Optional)",
-                  "type": "object",
-                  "properties": {
-                    "1": { "title": "Output 1", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "2": { "title": "Output 2", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "3": { "title": "Output 3", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "4": { "title": "Output 4", "type": "string", "pattern": "^[0-9A-Za-z_]*$" }
-                  }
-                }
-              }
-            },
-            {
-              "title": "MX88",
-              "type": "object",
-              "properties": {
-                "input_names": {
-                  "title": "Input Nicknames (Optional)",
-                  "type": "object",
-                  "properties": {
-                    "1": { "title": "Input 1", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "2": { "title": "Input 2", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "3": { "title": "Input 3", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "4": { "title": "Input 4", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "5": { "title": "Input 5", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "6": { "title": "Input 6", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "7": { "title": "Input 7", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "8": { "title": "Input 8", "type": "string", "pattern": "^[0-9A-Za-z_]*$" }
-                  }
-                },
-                "output_names": {
-                  "title": "Output Nicknames (Optional)",
-                  "type": "object",
-                  "properties": {
-                    "1": { "title": "Output 1", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "2": { "title": "Output 2", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "3": { "title": "Output 3", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "4": { "title": "Output 4", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "5": { "title": "Output 5", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "6": { "title": "Output 6", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "7": { "title": "Output 7", "type": "string", "pattern": "^[0-9A-Za-z_]*$" },
-                    "8": { "title": "Output 8", "type": "string", "pattern": "^[0-9A-Za-z_]*$" }
-                  }
-                }
-              }
-            }
+          "type": "string",
+          "enum": [
+            "AC-MX42-AUHD",
+            "AC-MX44-AUHD",
+            "AC-MX44-AUHD-HDBT",
+            "AC-MX88-UHD",
+            "AC-MX88-AUHD-GEN2",
+            "AC-MX88-AUHD-HDBT"
           ]
         },
         "simulation": {
