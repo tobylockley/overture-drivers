@@ -42,7 +42,6 @@ exports.createDevice = base => {
 
   function disconnect() {
     base.getVar('Status').string = 'Disconnected'
-    base.stopPolling()
   }
 
   function stop() {
@@ -74,12 +73,7 @@ exports.createDevice = base => {
 
     tcpClient.on('close', () => {
       logger.silly('TCPClient closed')
-      let pending = base.getPendingCommand()
       disconnect() // Triggered on timeout, this allows auto reconnect
-      if (pending) {
-        base.commandError('Lost Connection')
-        base.perform(pending.action, pending.params)
-      }
     })
 
     tcpClient.on('error', err => {

@@ -1,6 +1,6 @@
 {
   "name": "sony_bravia",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Driver for Sony Bravia TCP Connection",
   "main": "index.js",
   "scripts": {

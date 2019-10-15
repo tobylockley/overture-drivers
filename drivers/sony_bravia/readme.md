@@ -114,3 +114,7 @@ Only available in DTV mode. Shift the DTV channel of the display up or down.
 ### 1.0.10
 - Added better regex frame matching
 - Removed queue of commands for offline devices
+
+### 1.0.11
+- Removed attempt to retry after disconnect
+- Removed "base.stopPolling" on disconnect
