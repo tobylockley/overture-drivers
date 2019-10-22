@@ -118,3 +118,9 @@ Only available in DTV mode. Shift the DTV channel of the display up or down.
 ### 1.0.11
 - Removed attempt to retry after disconnect
 - Removed "base.stopPolling" on disconnect
+
+### 1.0.12
+- Change Power variable to "Off" when connection is lost
+
+### 1.0.13
+- Added option to enable/disable DTV source

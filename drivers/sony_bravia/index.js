@@ -29,6 +29,24 @@ exports.createDevice = base => {
     setPoll('getAudioLevel', poll_ms, isPoweredOn)
     setPoll('getAudioMute', poll_ms, isPoweredOn)
     setPoll('getChannel', poll_ms, isDTVMode)
+
+    if (config.dtv_enable) {
+      base.getVar('Sources').enums = [
+        'HDMI1',
+        'HDMI2',
+        'HDMI3',
+        'HDMI4',
+        'DTV'
+      ]
+    }
+    else {
+      base.getVar('Sources').enums = [
+        'HDMI1',
+        'HDMI2',
+        'HDMI3',
+        'HDMI4'
+      ]
+    }
   }
 
   function start() {
@@ -42,6 +60,7 @@ exports.createDevice = base => {
 
   function disconnect() {
     base.getVar('Status').string = 'Disconnected'
+    base.getVar('Power').string = 'Off'
   }
 
   function stop() {
