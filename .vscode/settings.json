@@ -5,18 +5,6 @@
   "debug.inlineValues": true,
   "debug.toolBarLocation": "floating",
   // "editor.rulers": [100],
-
   "eslint.alwaysShowStatus": true,
   "eslint.autoFixOnSave": true,
-
-  "maptz.regionfolder": {
-    "[javascript]": {
-      // Language selector
-      "foldEnd": "/* #endregion */",
-      "foldStart": "/* #region [NAME] *******************************************************************/",
-      // Use the `[NAME]` placeholder to indicate cursor position after insertion
-      "foldStartRegex": "[\\s]*#region[\\s]*(.*)",
-      "foldEndRegex": "[\\s]*#endregion"
-    }
-  }
 }

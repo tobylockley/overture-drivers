@@ -70,7 +70,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Windows CS",
+      "name": "Toby Windows CS",
       "runtimeExecutable": "C:\\Program Files\\Barco\\Barco Overture Control Server\\OvertureCS.exe",
       "windows": {
         "runtimeExecutable": "C:\\Program Files\\Barco\\Barco Overture Control Server\\OvertureCS.exe"
@@ -79,6 +79,27 @@
       "env": {
         "UXURI": "http://203.27.185.62:9950",
         "UID": "TobyCS",
+        "DRIVERPATH": "${workspaceRoot}\\drivers",
+        "DEBUGDRIVER": "true",
+        "LOGLEVEL": "silly",
+        "_IGNOREUXPROJECT": "true",
+        "data": "C:\\Program Files\\Barco\\Barco Overture Control Server\\data\\"
+      },
+      "internalConsoleOptions": "openOnSessionStart",
+      "outputCapture": "std"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Murray CS",
+      "runtimeExecutable": "C:\\Program Files\\Barco\\Barco Overture Control Server\\OvertureCS.exe",
+      "windows": {
+        "runtimeExecutable": "C:\\Program Files\\Barco\\Barco Overture Control Server\\OvertureCS.exe"
+      },
+      "protocol": "inspector",
+      "env": {
+        "UXURI": "http://203.27.185.62:9950",
+        "UID": "MurrayCS",
         "DRIVERPATH": "${workspaceRoot}\\drivers",
         "DEBUGDRIVER": "true",
         "LOGLEVEL": "silly",
