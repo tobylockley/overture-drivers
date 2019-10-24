@@ -36,7 +36,7 @@ exports.createDevice = base => {
       base.createVariable({
         name: decoder.varname_sources,
         type: 'enum',
-        enums: ['Dynamically Generated'],  // See function updateAvailableSources()
+        enums: ['See function updateAvailableSources()'],
         perform: {
           action: 'selectSource',
           params: { Channel: decoder.name, Name: '$string' }
@@ -50,7 +50,7 @@ exports.createDevice = base => {
       base.createVariable({
         name: wall.varname_sources,
         type: 'enum',
-        enums: ['Dynamically Generated'],  // See function updateAvailableSources()
+        enums: ['See function updateAvailableSources()'],
         perform: {
           action: 'selectSource',
           params: { Channel: wall.name, Name: '$string' }
@@ -64,7 +64,7 @@ exports.createDevice = base => {
       base.createVariable({
         name: decoder.varname_audio,
         type: 'enum',
-        enums: ['Dynamically Generated'],  // See function updateAvailableSources()
+        enums: ['See function updateAvailableSources()'],
         perform: {
           action: 'joinAudio',
           params: { Channel: decoder.name, Name: '$string' }
@@ -79,7 +79,7 @@ exports.createDevice = base => {
         base.createVariable({
           name: decoder.varname_usb,
           type: 'enum',
-          enums: ['Dynamically Generated'],  // See function updateAvailableSources()
+          enums: ['See function updateAvailableSources()'],
           perform: {
             action: 'joinUSB',
             params: { Channel: decoder.name, Name: '$string' }
@@ -106,9 +106,9 @@ exports.createDevice = base => {
       let response = await zyperCmd('show server info')  // If no error is thrown, command succeeded
       if (base.getVar('Status').string === 'Disconnected') {
         base.getVar('Status').string = 'Connected'
-        base.getVar('MacAddress').string = response.gen.macAddress
-        base.getVar('SerialNumber').string = response.gen.serialNumber
-        base.getVar('FirmwareVersion').string = response.gen.version
+        base.getVar('MacAddress').string = response.text.gen.macAddress
+        base.getVar('SerialNumber').string = response.text.gen.serialNumber
+        base.getVar('FirmwareVersion').string = response.text.gen.version
       }
     }
     catch (error) {
@@ -138,7 +138,7 @@ exports.createDevice = base => {
       for (let warning of zyperResponse.warnings) logger.warn(`zyperCmd warning > ${warning}`)
       if (zyperResponse.errors.length > 0) throw new Error(zyperResponse.errors[0])
       base.commandDone()
-      return zyperResponse.text
+      return zyperResponse
     }
     catch (error) {
       base.commandError(error.message)
@@ -154,7 +154,7 @@ exports.createDevice = base => {
       let response = await zyperCmd('show device config decoders')
       // let response_status = await zyperCmd('show device status decoders')
       // Process each decoder in response
-      for (let decoder of response) {
+      for (let decoder of response.text) {
         let decoder_config = config.decoders.find(x => x.name === decoder.gen.name)
         let varname_sources = decoder_config.varname_sources
         let varname_usb = decoder_config.varname_usb
@@ -208,22 +208,27 @@ exports.createDevice = base => {
       let videowalls = await zyperCmd('show video-walls')
       let multiviews = await zyperCmd('show multiviews config')
 
+      encoders = encoders.text
+      decoders = decoders.text
+      videowalls = videowalls.text
+      multiviews = multiviews.text
+
       // Store for reference (used in selectSource)
       config.multiviews = multiviews
       config.encoders = encoders
-  
+
       // Generate a sorted array for each type of encoder
       let sourcesByType = {
         'ZyperUHD': encoders.filter(x => x.gen.model === 'ZyperUHD').map(x => x.gen.name).sort(),
         'Zyper4K': encoders.filter(x => x.gen.model === 'Zyper4K').map(x => x.gen.name).sort(),
         'MV': multiviews.map(x => x.gen.name).sort()
       }
-  
+
       for (let decoder of config.decoders) {
         let data = decoders.find(x => x.gen.name === decoder.name)
         let sources = ['None'].concat(sourcesByType[data.gen.model])
         let audioSources = ['Audio Follows Video']
-  
+
         // For ZyperUHD, add USB and analog audio sources
         if (data.gen.model === 'ZyperUHD') {
           base.getVar(decoder.varname_usb).enums = sources
@@ -236,11 +241,11 @@ exports.createDevice = base => {
           sources = sources.concat(sourcesByType['MV'])
           audioSources = audioSources.concat(sourcesByType['Zyper4K'])
         }
-  
+
         base.getVar(decoder.varname_sources).enums = sources
         base.getVar(decoder.varname_audio).enums = audioSources
       }
-  
+
       for (let wall of config.videowalls) {
         let data = videowalls.find(x => x.gen.name === wall.name)
         let wallModel = decoders.find(x => x.gen.name === data.decodersRow1.col1).gen.model
@@ -322,9 +327,6 @@ exports.createDevice = base => {
     try {
       let decoder = config.decoders.find(x => x.name === params.Channel)
       let varname_usb = decoder.varname_usb
-      if (base.getVar(varname_usb).enums.indexOf(params.Name) === 0) {
-        params.Name = 'none'
-      }
       await zyperCmd(`join ${params.Name} ${params.Channel} usb`)
       base.getVar(varname_usb).string = params.Name  // No need to pass the response. If no errors, source was set OK
     }
