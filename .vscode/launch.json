@@ -98,6 +98,8 @@
       },
       "protocol": "inspector",
       "env": {
+        "UXURI": "http://203.27.185.62:9950",
+        "UID": "MurrayCS",
         "DRIVERPATH": "${workspaceRoot}\\drivers",
         "DEBUGDRIVER": "true",
         "LOGLEVEL": "silly",
