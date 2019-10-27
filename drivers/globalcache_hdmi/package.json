@@ -1,6 +1,6 @@
 {
   "name": "globalcache_hdmi",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Driver For Global Cache HDMI Module",
   "main": "index.js",
     "scripts": {

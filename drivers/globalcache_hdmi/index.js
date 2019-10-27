@@ -113,17 +113,17 @@ exports.createDevice = base => {
     else {
       let match = data.match(/state,1:(\d),(\d)/)
       if (match) {
-        if (pendingCommand.inputsScanned === undefined) pendingCommand.inputsScanned = 0
-        pendingCommand.inputsScanned += 1
+        if (pendingCommand && pendingCommand.inputsScanned === undefined) pendingCommand.inputsScanned = 0
+        pendingCommand && (pendingCommand.inputsScanned += 1)
         let input = parseInt(match[1])
         let state = parseInt(match[2])
         if (state === 1) {
           base.getVar('Sources').string = `HDMI${input}`
-          pendingCommand.inputFound = true
+          pendingCommand && (pendingCommand.inputFound = true)
         }
 
         // Command complete when all 3 inputs scanned
-        if (pendingCommand.inputsScanned === 3) {
+        if (pendingCommand && pendingCommand.inputsScanned === 3) {
           base.commandDone()
           // If no input was found to be selected, change to None
           if (!pendingCommand.inputFound) base.getVar('Sources').string = 'None'

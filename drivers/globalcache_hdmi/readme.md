@@ -37,3 +37,5 @@ To select the input source to display.
 ### 1.0.0
 - Initial version.
 
+### 1.0.1
+- Fixed error with reference to pendingCommand in frameParser
