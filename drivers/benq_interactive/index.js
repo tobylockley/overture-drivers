@@ -3,14 +3,14 @@ const TICK_PERIOD = 5000 // In-built tick interval
 const TCP_TIMEOUT = 10000 // Will timeout after this length of inactivity
 const TCP_RECONNECT_DELAY = 3000 // How long to wait before attempting to reconnect
 
-const GET_PWR = String.fromCharCode(0x6C)
-const GET_SRC = String.fromCharCode(0x6A)
-const GET_VOL = String.fromCharCode(0x66)
-const GET_MUT = String.fromCharCode(0x67)
-const SET_PWR = String.fromCharCode(0x21)
-const SET_SRC = String.fromCharCode(0x22)
-const SET_VOL = String.fromCharCode(0x35)
-const SET_MUT = String.fromCharCode(0x36)
+const GET_PWR = String.fromCharCode(0x6C)  // l
+const GET_SRC = String.fromCharCode(0x6A)  // j
+const GET_VOL = String.fromCharCode(0x66)  // f
+const GET_MUT = String.fromCharCode(0x67)  // g
+const SET_PWR = String.fromCharCode(0x21)  // !
+const SET_SRC = String.fromCharCode(0x22)  // "
+const SET_VOL = String.fromCharCode(0x35)  // 5
+const SET_MUT = String.fromCharCode(0x36)  // 6
   
 let host
 exports.init = _host => {
