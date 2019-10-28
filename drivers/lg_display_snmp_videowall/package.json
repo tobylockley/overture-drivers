@@ -1,0 +1,302 @@
+{
+  "name": "lg_display_snmp_videowall",
+  "version": "1.0.3",
+  "description": "Driver for LG display using SNMP, with TCP fallback for videowall functions",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "LG",
+    "models": [
+      "65UU640C"
+    ],
+    "type": "device",
+    "subtype": "display",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Status_TCP_Port",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "smooth": 20000,
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "perform": {
+          "action": "Set Power",
+          "params": {
+            "Status": "$value"
+          }
+        }
+      },
+      {
+        "name": "ScreenMute",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "perform": {
+          "action": "Set Screen Mute",
+          "params": {
+            "Status": "$value"
+          }
+        }
+      },
+      {
+        "name": "Sources",
+        "type": "enum",
+        "enums": [
+          "Determined by config"
+        ],
+        "perform": {
+          "action": "Select Source",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      },
+      {
+        "name": "AudioMute",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "perform": {
+          "action": "Set Audio Mute",
+          "params": {
+            "Status": "$value"
+          }
+        }
+      },
+      {
+        "name": "AudioLevel",
+        "type": "integer",
+        "min": 0,
+        "max": 100,
+        "perform": {
+          "action": "Set Audio Level",
+          "params": {
+            "Level": "$value"
+          }
+        }
+      },
+      {
+        "name": "IRCommands",
+        "type": "enum",
+        "enums": [
+          "Populated during setup"
+        ],
+        "perform": {
+          "action": "Send IR Command",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Status": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Set Screen Mute",
+        "params": {
+          "Status": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Select Source",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Set Audio Mute",
+        "params": {
+          "Status": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Set Audio Level",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        }
+      },
+      {
+        "name": "Send IR Command",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "LG Display IP Settings",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address:",
+          "type": "string",
+          "default": ""
+        },
+        "port": {
+          "title": "SNMP Port:",
+          "type": "integer",
+          "default": 161,
+          "description": "Default: 161"
+        },
+        "tcp_port": {
+          "title": "TCP Port:",
+          "type": "integer",
+          "default": 9761,
+          "description": "Default: 9761"
+        },
+        "mac": {
+          "title": "MAC Address:",
+          "type": "string",
+          "default": "38:8C:50:",
+          "pattern": "^(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$",
+          "description": "Needed for Wake On Lan functionality"
+        },
+        "setID": {
+          "title": "Set ID:",
+          "type": "integer",
+          "default": 1,
+          "minimum": 1,
+          "maximum": 255,
+          "description": "Found in General Settings. Default: 1"
+        },
+        "videowall": {
+          "title": "Enable Videowall Control",
+          "type": "boolean",
+          "format": "checkbox",
+          "description": "If supported, enable tile mode and tile ID controls for this display."
+        },
+        "inputs": {
+          "type": "object",
+          "title": "Available Inputs",
+          "properties": {
+            "hdmi1": {
+              "title": "HDMI 1",
+              "hexcode": "0x90",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": true
+            },
+            "hdmi2": {
+              "title": "HDMI 2",
+              "hexcode": "0x91",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": true
+            },
+            "hdmi3": {
+              "title": "HDMI 3",
+              "hexcode": "0x92",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "hdmi4": {
+              "title": "HDMI 4",
+              "hexcode": "0x93",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "dvi": {
+              "title": "DVI",
+              "hexcode": "0x70",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "dvi_alt": {
+              "title": "DVI (Alt)",
+              "hexcode": "0x80",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "rgb": {
+              "title": "RGB",
+              "hexcode": "0x60",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "comp": {
+              "title": "Component",
+              "hexcode": "0x40",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "av": {
+              "title": "AV",
+              "hexcode": "0x20",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            },
+            "custom": {
+              "title": "Custom",
+              "hexcode": "0x00",
+              "type": "boolean",
+              "format": "checkbox",
+              "default": false
+            }
+          }
+        },
+        "custom_title": {
+          "title": "Custom Input Title:",
+          "type": "string"
+        },
+        "custom_hexcode": {
+          "title": "Custom Input Hex Code:",
+          "description": "Hex code for custom input, in form '0xFF'",
+          "pattern": "^0x[A-Fa-f0-9]{2}$",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "snmp-native": "^1.2.0",
+    "wol": "^1.0.6"
+  }
+}
