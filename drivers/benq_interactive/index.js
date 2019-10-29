@@ -92,7 +92,7 @@ exports.createDevice = base => {
 
   //-------------------------------------------------------------------------- SEND/RECEIVE HANDLERS
   function send(data) {
-    logger.silly(`TCPClient send: ${data}`)
+    logger.debug(`TCPClient send: ${data}`)
     return tcpClient && tcpClient.write(data)
   }
 
@@ -106,13 +106,15 @@ exports.createDevice = base => {
   function onFrame(data) {
     let match // Used for regex matching below
     const pending = base.getPendingCommand()
-    logger.silly(`onFrame (pending = ${pending && pending.action}): ${data}`)
+    logger.debug(`onFrame (pending = ${pending && pending.action}): ${data}`)
 
     if ((match = data.match(/.(\d\d)(.)(.?)(\d*?)\r/))) {
       const id = parseInt(match[1])
       const type = match[2]
       const cmd = match[3]
-      const val = parseInt(match[4])
+      const val = match[4]
+
+      logger.silly(`ID: ${id}   TYPE: ${type}   CMD: ${cmd}   VAL: ${val}`)
 
       // DO SOME BASIC ERROR CHECKING
       if (id != config.id) {
@@ -127,43 +129,52 @@ exports.createDevice = base => {
 
       // GET RESPONSES
       else if (pending.action === 'getPower' && cmd === GET_PWR && type === 'r') {
-        base.getVar('Power').value = val
+        base.getVar('Power').value = parseInt(val)
+        base.commandDone()
       }
       else if (pending.action === 'getSource' && cmd === GET_SRC && type === 'r') {
-        switch (val) {
-        case 0:
-          base.getVar('Sources').string = 'VGA'; break
-        case 1:
-          base.getVar('Sources').string = 'HDMI1'; break
-        case 2:
-          base.getVar('Sources').string = 'HDMI2'; break
-        case 21:
-          base.getVar('Sources').string = 'HDMI3'; break
-        case 22:
-          base.getVar('Sources').string = 'HDMI4'; break
-        default:
+        let sourceList = {
+          '000': 'VGA',
+          '001': 'HDMI1',
+          '002': 'HDMI2',
+          '021': 'HDMI3',
+          '022': 'HDMI4',
+          '101': 'Android',
+          '102': 'OPS',
+        }
+        if (Object.keys(sourceList).includes(val)) {
+          base.getVar('Sources').string = sourceList[val]
+          base.commandDone()
+        }
+        else {
           logger.warn('onFrame: Unrecognised source value')
         }
       }
       else if (pending.action === 'getAudioLevel' && cmd === GET_VOL && type === 'r') {
-        base.getVar('AudioLevel').value = val
+        base.getVar('AudioLevel').value = parseInt(val)
+        base.commandDone()
       }
       else if (pending.action === 'getAudioMute' && cmd === GET_MUT && type === 'r') {
-        base.getVar('AudioMute').value = val
+        base.getVar('AudioMute').value = parseInt(val)
+        base.commandDone()
       }
 
       // SET RESPONSES
-      else if (pending.action === 'setPower' && cmd === SET_PWR && type === '+') {
+      else if (pending.action === 'setPower' && type === '+') {
         base.getVar('Power').string = pending.params.Status
+        base.commandDone()
       }
-      else if (pending.action === 'selectSource' && cmd === SET_SRC && type === '+') {
+      else if (pending.action === 'selectSource' && type === '+') {
         base.getVar('Sources').string = pending.params.Name
+        base.commandDone()
       }
-      else if (pending.action === 'setAudioLevel' && cmd === SET_VOL && type === '+') {
+      else if (pending.action === 'setAudioLevel' && type === '+') {
         base.getVar('AudioLevel').value = pending.params.Level
+        base.commandDone()
       }
-      else if (pending.action === 'setAudioMute' && cmd === SET_MUT && type === '+') {
+      else if (pending.action === 'setAudioMute' && type === '+') {
         base.getVar('AudioMute').string = pending.params.Status
+        base.commandDone()
       }
 
       else {
@@ -272,7 +283,7 @@ exports.createDevice = base => {
     val = val.toString().padStart(3, '0')
     let id = config.id.toString().padStart(2, '0')
     let msg = `${id}s${cmd}${val}`
-    sendDefer(`${msg.length}${msg}\r`)
+    sendDefer(`${msg.length + 1}${msg}\r`)
   }
 
   //----------------------------------------------------------------------------- EXPORTED FUNCTIONS

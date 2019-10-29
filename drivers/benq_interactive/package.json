@@ -1,6 +1,6 @@
 {
   "name": "benq_interactive",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.6",
   "description": "Driver for BenQ Interactive Panel",
   "main": "index.js",
   "scripts": {
@@ -41,11 +41,13 @@
         "name": "Sources",
         "type": "enum",
         "enums": [
+          "VGA",
           "HDMI1",
           "HDMI2",
           "HDMI3",
           "HDMI4",
-          "VGA"
+          "Android",
+          "OPS"
         ],
         "perform": {
           "action": "Select Source",
