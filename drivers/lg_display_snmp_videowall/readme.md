@@ -79,3 +79,10 @@ Set Audio level of the device (between 0 and 100)
 
 ### 1.0.3
 - Combined SNMP driver with TCP videowall functions
+
+### 1.0.4
+- Fixed power on/off bug when TCP port is not connecting
+- Stopped tcpClient on driver "stop"
+
+### 1.0.5
+- Fixed SNMP write error for single digit values

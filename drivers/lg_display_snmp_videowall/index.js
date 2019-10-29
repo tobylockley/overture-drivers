@@ -5,7 +5,7 @@ const TICK_PERIOD = 5000           // In-built tick interval
 const POLL_PERIOD = 5000           // Continuous polling function interval
 const SNMP_TIMEOUT = 2000          // SNMP request timeout
 const TCP_TIMEOUT = 30000          // Will timeout after this length of inactivity
-const TCP_RECONNECT_DELAY = 1000   // How long to wait before attempting to reconnect
+const TCP_RECONNECT_DELAY = 10000   // How long to wait before attempting to reconnect
 
 let host
 exports.init = _host => {
@@ -107,7 +107,7 @@ exports.createDevice = base => {
     networkUtilities = null
     base.stopPolling()
     base.clearPendingCommands()
-    snmpSession.close()
+    snmpSession && snmpSession.close()
     snmpSession = null
     tcpClient && tcpClient.end()
     tcpClient = null
@@ -140,6 +140,7 @@ exports.createDevice = base => {
   function initTcpClient() {
     if (tcpClient) return // Return if tcpClient already exists
 
+    logger.debug('Initialising TCP Client')
     tcpClient = host.createTCPClient()
     tcpClient.setOptions({
       receiveTimeout: TCP_TIMEOUT,
@@ -148,7 +149,7 @@ exports.createDevice = base => {
     tcpClient.connect(config.tcp_port, config.host)
 
     tcpClient.on('connect', () => {
-      logger.silly('TCPClient connected')
+      logger.silly(`TCPClient connected on port ${config.tcp_port}`)
       base.getVar('Status_TCP_Port').string = 'Connected'
       base.startPolling()
     })
@@ -159,13 +160,14 @@ exports.createDevice = base => {
 
     tcpClient.on('close', () => {
       logger.silly('TCPClient closed')
-      base.getVar('Status_TCP_Port').string = 'Disconnected' // Triggered on timeout, this allows auto reconnect
-      base.getVar('Power').value = 0  // Allow for WOL to be sent
+      base.getVar('Status_TCP_Port').value = 0 // Triggered on timeout, this allows auto reconnect
     })
 
     tcpClient.on('error', err => {
       logger.error(`TCPClient: ${err}`)
-      stop() // Throw out the tcpClient and get a fresh connection
+      base.getVar('Status_TCP_Port').value = 0
+      tcpClient.end()
+      tcpClient = null
     })
   }
 
@@ -409,7 +411,7 @@ exports.createDevice = base => {
 
   function setSnmpVar(varname, value) {
     // Type 4 = Octet String
-    snmpSession.set({ oid: oids[varname], value: value.toString(16), type: 4 }, function (error) {
+    snmpSession.set({ oid: oids[varname], value: value.toString(16).padStart(2, '0'), type: 4 }, function (error) {
       if (error) {
         logger.error(`set ${varname} error: ${error.message}`)
       }

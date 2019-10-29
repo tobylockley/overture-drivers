@@ -1,6 +1,6 @@
 {
   "name": "lg_display_snmp_videowall",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Driver for LG display using SNMP, with TCP fallback for videowall functions",
   "main": "index.js",
   "scripts": {
