@@ -211,6 +211,9 @@ exports.createDevice = base => {
       // Store for reference (used in selectSource)
       config.multiviews = multiviews
       config.encoders = encoders
+
+      // Used for array comparison
+      let isEqual = host.lodash.isEqual
   
       // Generate a sorted array for each type of encoder
       let sourcesByType = {
@@ -226,7 +229,6 @@ exports.createDevice = base => {
   
         // For ZyperUHD, add USB and analog audio sources
         if (data.gen.model === 'ZyperUHD') {
-          base.getVar(decoder.varname_usb).enums = sources
           audioSources = audioSources.concat(sourcesByType['ZyperUHD'].map(x => `[HDMI] ${x}`))
           audioSources = audioSources.concat(sourcesByType['ZyperUHD'].map(x => `[ANALOG] ${x}`))
         }
@@ -236,15 +238,27 @@ exports.createDevice = base => {
           sources = sources.concat(sourcesByType['MV'])
           audioSources = audioSources.concat(sourcesByType['Zyper4K'])
         }
-  
-        base.getVar(decoder.varname_sources).enums = sources
-        base.getVar(decoder.varname_audio).enums = audioSources
+
+        // Compare sources and update only if different
+        if (!isEqual(base.getVar(decoder.varname_sources).enums, sources)) {
+          base.getVar(decoder.varname_sources).enums = sources
+        }
+        if (!isEqual(base.getVar(decoder.varname_audio).enums, audioSources)) {
+          base.getVar(decoder.varname_audio).enums = audioSources
+        }
+        if (data.gen.model === 'ZyperUHD' && !isEqual(base.getVar(decoder.varname_usb).enums, sources)) {
+          base.getVar(decoder.varname_usb).enums = sources
+        }
       }
   
       for (let wall of config.videowalls) {
         let data = videowalls.find(x => x.gen.name === wall.name)
         let wallModel = decoders.find(x => x.gen.name === data.decodersRow1.col1).gen.model
-        base.getVar(wall.varname_sources).enums = ['None'].concat(sourcesByType[wallModel])
+        let wall_sources = ['None'].concat(sourcesByType[wallModel])
+        if (!isEqual(base.getVar(wall.varname_sources).enums, wall_sources)) {
+          base.getVar(wall.varname_sources).enums = wall_sources
+        }
+        
       }
     }
     catch (error) {
@@ -284,7 +298,8 @@ exports.createDevice = base => {
       else if (wall) {
         joinmethod = 'video-wall'
         varname_sources = wall.varname_sources
-        await zyperCmd(`join ${params.Name} ${params.Channel} ${joinmethod}`)
+        let sourcename = params.Name === 'None' ? 'none' : params.Name
+        await zyperCmd(`join ${sourcename} ${params.Channel} ${joinmethod}`)
         base.getVar(varname_sources).string = params.Name  // No need to pass the response. If no errors, source was set OK
       }
     }

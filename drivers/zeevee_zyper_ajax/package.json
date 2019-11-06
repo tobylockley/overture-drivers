@@ -1,6 +1,6 @@
 {
   "name": "zeevee_zyper_ajax",
-  "version": "1.0.5",
+  "version": "1.0.7-hotfix1",
   "description": "Driver for Zyper Management Platform over a TCP Connection",
   "main": "index.js",
   "scripts": {

@@ -51,3 +51,12 @@ To select the input source to display.
 
 ### 1.0.4
   - Added audio join functionality
+
+### 1.0.5
+  - Fixed bug setting usb to None
+
+### 1.0.6
+  - Fixed bug setting videowall to None
+
+### 1.0.7
+  - Sources only update if difference detected
