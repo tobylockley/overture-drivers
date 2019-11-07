@@ -1,6 +1,6 @@
-const CMD_DEFER_TIME = 30000 // Timeout when using commandDefer
+const CMD_DEFER_TIME = 5000 // Timeout when using commandDefer
 const TICK_PERIOD = 5000 // In-built tick interval
-const TCP_TIMEOUT = 10000 // Will timeout after this length of inactivity
+const TCP_TIMEOUT = 30000 // Will timeout after this length of inactivity
 const TCP_RECONNECT_DELAY = 3000 // How long to wait before attempting to reconnect
 
 let host
@@ -125,6 +125,13 @@ exports.createDevice = base => {
       'setChannel',
       'shiftChannel'
     ]
+
+    // General error check
+    match = data.match(/A\w{4}F{16}/)
+    if (pendingCommand && match) {
+      base.commandError('Device responded with error')
+      return  // No need to check for anything else
+    }
 
     if (pendingCommand && setFns.includes(pendingCommand.action)) {
       // Parse response after issueing a SET function

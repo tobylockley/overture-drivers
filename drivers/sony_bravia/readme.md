@@ -124,3 +124,6 @@ Only available in DTV mode. Shift the DTV channel of the display up or down.
 
 ### 1.0.13
 - Added option to enable/disable DTV source
+
+### 1.0.14
+- Added general error detection on responses
