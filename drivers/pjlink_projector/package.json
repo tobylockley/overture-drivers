@@ -1,0 +1,98 @@
+{
+  "name": "pjlink_projector",
+  "version": "1.0.0-beta.1",
+  "description": "Driver for PJLINK projectors",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "",
+    "models": [],
+    "type": "device",
+    "subtype": "projector",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On",
+          "Powering Off",
+          "Powering On"
+        ],
+        "perform": {
+          "action": "Set Power",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "Sources",
+        "type": "enum",
+        "enums": [
+          "HDMI1",
+          "HDMI2",
+          "HDMI3",
+          "HDMI4"
+        ],
+        "perform": {
+          "action": "Select Source",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Select Source",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Template Setup",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address:",
+          "type": "string",
+          "default": ""
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 4352,
+          "description": "Default: 4352"
+        }
+      }
+    }
+  }
+}
