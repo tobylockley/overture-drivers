@@ -1,0 +1,88 @@
+{
+  "name": "behaviour_joinable_rooms",
+  "version": "1.0.0-beta.7",
+  "description": "Provides a JoinStatus variable, to trigger actions and sync UIs between rooms",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "overture",
+    "models": [],
+    "type": "behavior",
+    "subtype": "",
+
+    "variables": [
+      {
+        "name": "JoinStatus",
+        "type": "enum",
+        "enums": [
+          "Unjoined"
+        ],
+        "perform": {
+          "action": "Set Join",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      }
+    ],
+
+    "commands": [
+      {
+        "name": "Set Join",
+        "params": {
+          "Status": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Joinable Rooms Setup",
+      "properties": {
+        "groups": {
+          "title": "Join Groups",
+          "type": "array",
+          "format": "table",
+          "uniqueItems": true,
+          "items": {
+            "title": "Join Group",
+            "type": "object",
+            "properties": {
+              
+              "name": {
+                "title": "Group Name",
+                "description": "Nickname for this join group. Must be the same across rooms in this group.",
+                "type": "string"
+              },
+              "timeout": {
+                "title": "Join Timeout (minutes)",
+                "description": "If join is not confirmed within this time period, rooms will be unjoined.",
+                "type": "integer",
+                "default": 1,
+                "minimum": 1
+              },
+              "rooms": {
+                "title": "Rooms",
+                "type": "array",
+                "format": "table",
+                "uniqueItems": true,
+                "items": {
+                  "title": "Room",
+                  "description": "Rooms variable name",
+                  "type": "string"
+                }
+              }
+
+            }
+          }
+        }
+      }
+    }
+  }
+}
