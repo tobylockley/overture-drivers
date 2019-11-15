@@ -71,17 +71,15 @@ exports.createDevice = base => {
 
   // ------------------------------ SETUP FUNCTIONS ------------------------------
 
-  function isConnected() { return base.getVar('Status').string === 'Connected' }
-
   function setup(_config) {
     config = _config
     base.setTickPeriod(TICK_PERIOD)
 
     // Register polling functions
     base.setPoll({ action: 'getPower', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
-    base.setPoll({ action: 'getSource', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
-    base.setPoll({ action: 'getAVMute', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
-    base.setPoll({ action: 'getAvailableSources', period: 60000, enablePollFn: isConnected, startImmediately: true })
+    base.setPoll({ action: 'getSource', period: POLL_PERIOD, enablePollFn: isPoweredOn, startImmediately: true })
+    base.setPoll({ action: 'getAVMute', period: POLL_PERIOD, enablePollFn: isPoweredOn, startImmediately: true })
+    base.setPoll({ action: 'getAvailableSources', period: 60000, enablePollFn: isPoweredOn, startImmediately: true })
   }
 
   function start() {
@@ -303,6 +301,15 @@ exports.createDevice = base => {
     if (params.Status == 'Off') sendDefer('%1AVMT 10\r')
     else if (params.Status == 'On') sendDefer('%1AVMT 11\r')
     else logger.warn('setVideoMute only accepts "Off" or "On"')
+  }
+
+  //------------------------------------------------------------------------------- HELPER FUNCTIONS
+  function isConnected() {
+    return base.getVar('Status').string === 'Connected'
+  }
+
+  function isPoweredOn() {
+    return isConnected() && base.getVar('Power').string === 'On'
   }
 
 

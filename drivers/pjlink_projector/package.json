@@ -1,6 +1,6 @@
 {
   "name": "pjlink_projector",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Driver for PJLink projectors",
   "main": "index.js",
   "scripts": {
