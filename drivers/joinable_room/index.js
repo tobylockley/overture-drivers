@@ -6,7 +6,6 @@
  * - Change status enum vars to Initiated: , Accepted: , Joined: etc with full group name (spaces ok)
  * - Error during setup if multiple groups contain exact same rooms
  * - Error during setup if multiple groups have same nickname
- * - Extra variable called JoinTrigger, that starts the join for each group. Enum of group names. Can be used as buttons on UI
  */
 
 'use strict'
@@ -26,13 +25,14 @@ exports.createDevice = base => {
 
   function setup(_config) {
     config = _config
-
     // config.groups = [ { name: "Group Name", rooms: ["room1", "room2", ...] }, ... ]
     let joinEnums = ['Unjoined']
-    for (let group of config.groups) {
-      joinEnums.push(`Initiated_${group.name}`)
-      joinEnums.push(`Accepted_${group.name}`)
-      joinEnums.push(`Joined_${group.name}`)
+    for (let i = 0; i < config.groups.length; i++) {
+      const group = config.groups[i]
+      if (group.name === '') group.name = `Group ${i+1}`
+      joinEnums.push(`Initiated: ${group.name}`)
+      joinEnums.push(`Accepted: ${group.name}`)
+      joinEnums.push(`Joined: ${group.name}`)
     }
     base.getVar('JoinStatus').enums = joinEnums
   }
@@ -44,7 +44,7 @@ exports.createDevice = base => {
     // Unjoin all current rooms
     let currStatus = base.getVar('JoinStatus')
     if (currStatus.value > 0) {
-      let match = currStatus.string.match(/^\w+_(.+)$/)
+      let match = currStatus.string.match(/^\w+: (.+)$/)  // Match group name
       let group = match && config.groups.find(x => x.name === match[1])
       group && unJoinGroup(group)
     }
@@ -57,23 +57,21 @@ exports.createDevice = base => {
   // ------------------------------ SET FUNCTIONS ------------------------------
 
   function setJoin(params) {
-    // params.Status = "Unjoined", "Initiated_<GROUP_NAME>", "Accepted_<GROUP_NAME>", or "Joined_<GROUP_NAME>"
+    // params.Status = "Unjoined", "Initiated: <GROUP NAME>", "Accepted: <GROUP NAME>", or "Joined: <GROUP NAME>"
     let currStatus = base.getVar('JoinStatus')
-    let match_init = params.Status.match(/Initiated_(.+)/)
-    let match_accept = params.Status.match(/Accepted_(.+)/)
-    let match_joined = params.Status.match(/Joined_(.+)/)
+    let match = params.Status.match(/^([A-Za-z]+): (.+)$/)
+    let group = match && config.groups.find(x => x.name === match[2])
+    let status_init = group && `Initiated: ${group.name}`
+    let status_acpt = group && `Accepted: ${group.name}`
+    let status_join = group && `Joined: ${group.name}`
 
     /********************************* INITIATED *********************************/
-    if (match_init) {
-      if (currStatus.value === 0) {
-        let group = config.groups.find(x => x.name === match_init[1])
-        // Check all rooms for valid JoinStatus enums
-        if (initCheck(group)) {
-          currStatus.string = params.Status  // Set join status first, to avoid infinite loop
-          // All rooms have been configured properly, continue with initiating join
+    if (match && match[1] === 'Initiated') {
+      if (group && currStatus.value === 0) {
+        if (initCheck(group)) {  // Check all rooms are configured with same group
+          currStatus.string = status_init  // Set join status first, to avoid infinite loop
           for (let room of group.rooms) {
-            let roomStatus = host.getVariable(`${room}.JoinStatus`)
-            if (roomStatus.value === 0) roomStatus.string = `Initiated_${group.name}`
+            host.setVariable(`${room}.JoinStatus`, status_init)  // This triggers init state for all rooms in group
           }
           initJoinTimeout(group)
         }
@@ -84,33 +82,30 @@ exports.createDevice = base => {
     }
 
     /********************************* ACCEPTED *********************************/
-    else if (match_accept) {
-      if (currStatus.string === `Initiated_${match_accept[1]}`) {
-        // Current status must be "Initiated" and match group name
-        currStatus.string = params.Status  // Set to Accepted
-        let group = config.groups.find(x => x.name === match_accept[1])
-        // Check all rooms in group, and if all have accepted, set all rooms as joined
-        if (acceptCheck(group)) {
+    else if (match && match[1] === 'Accepted') {
+      if (group && currStatus.string === status_init) {  // Current status must be "Initiated" and match group name
+        if (acceptCheck(group)) {  // Check if all rooms in group have already accepted, then trigger room join
           if (group.joinTimeout) clearTimeout(group.joinTimeout)
-          currStatus.string = `Joined_${group.name}`
+          currStatus.string = status_join
           for (let room of group.rooms) {
-            host.setVariable(`${room}.JoinStatus`, `Joined_${group.name}`)
+            host.setVariable(`${room}.JoinStatus`, status_join)  // This will trigger the "Joined" code below for all rooms in group
           }
+        }
+        else {
+          currStatus.string = status_acpt  // Set this room to Accepted
         }
       }
       else {
-        logger.error(`Joins can only be accepted from an initiated state for that group: ${params.Status}`)
+        logger.error(`Joins can only be accepted from an initiated state of the same group: ${params.Status}`)
       }
     }
 
     /********************************* JOINED *********************************/
-    else if (match_joined) {
-      let group = config.groups.find(x => x.name === match_joined[1])
-      // This will only be set from other room behaviours. To safeguard, check that all rooms in group are accepted or joined already
-      if (currStatus.string === `Accepted_${match_joined[1]}` && joinedCheck(group)) {
+    else if (match && match[1] === 'Joined') {
+      if (group && currStatus.string === status_acpt && joinCheck(group)) {
         // Current status must be "Accepted" and match group name. Also other rooms in group must be either accepted or joined.
-        currStatus.string = params.Status  // Set to Joined
         if (group.joinTimeout) clearTimeout(group.joinTimeout)  // If timeout is active, clear it
+        currStatus.string = status_join  // Set this room to Joined
       }
       else {
         logger.error(`JoinStatus can't be set to "Joined" manually, you must initiate the join first, then accept: ${params.Status}`)
@@ -119,10 +114,10 @@ exports.createDevice = base => {
     
     /********************************* UNJOINED *********************************/
     else if (params.Status === 'Unjoined') {
-      let match = currStatus.string.match(/^\w+_(.+)$/)
-      if (match) {
-        let group = config.groups.find(x => x.name === match[1])
-        unJoinGroup(group)
+      let match_curr = currStatus.string.match(/^[A-Za-z]+: (.+)$/)
+      if (match_curr) {
+        let group_curr = config.groups.find(x => x.name === match_curr[1])
+        group_curr && unJoinGroup(group_curr)
       }
     }
     
@@ -140,14 +135,14 @@ exports.createDevice = base => {
     try {
       return group.rooms.reduce( (acc, roomName) => {
         let roomStatus = host.getVariable(`${roomName}.JoinStatus`)
-        if ( roomStatus.enums && roomStatus.enums.includes(`Initiated_${group.name}`) ) {
+        if (roomStatus && roomStatus.enums && roomStatus.enums.includes(`Initiated: ${group.name}`)) {
           return acc && true
         }
         else {
-          logger.error(`Could not initiate join for ${roomName}, please ensure join-group ${group.name} has been configured correctly.`)
+          logger.error(`Could not initiate join, please ensure join group (${group.name}) has been configured for ${roomName}.`)
           return false
         }
-      }, true)
+      }, true)  // true = initial value
     }
     catch(error) {
       logger.error(`initCheck failed: ${error.message}`)
@@ -157,13 +152,13 @@ exports.createDevice = base => {
 
   function initJoinTimeout(group) {
     // If all rooms in group are not approved before timeout ends, rooms become unjoined
-    let timeout_ms = group.timeout * 60 * 1000  // group.timeout is in minutes
+    let timeout_ms = group.timeout * 1000  // group.timeout is in seconds
     group.joinTimeout = setTimeout(() => {
       logger.debug(`Join Group ${group.name} has timed out, resetting to Unjoined state.`)
       unJoinGroup(group)
       group.joinTimeout = null
     }, timeout_ms)
-    logger.debug(`Setting room join timeout for ${timeout_ms}ms`)
+    logger.debug(`Setting room join timeout for ${group.timeout} seconds`)
   }
 
   function acceptCheck(group) {
@@ -171,8 +166,8 @@ exports.createDevice = base => {
     try {
       return group.rooms.reduce( (acc, roomName) => {
         let roomStatus = host.getVariable(`${roomName}.JoinStatus`)
-        return acc && roomStatus.string === `Accepted_${group.name}`
-      }, true)
+        return acc && roomStatus.string === `Accepted: ${group.name}`
+      }, true)  // true = initial value
     }
     catch(error) {
       logger.error(`acceptCheck failed: ${error.message}`)
@@ -180,14 +175,14 @@ exports.createDevice = base => {
     }
   }
 
-  function joinedCheck(group) {
+  function joinCheck(group) {
     // Return true if all rooms in group have EITHER accepted join request, or already in joined mode
     try {
       return group.rooms.reduce( (acc, roomName) => {
         let roomStatus = host.getVariable(`${roomName}.JoinStatus`)
-        let acceptCheck = (roomStatus.string === `Accepted_${group.name}`)
-        let joinedCheck = (roomStatus.string === `Joined_${group.name}`)
-        return acc && (acceptCheck || joinedCheck)
+        let acceptedCheck = (roomStatus.string === `Accepted: ${group.name}`)
+        let joinedCheck = (roomStatus.string === `Joined: ${group.name}`)
+        return acc && (acceptedCheck || joinedCheck)
       }, true)
     }
     catch(error) {
@@ -201,10 +196,9 @@ exports.createDevice = base => {
     try {
       base.getVar('JoinStatus').value = 0
       for (let room of group.rooms) {
-        let roomStatus = host.getVariable(`${room}.JoinStatus`)
-        if (roomStatus.value > 0) {
+        if (host.getVariable(`${room}.JoinStatus`) > 0) {
           logger.debug(`Unjoining room ${room}`)
-          roomStatus.value = 0
+          host.setVariable(`${room}.JoinStatus`, 0)
         }
       }
       if (group.joinTimeout) clearTimeout(group.joinTimeout)

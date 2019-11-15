@@ -1,6 +1,6 @@
 {
-  "name": "behaviour_joinable_rooms",
-  "version": "1.0.0-beta.7",
+  "name": "joinable_rooms",
+  "version": "1.0.1-beta.1",
   "description": "Provides a JoinStatus variable, to trigger actions and sync UIs between rooms",
   "main": "index.js",
   "scripts": {
@@ -29,7 +29,6 @@
         }
       }
     ],
-
     "commands": [
       {
         "name": "Set Join",
@@ -40,7 +39,6 @@
         }
       }
     ],
-
     "pointSetupSchema": {
       "type": "object",
       "title": "Joinable Rooms Setup",
@@ -54,17 +52,16 @@
             "title": "Join Group",
             "type": "object",
             "properties": {
-              
               "name": {
                 "title": "Group Name",
                 "description": "Nickname for this join group. Must be the same across rooms in this group.",
                 "type": "string"
               },
               "timeout": {
-                "title": "Join Timeout (minutes)",
+                "title": "Join Timeout (seconds)",
                 "description": "If join is not confirmed within this time period, rooms will be unjoined.",
                 "type": "integer",
-                "default": 1,
+                "default": 60,
                 "minimum": 1
               },
               "rooms": {
@@ -78,7 +75,6 @@
                   "type": "string"
                 }
               }
-
             }
           }
         }
