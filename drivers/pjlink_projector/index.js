@@ -6,6 +6,54 @@ const POLL_PERIOD = 5000           // Continuous polling function interval
 const TCP_TIMEOUT = 30000          // Will timeout after this length of inactivity
 const TCP_RECONNECT_DELAY = 3000   // How long to wait before attempting to reconnect
 
+const POSSIBLE_SOURCES = {
+  '11': 'RGB1',
+  '12': 'RGB2',
+  '13': 'RGB3',
+  '14': 'RGB4',
+  '15': 'RGB5',
+  '16': 'RGB6',
+  '17': 'RGB7',
+  '18': 'RGB8',
+  '19': 'RGB9',
+  '21': 'VIDEO1',
+  '22': 'VIDEO2',
+  '23': 'VIDEO3',
+  '24': 'VIDEO4',
+  '25': 'VIDEO5',
+  '26': 'VIDEO6',
+  '27': 'VIDEO7',
+  '28': 'VIDEO8',
+  '29': 'VIDEO9',
+  '31': 'DIGITAL1',
+  '32': 'DIGITAL2',
+  '33': 'DIGITAL3',
+  '34': 'DIGITAL4',
+  '35': 'DIGITAL5',
+  '36': 'DIGITAL6',
+  '37': 'DIGITAL7',
+  '38': 'DIGITAL8',
+  '39': 'DIGITAL9',
+  '41': 'STORAGE1',
+  '42': 'STORAGE2',
+  '43': 'STORAGE3',
+  '44': 'STORAGE4',
+  '45': 'STORAGE5',
+  '46': 'STORAGE6',
+  '47': 'STORAGE7',
+  '48': 'STORAGE8',
+  '49': 'STORAGE9',
+  '51': 'NETWORK1',
+  '52': 'NETWORK2',
+  '53': 'NETWORK3',
+  '54': 'NETWORK4',
+  '55': 'NETWORK5',
+  '56': 'NETWORK6',
+  '57': 'NETWORK7',
+  '58': 'NETWORK8',
+  '59': 'NETWORK9'
+}
+
 let host
 exports.init = _host => {
   host = _host
@@ -31,6 +79,9 @@ exports.createDevice = base => {
 
     // Register polling functions
     base.setPoll({ action: 'getPower', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
+    base.setPoll({ action: 'getSource', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
+    base.setPoll({ action: 'getAVMute', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
+    base.setPoll({ action: 'getAvailableSources', period: 60000, enablePollFn: isConnected, startImmediately: true })
   }
 
   function start() {
@@ -98,22 +149,24 @@ exports.createDevice = base => {
   }
 
   function onFrame(data) {
-    let match
     let pending = base.getPendingCommand()
     logger.debug(`onFrame (pending = ${pending && pending.action}): ${data}`)
 
-    match = data.match(/%1(.*?)=(.*?)\r/)
-    if (match && match[2].includes('ERR')) {
-      if (match[2] === 'ERR1') {
+    let match = data.match(/%1(.*?)=(.*?)\r/)
+    let cmd = match && match[1]
+    let val = match && match[2]
+    let val_int = val && parseInt(val)
+    if (match && val.includes('ERR')) {
+      if (val === 'ERR1') {
         logger.error('PJLink Error: Undefined command')
       }
-      else if (match[2] === 'ERR2') {
+      else if (val === 'ERR2') {
         logger.error('PJLink Error: Out of parameter')
       }
-      else if (match[2] === 'ERR3') {
+      else if (val === 'ERR3') {
         logger.error('PJLink Error: Unavailable at this time')
       }
-      else if (match[2] === 'ERR4') {
+      else if (val === 'ERR4') {
         logger.error('PJLink Error: Projector/Display failure')
       }
       else {
@@ -122,11 +175,58 @@ exports.createDevice = base => {
       pending && base.commandError('Error response from device')
     }
     else if (match) {
-      if (pending.action == 'getPower' && match[1] === 'POWR') {
-        base.getVar('Power').value = parseInt(match[2])  // 0=off, 1=on, 2=cooling, 3=warming
+      if (pending.action === 'getPower' && cmd === 'POWR') {
+        base.getVar('Power').value = val_int // 0=off, 1=on, 2=cooling, 3=warming
         base.commandDone()
       }
-      else if (pending.action == 'setPower' && match[1] === 'POWR' && match[2] === 'OK') {
+      else if (pending.action === 'getSource' && cmd === 'INPT') {
+        // Get source from list
+        let source_name = POSSIBLE_SOURCES[val]
+        if (source_name && base.getVar('Sources').enums.includes(source_name)) {
+          base.getVar('Sources').string = source_name
+          base.commandDone()
+        }
+        else {
+          base.commandError('Error getting current source')
+        }
+      }
+      else if (pending.action === 'getAVMute' && cmd === 'AVMT') {
+        // Decipher audio/video mute status
+        if (val_int == 11) {
+          base.getVar('AudioMute').value = 0
+          base.getVar('VideoMute').value = 1
+          base.commandDone()
+        }
+        else if (val_int == 21) {
+          base.getVar('AudioMute').value = 1
+          base.getVar('VideoMute').value = 0
+          base.commandDone()
+        }
+        else if (val_int == 31) {
+          base.getVar('AudioMute').value = 1
+          base.getVar('VideoMute').value = 1
+          base.commandDone()
+        }
+        else if (val_int == 30) {
+          base.getVar('AudioMute').value = 0
+          base.getVar('VideoMute').value = 0
+          base.commandDone()
+        }
+        else {
+          logger.error(`onFrame, unknown AVMT value: ${val}`)
+        }
+      }
+      else if (pending.action === 'getAvailableSources' && cmd === 'INST') {
+        // Construct sources enum
+        let sources = []
+        for (let id of val.split(' ')) {
+          let source_name = POSSIBLE_SOURCES[id]
+          source_name && sources.push(source_name)
+        }
+        base.getVar('Sources').enums = sources
+        base.commandDone()
+      }
+      else if (pending.action === 'setPower' && cmd === 'POWR' && val === 'OK') {
         if (pending.params.Status === 'Off') {
           base.getVar('Power').value = 2  // Cooling down
           base.commandDone()
@@ -136,16 +236,24 @@ exports.createDevice = base => {
           base.commandDone()
         }
       }
-      else if (pending.action == 'getSource' && match[1] === 'INPT') {
-        base.getVar('Sources').string = pending.params.Status
+      else if (pending.action === 'selectSource' && cmd === 'INPT' && val === 'OK') {
+        base.getVar('Sources').string = pending.params.Name
         base.commandDone()
       }
-      // Set options for inputs in setup
-      // AV Mute
-      // Use INST to get sources available
+      else if (pending.action === 'setAudioMute' && cmd === 'AVMT' && val === 'OK') {
+        base.getVar('AudioMute').string = pending.params.Status
+        base.commandDone()
+      }
+      else if (pending.action === 'setVideoMute' && cmd === 'AVMT' && val === 'OK') {
+        base.getVar('VideoMute').string = pending.params.Status
+        base.commandDone()
+      }
+      else {
+        logger.warn(`onFrame data matched regex but not processed: ${data}`)
+      }
     }
     else {
-      logger.warn(`onFrame data not processed: ${data}`)
+      logger.silly(`onFrame data not processed: ${data}`)
     }
   }
 
@@ -159,6 +267,14 @@ exports.createDevice = base => {
     sendDefer('%1INPT ?\r')
   }
 
+  function getAVMute() {
+    sendDefer('%1AVMT ?\r')
+  }
+
+  function getAvailableSources() {
+    sendDefer('%1INST ?\r')
+  }
+
 
   // ------------------------------ SET FUNCTIONS ------------------------------
   function setPower(params) {
@@ -168,15 +284,32 @@ exports.createDevice = base => {
   }
 
   function selectSource(params) {
-    let match = params.Name.match(/HDMI(\d)/)
-    match && sendDefer(`*SCINPT000000010000000${match[1]}\n`)
+    for (let id in POSSIBLE_SOURCES) {
+      if (POSSIBLE_SOURCES[id] === params.Name) {
+        sendDefer(`%1INPT ${id}\r`)
+        return
+      }
+    }
+    logger.error(`selectSource: could not find ${params.Name} in possible sources`)
+  }
+
+  function setAudioMute(params) {
+    if (params.Status == 'Off') sendDefer('%1AVMT 20\r')
+    else if (params.Status == 'On') sendDefer('%1AVMT 21\r')
+    else logger.warn('setAudioMute only accepts "Off" or "On"')
+  }
+
+  function setVideoMute(params) {
+    if (params.Status == 'Off') sendDefer('%1AVMT 10\r')
+    else if (params.Status == 'On') sendDefer('%1AVMT 11\r')
+    else logger.warn('setVideoMute only accepts "Off" or "On"')
   }
 
 
   // ------------------------------ EXPORTED FUNCTIONS ------------------------------
   return {
     setup, start, stop, tick,
-    getPower, getSource,
-    setPower, selectSource
+    getPower, getSource, getAVMute, getAvailableSources,
+    setPower, selectSource, setAudioMute, setVideoMute
   }
 }
