@@ -94,20 +94,20 @@ exports.createDevice = base => {
   }
 
   function onFrame(data) {
-    let pendingCommand = base.getPendingCommand()
-    logger.debug(`onFrame (pending = ${pendingCommand && pendingCommand.action}): ${data}`)
+    let pending = base.getPendingCommand()
+    logger.debug(`onFrame (pending = ${pending && pending.action}): ${data}`)
     let match = data.match(/POWR(\d+)/)
-    if (match && pendingCommand) {
-      if (match && pendingCommand.action == 'getPower') {
+    if (match && pending) {
+      if (match && pending.action == 'getPower') {
         base.getVar('Power').value = parseInt(match[1])  // 0 = off, 1 = on
         base.commandDone()
       }
-      else if (match && pendingCommand.action == 'setPower') {
-        base.getVar('Power').string = pendingCommand.params.Status
+      else if (match && pending.action == 'setPower') {
+        base.getVar('Power').string = pending.params.Status
         base.commandDone()
       }
     }
-    else if (match && !pendingCommand) {
+    else if (match && !pending) {
       logger.warn(`Received data but no pending command: ${data}`)
     }
     else {
