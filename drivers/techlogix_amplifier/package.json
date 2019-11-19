@@ -1,6 +1,6 @@
 {
   "name": "techlogix_amplifier",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Driver for Techlogix Power Amplifier",
   "main": "index.js",
   "scripts": {
@@ -27,9 +27,23 @@
         ]
       },
       {
+        "name": "Sources",
+        "type": "enum",
+        "enums": [],
+        "perform": {
+          "action": "Select Source",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      },
+      {
         "name": "AudioMute",
         "type": "enum",
-        "enums": ["Off", "On"],
+        "enums": [
+          "Off",
+          "On"
+        ],
         "perform": {
           "action": "Set Audio Mute",
           "params": {

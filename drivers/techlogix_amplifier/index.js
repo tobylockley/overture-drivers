@@ -1,16 +1,15 @@
 'use strict'
 
-const CMD_DEFER_TIME = 1000
+const CMD_DEFER_TIME = 2000
 const TICK_PERIOD = 5000
 const POLL_PERIOD = 5000
 const TCP_TIMEOUT = 30000
-const TCP_RECONNECT_DELAY = 1000
+const TCP_RECONNECT_DELAY = 10000
 
 let host
 exports.init = _host => {
   host = _host
 }
-
 
 exports.createDevice = base => {
   const logger = base.logger || host.logger
@@ -21,16 +20,17 @@ exports.createDevice = base => {
   frameParser.setSeparator('\r\n')
   frameParser.on('data', data => onFrame(data))
 
+  // ------------------------------ SETUP FUNCTIONS ------------------------------
+
+  function isConnected() { return base.getVar('Status').string === 'Connected' }
+
 
   const setup = _config => {
     config = _config
     base.setTickPeriod(TICK_PERIOD)
-    base.setPoll({
-      action: 'getStatus',
-      period: POLL_PERIOD,
-      enablePollFn: () => { return base.getVar('Status').string === 'Connected' },
-      startImmediately: true
-    })
+
+    // Register polling functions
+    base.setPoll({ action: 'getStatus', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
 
     // Create dynamic variables based on model
     let sources, mic_input, ducking
@@ -53,17 +53,7 @@ exports.createDevice = base => {
       ducking = false
     }
 
-    base.createVariable({
-      name: 'Sources',
-      type: 'enum',
-      enums: sources,
-      perform: {
-        action: 'Select Source',
-        params: {
-          Name: '$string'
-        }
-      }
-    })
+    base.getVar('Sources').enums = sources
 
     if (mic_input) {
       base.createVariable({
@@ -115,69 +105,62 @@ exports.createDevice = base => {
     }
   }
 
-
   const start = () => {
     initTcpClient()
   }
 
-
-  const stop = () => {
+  function stop() {
     base.getVar('Status').string = 'Disconnected'
-    if (tcpClient) {
-      tcpClient.end()
-      tcpClient = null
-    }
+    tcpClient && tcpClient.end()
+    tcpClient = null
+    base.stopPolling()
+    base.clearPendingCommands()
   }
-
 
   function tick() {
-    !tcpClient && initTcpClient()  // Attempt reconnection after an error
+    !tcpClient && initTcpClient()
   }
 
+  function initTcpClient() {
+    if (tcpClient) return  // Return if tcpClient already exists
 
-  const initTcpClient = () => {
-    if (!tcpClient) {
-      tcpClient = host.createTCPClient()
-      tcpClient.setOptions({
-        receiveTimeout: TCP_TIMEOUT,
-        autoReconnectionAttemptDelay: TCP_RECONNECT_DELAY
-      })
-      tcpClient.connect(config.port, config.host)
+    tcpClient = host.createTCPClient()
+    tcpClient.setOptions({
+      receiveTimeout: TCP_TIMEOUT,
+      autoReconnectionAttemptDelay: TCP_RECONNECT_DELAY
+    })
+    tcpClient.connect(config.port, config.host)
 
-      tcpClient.on('connect', () => {
-        logger.silly('TCPClient connected')
-        base.getVar('Status').string = 'Connected'
-        base.startPolling()
-      })
+    tcpClient.on('connect', () => {
+      logger.silly('TCPClient connected')
+      base.getVar('Status').string = 'Connected'
+      base.startPolling()
+    })
 
-      tcpClient.on('data', data => {
-        frameParser.push(data)
-      })
+    tcpClient.on('data', data => {
+      frameParser.push(data.toString())
+    })
 
-      tcpClient.on('close', () => {
-        logger.silly('TCPClient closed')
-        base.getVar('Status').string = 'Disconnected'
-      })
+    tcpClient.on('close', () => {
+      logger.silly('TCPClient closed')
+      base.getVar('Status').string = 'Disconnected'  // Triggered on timeout, this allows auto reconnect
+    })
 
-      tcpClient.on('error', err => {
-        logger.error(`TCPClient: ${err}`)
-        stop()
-      })
-    }
+    tcpClient.on('error', err => {
+      logger.error(`TCPClient: ${err}`)
+      stop()  // Throw out the tcpClient and get a fresh connection
+    })
   }
-
 
   const send = data => {
     logger.silly(`TCPClient send: ${data}`)
     return tcpClient && tcpClient.write(data)
   }
 
-
   const sendDefer = data => {
     base.commandDefer(CMD_DEFER_TIME)
     if (!send(data)) base.commandError('Data not sent')
   }
-
 
   const onFrame = data => {
     let match
@@ -228,15 +211,12 @@ exports.createDevice = base => {
     match && (base.getVar('AudioMute').string = 'Off')
   }
 
-
   const getStatus = () => sendDefer(Buffer.from('600%'))
-
 
   const selectSource = params => {
     let match = params.Name.match(/.*?(\d+)/i)
     match && send(Buffer.from(`${parseInt(match[1])}A1.`))
   }
-
 
   const setAudioMute = params => {
     if (params.Status == 'Off') {
@@ -251,7 +231,6 @@ exports.createDevice = base => {
       }
     }
   }
-
 
   const setAudioMuteIn = params => {
     if (params.Status == 'Off') send(Buffer.from('0A1.'))

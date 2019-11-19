@@ -124,3 +124,5 @@ Set ducking level of the device (between 0 and 60).
 - General code cleanup.
 - Changed tcpClient logic to allow auto reconnection.
 
+### 1.0.4
+- Sources is declared in package.json, enums added in setup depending on model
