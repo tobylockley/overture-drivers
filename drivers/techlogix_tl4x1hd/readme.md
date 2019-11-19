@@ -53,3 +53,6 @@ Mute or unmute the output.
 ### 1.0.2
 - Changed name from "tl_4x1_hd" to "techlogix_tl4x1hd"
 - Updated syntax, eslint
+
+### 1.0.3
+- Updated TCP connection code

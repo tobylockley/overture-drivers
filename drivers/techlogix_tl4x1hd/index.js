@@ -20,40 +20,37 @@ exports.createDevice = base => {
   frameParser.setSeparator('\r\n')
   frameParser.on('data', data => onFrame(data))
 
-  //------------------------------------------------------------------------- STANDARD SDK FUNCTIONS
+
+  // ------------------------------ SETUP FUNCTIONS ------------------------------
+
+  function isConnected() { return base.getVar('Status').string === 'Connected' }
+
   function setup(_config) {
     config = _config
     base.setTickPeriod(TICK_PERIOD)
-    base.setPoll({
-      action: 'getStatus',
-      period: POLL_PERIOD,
-      enablePollFn: () => { return base.getVar('Status').string === 'Connected' },
-      startImmediately: true
-    })
+
+    // Register polling functions
+    base.setPoll({ action: 'getStatus', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
   }
 
   function start() {
     initTcpClient()
   }
 
-  function tick() {
-    !tcpClient && initTcpClient()  // Attempt reconnection after an error
-  }
-
-  function disconnect() {
-    base.getVar('Status').string = 'Disconnected'
-    base.stopPolling()
-  }
-
   function stop() {
-    disconnect()
+    base.getVar('Status').string = 'Disconnected'
     tcpClient && tcpClient.end()
     tcpClient = null
+    base.stopPolling()
+    base.clearPendingCommands()
   }
 
-  //-------------------------------------------------------------------------- SEND/RECEIVE HANDLERS
+  function tick() {
+    if (!tcpClient) initTcpClient()
+  }
+
   function initTcpClient() {
-    if (tcpClient) return // Return if tcpClient already exists
+    if (tcpClient) return  // Return if tcpClient already exists
 
     tcpClient = host.createTCPClient()
     tcpClient.setOptions({
@@ -74,17 +71,12 @@ exports.createDevice = base => {
 
     tcpClient.on('close', () => {
       logger.silly('TCPClient closed')
-      let pending = base.getPendingCommand()
-      disconnect() // Triggered on timeout, this allows auto reconnect
-      if (pending) {
-        base.commandError('Lost Connection')
-        base.perform(pending.action, pending.params)
-      }
+      base.getVar('Status').string = 'Disconnected'  // Triggered on timeout, this allows auto reconnect
     })
 
     tcpClient.on('error', err => {
       logger.error(`TCPClient: ${err}`)
-      stop() // Throw out the tcpClient and get a fresh connection
+      stop()  // Throw out the tcpClient and get a fresh connection
     })
   }
 
@@ -99,8 +91,8 @@ exports.createDevice = base => {
   }
 
   const onFrame = data => {
-    base.commandDone()
-    logger.silly(`onFrame: ${data}`)
+    let pending = base.getPendingCommand()
+    logger.debug(`onFrame (pending = ${pending && pending.action}): ${data}`)
     if (data.startsWith('AV: ')) {
       logger.silly(data.substr(4,1))
       base.getVar('Sources').string = 'HDMI' + data.substr(4,1)
@@ -111,6 +103,7 @@ exports.createDevice = base => {
     else if (data == 'UNMUTE\r\n') {
       base.getVar('Mute').string = 'Off'
     }
+    base.commandDone()
   }
 
   //---------------------------------------------------------------------------------- GET FUNCTIONS

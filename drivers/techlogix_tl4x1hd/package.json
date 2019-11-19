@@ -1,6 +1,6 @@
 {
   "name": "techlogix_tl4x1hd",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Driver for tl-4x1-hd switcher",
   "main": "index.js",
   "scripts": {
