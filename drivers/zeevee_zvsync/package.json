@@ -1,7 +1,7 @@
 {
   "name": "zeevee_zvsync",
-  "version": "1.0.0-beta.1",
-  "description": "Driver for IR control of ZeeVee ZvSync",
+  "version": "1.0.1",
+  "description": "Driver for ZeeVee ZVSync",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -10,7 +10,9 @@
   "license": "MIT",
   "overture": {
     "brand": "ZeeVee",
-    "model": "ZvSync",
+    "models": [
+      "ZVSync"
+    ],
     "type": "device",
     "subtype": "player",
     "variables": [
@@ -26,50 +28,12 @@
         "name": "IR_Commands",
         "type": "enum",
         "enums": [
-          "Idle",
-          "Channel Down",
-          "Channel Up",
-          "Cursor Down",
-          "Cursor Enter",
-          "Cursor Left",
-          "Cursor Right",
-          "Cursor Up",
-          "Digit 0",
-          "Digit 1",
-          "Digit 2",
-          "Digit 3",
-          "Digit 4",
-          "Digit 5",
-          "Digit 6",
-          "Digit 7",
-          "Digit 8",
-          "Digit 9",
-          "Exit",
-          "Forward",
-          "Function Blue",
-          "Function Green",
-          "Function Red",
-          "Function Yellow",
-          "Guide",
-          "Info",
-          "Menu Main",
-          "Mute Toggle",
-          "Pause",
-          "Play",
-          "Power Toggle",
-          "Previous Channel",
-          "Record",
-          "Replay",
-          "Reverse",
-          "Skip",
-          "Stop",
-          "Volume Down",
-          "Volume Up"
+          "Populated during device setup"
         ],
         "perform": {
           "action": "Send Command",
           "params": {
-            "Name": "$string"
+            "Index": "$value"
           }
         }
       }
@@ -78,21 +42,19 @@
       {
         "name": "Send Command",
         "params": {
-          "Name": {
-            "type": "string"
+          "Index": {
+            "type": "integer"
           }
         }
       }
     ],
-    
     "pointSetupSchema": {
       "type": "object",
-      "title": "Setup for  GC IR emitter",
+      "title": "Setup for GlobalCache IR emitter",
       "properties": {
         "host": {
-          "title": "GC IR emitter IP/Hostname",
-          "type": "string",
-          "default": "192.168.1.70"
+          "title": "GlobalCache Device IP/Hostname",
+          "type": "string"
         },
         "port": {
           "title": "Port:",
@@ -101,25 +63,21 @@
           "description": "Default: 4998"
         },
         "module": {
-          "title": "Module#:",
-          "type": "string",
-          "default": "1",
-          "description": "Module of GC (1 for Itach)"
+          "title": "GlobalCache Module:",
+          "type": "integer",
+          "minimum": 1,
+          "default": 1,
+          "description": "iTach = 1"
         },
         "ir_port": {
           "title": "IR Port:",
-          "type": "string",
-          "default": "1",
-          "description": "IR blaster port in use (1-3)"
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3,
+          "default": 1,
+          "description": "IR emitter port to use (1-3)"
         }
-      },
-      "required": [
-        "host",
-        "port",
-        "module",
-        "ir_port"
-      ]
+      }
     }
-  },
-  "dependencies": {}
+  }
 }
