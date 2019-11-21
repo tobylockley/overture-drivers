@@ -6,6 +6,9 @@
  * Delete files after upload
  * Only upload if folderId not in parents
  *
+ * Overture User Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXljbG9ha0lkIjoiYWVmMDNhM2UtMDIxYy00ZjI3LTljNzUtNDdiOTI0OTE1ODI5IiwiaWQiOiI1YjcyMjdhNjdjMTQzYjAwMGU1YzY2ODAiLCJuYW1lIjoiQVBJIiwicm9sZXMiOlt7ImlkIjoic3lzdGVtIiwibmFtZSI6IlN5c3RlbSIsImFsdG5hbWUiOiJzeXN0ZW0iLCJzeXN0ZW0iOnRydWUsImhyY19hY2Nlc3NfcmlnaHRzIjoxMDAsImhyY19hbGFybXNfcmlnaHRzIjoxMDAsInJvbGVfaWQiOiJzeXN0ZW0ifV0sInVzZXJuYW1lIjoiYXBpIn0.1XM6YossFjF_LdmkJChKda5dWoFzjrBHQGtOZoI2ezg
+ * Google Auth Code: 4/qQHO8KFOqRTRCTI8PKc0E_YGHjJZNb578XOkfXaI7L4zU2r6h_uf8iY
+ * Driver Folder ID: 17Itlz9UpFlRYw_YcFVr4d7cWkGWd9Q2g
  */
 
 const TICK_PERIOD = 5000 // In-built tick interval
