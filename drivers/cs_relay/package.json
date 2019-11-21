@@ -1,0 +1,47 @@
+{
+  "name": "cs_relay",
+  "version": "1.0.0-beta.5",
+  "description": "Provides a way to see CS logs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "overture",
+    "models": [],
+    "type": "behavior",
+    "subtype": "",
+    "variables": [],
+    "commands": [
+      {
+        "name": "Get Project",
+        "params": {
+          "Identifier": { "type": "string" }
+        }
+      },
+      {
+        "name": "Get Logs",
+        "params": {
+          "Identifier": { "type": "string" }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "CS Relay Setup",
+      "properties": {
+        "port": {
+          "title": "CS Port",
+          "type": "integer",
+          "default": 8080,
+          "description": "Default: 8080"
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "socket.io-client": "^2.3.0"
+  }
+}
