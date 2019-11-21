@@ -1,10 +1,10 @@
 'use strict'
 
+//---------------------------------------------------------------------------------------- CONSTANTS
 const CMD_DEFER_TIME = 3000        // Timeout when using commandDefer
 const TICK_PERIOD = 5000           // In-built tick interval
-const POLL_PERIOD = 5000           // Continuous polling function interval
 const TCP_TIMEOUT = 30000          // Will timeout after this length of inactivity
-const TCP_RECONNECT_DELAY = 3000   // How long to wait before attempting to reconnect
+const TCP_RECONNECT_DELAY = 5000   // How long to wait before attempting to reconnect
 
 let host
 exports.init = _host => {
@@ -20,37 +20,38 @@ exports.createDevice = base => {
   frameParser.setSeparator('\n')
   frameParser.on('data', data => onFrame(data))
 
-
-  // ------------------------------ SETUP FUNCTIONS ------------------------------
-
-  function isConnected() { return base.getVar('Status').string === 'Connected' }
-
+  //------------------------------------------------------------------------- STANDARD SDK FUNCTIONS
   function setup(_config) {
     config = _config
     base.setTickPeriod(TICK_PERIOD)
-
     // Register polling functions
-    base.setPoll({ action: 'getPower', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
+    let pollms = config.polltime * 1000
+    base.setPoll({action: 'getPower', period: pollms, enablePollFn: isConnected, startImmediately: true})
   }
 
   function start() {
     initTcpClient()
   }
 
-  function stop() {
+  function tick() {
+    if (!tcpClient) initTcpClient()
+  }
+
+  function disconnect() {
     base.getVar('Status').string = 'Disconnected'
+    base.getVar('Power').string = 'Off'
+  }
+
+  function stop() {
+    disconnect()
     tcpClient && tcpClient.end()
     tcpClient = null
     base.stopPolling()
     base.clearPendingCommands()
   }
 
-  function tick() {
-    if (!tcpClient) initTcpClient()
-  }
-
   function initTcpClient() {
-    if (tcpClient) return  // Return if tcpClient already exists
+    if (tcpClient) return  // Do nothing if tcpClient already exists
 
     tcpClient = host.createTCPClient()
     tcpClient.setOptions({
@@ -71,18 +72,16 @@ exports.createDevice = base => {
 
     tcpClient.on('close', () => {
       logger.silly('TCPClient closed')
-      base.getVar('Status').string = 'Disconnected'  // Triggered on timeout, this allows auto reconnect
+      disconnect() // Triggered on timeout, this allows auto reconnect
     })
 
     tcpClient.on('error', err => {
       logger.error(`TCPClient: ${err}`)
-      stop()  // Throw out the tcpClient and get a fresh connection
+      stop() // Throw out the tcpClient and get a fresh connection
     })
   }
 
-
-  // ------------------------------ SEND/RECEIVE HANDLERS ------------------------------
-
+  //-------------------------------------------------------------------------- SEND/RECEIVE HANDLERS
   function send(data) {
     logger.silly(`TCPClient send: ${data}`)
     return tcpClient && tcpClient.write(data)
@@ -99,7 +98,7 @@ exports.createDevice = base => {
     let match = data.match(/POWR(\d+)/)
     if (match && pending) {
       if (match && pending.action == 'getPower') {
-        base.getVar('Power').value = parseInt(match[1])  // 0 = off, 1 = on
+        base.getVar('Power').value = parseInt(match[1])  // 0 = Off, 1 = On
         base.commandDone()
       }
       else if (match && pending.action == 'setPower') {
@@ -115,22 +114,27 @@ exports.createDevice = base => {
     }
   }
 
-
-  // ------------------------------ GET FUNCTIONS ------------------------------
-
+  //---------------------------------------------------------------------------------- GET FUNCTIONS
   function getPower() {
     sendDefer('*SEPOWR################\n')
   }
 
-
-  // ------------------------------ SET FUNCTIONS ------------------------------
+  //---------------------------------------------------------------------------------- SET FUNCTIONS
   function setPower(params) {
     if (params.Status == 'Off') sendDefer('*SCPOWR0000000000000000\n')
     else if (params.Status == 'On') sendDefer('*SCPOWR0000000000000001\n')
   }
 
+  //------------------------------------------------------------------------------- HELPER FUNCTIONS
+  function isConnected() {
+    return base.getVar('Status').string == 'Connected'
+  }
 
-  // ------------------------------ EXPORTED FUNCTIONS ------------------------------
+  function isPoweredOn() {
+    return isConnected() && base.getVar('Power').string == 'On'
+  }
+
+  //----------------------------------------------------------------------------- EXPORTED FUNCTIONS
   return {
     setup, start, stop, tick,
     getPower,
