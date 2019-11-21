@@ -4,10 +4,20 @@
   "description": "Driver for Sony Bravia TCP Connection",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "mocha"
+    "start": "node index.js"
   },
-  "author": "Audio Visual Distributors",
+  "author": {
+    "name": "Audio Visual Distributors",
+    "email": "support@avdistributors.com.au",
+    "url": "https://www.avdistributors.com.au/"
+  },
+  "contributors": [
+    {
+      "name": "Toby Lockley",
+      "email": "toby@avdistributors.com.au",
+      "url": "https://www.avdistributors.com.au"
+    }
+  ],
   "license": "MIT",
   "overture": {
     "brand": "Sony",
