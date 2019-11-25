@@ -19,14 +19,6 @@ if (cluster.isMaster) { // MASTER
       console.log(`[${process.pid} M] Message from worker (${worker.process.pid}): ${msg}`)
     })
   }
-
-  cluster.on('exit', (worker, code) => {
-    console.log(`[${worker.process.pid} W] Worker died with code ${code}`)
-    for (let id in cluster.workers) {
-      cluster.workers[id].kill() // Kill all workers
-    }
-    server.close() // Stop server
-  })
   
   app.use(express.static('public'))
   app.use('/lib', [
@@ -43,6 +35,18 @@ if (cluster.isMaster) { // MASTER
       console.log(`[${process.pid} M] [${socket.id}] Test: ${msg}`)
     })
     socket.emit('setText', {id:12345, text:'hello'})
+  })
+
+  cluster.on('exit', (worker, code) => {
+    console.log(`[${worker.process.pid} W] Worker died with code ${code}`)
+    for (let id in cluster.workers) {
+      cluster.workers[id].kill() // Kill all workers
+    }
+    server.close() // Stop server
+  })
+
+  cluster.on('message', (worker, message) => {
+    // process worker messages here,
   })
 }
 
