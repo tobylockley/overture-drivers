@@ -2,12 +2,29 @@
   "name": "device_simulator",
   "version": "1.0.0",
   "description": "Simulate devices, for learning TCP control",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node app.js",
-    "start-debug": "nodemon app.js",
+    "start": "node server.js",
+    "start-debug": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Toby Lockley",
-  "license": "MIT"
+  "author": {
+    "name": "Audio Visual Distributors",
+    "email": "support@avdistributors.com.au",
+    "url": "https://www.avdistributors.com.au/"
+  },
+  "contributors": [
+    {
+      "name": "Toby Lockley",
+      "email": "toby@avdistributors.com.au",
+      "url": "https://www.avdistributors.com.au"
+    }
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "ejs": "^3.0.1",
+    "express": "^4.17.1",
+    "jquery": "^3.4.1",
+    "socket.io": "^2.3.0"
+  }
 }
