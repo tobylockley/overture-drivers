@@ -137,7 +137,7 @@ exports.createDevice = base => {
           resolve()
         }
         else {
-          reject(`Resource is secured by another user for ${getTimeLeft(userTimeout)} seconds`)
+          reject(`Resource is secured by another user for the next ${getTimeLeft(userTimeout)} seconds`)
         }
       }
       else {
@@ -148,16 +148,21 @@ exports.createDevice = base => {
 
   function updateUser(id) {
     userId = id
-    userTimeout && clearTimeout(userTimeout)
-    userTimeout = setTimeout(() => {
-      userId = null
-      clearTimeout(userTimeout)
-    }, USER_TIMEOUT)
+    if (userTimeout) {
+      userTimeout.refresh()
+    }
+    else {
+      userTimeout = setTimeout(() => {
+        clearTimeout(userTimeout)
+        userTimeout = null
+        userId = null
+      }, USER_TIMEOUT)
+    }
   }
 
   function getTimeLeft(timeout) {
     if (!timeout) return 0
-    else return Math.ceil((timeout._idleStart + timeout._idleTimeout - Date.now()) / 1000)
+    else return Math.ceil((timeout._idleStart + timeout._idleTimeout)/1000 - process.uptime())
   }
 
   //----------------------------------------------------------------------------- EXPORTED FUNCTIONS
