@@ -28,3 +28,13 @@ socket.on('update', data => {
     $(`#${data.id}`).css('color', 'black')
   }
 })
+
+socket.on('disconnect', reason => {
+  console.log('Socket disconnected:', reason)
+  $('#error-container').css('visibility', 'visible')
+})
+
+socket.on('connect', () => {
+  console.log('Socket connected')
+  $('#error-container').css('visibility', 'hidden')
+})

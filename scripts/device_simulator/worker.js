@@ -1,6 +1,7 @@
 const net = require('net')
 const FrameParser = require('./FrameParser.js')
 const VirtualDevice = require('./VirtualDevice.js')
+const colorCodes = require('./colorCodes.json')
 
 let device, parser, socket
 
@@ -8,8 +9,8 @@ function initWorker(port) {
   console.log(`[${process.pid} W] Worker starting on port ${port}`)
   device = new VirtualDevice()
   parser = new FrameParser('\n', onFrame)
-  net.createServer(s => {
-    socket = s
+  net.createServer(_socket => {
+    socket = _socket
     socket.on('data', function(data) {
       // console.debug(`[${process.pid} W] TCP packet received: ${data.toString().replace(/\n/g, '\\n').replace(/\r/g, '\\r')}`)
       parser.push(data)
@@ -90,6 +91,29 @@ function onFrame(data) {
     }
     catch (error) {
       socket.write(`setB,ERR,${error.message}\n`)
+    }
+    return
+  }
+
+  match = data.match(/recallPreset,(.*?)\n/)
+  if (match) {
+    // console.debug(`[${process.pid} W] recallPreset:`, match)
+    try {
+      // Retrieve color from json file, then set rgb
+      let color = colorCodes[match[1].toUpperCase()]
+      if (color) {
+        device.r = color[0]
+        device.g = color[1]
+        device.b = color[2]
+        socket.write(`recallPreset,OK,${match[1]}\n`)
+        updateMaster()
+      }
+      else {
+        throw new Error('Preset not found')
+      }
+    }
+    catch (error) {
+      socket.write(`recallPreset,ERR,${error.message}\n`)
     }
     return
   }

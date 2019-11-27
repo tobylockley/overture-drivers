@@ -9,6 +9,8 @@ require('console-stamp')(console, {
 
 const cluster = require('cluster')
 const path = require('path')
+const express = require('express')
+const favicon = require('serve-favicon')
 
 function showUsageThenExit() {
   console.log(`Usage: ${path.basename(process.argv[0])} ${path.basename(process.argv[1])} WORKERS,`)
@@ -21,7 +23,6 @@ if (num_workers <= 0) showUsageThenExit()
 
 // MASTER
 if (cluster.isMaster) {
-  const express = require('express')
   const app = express()
   const APP_PORT = 3000
   const server = app.listen(APP_PORT, () => {
@@ -29,6 +30,7 @@ if (cluster.isMaster) {
   })
   const io = require('socket.io')(server)
   
+  app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
   app.use(express.static('public'))
   app.use('/lib', [
     express.static(__dirname + '/node_modules/jquery/dist/')
