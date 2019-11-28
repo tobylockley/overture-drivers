@@ -26,7 +26,7 @@ if (cluster.isMaster) {
   const app = express()
   const APP_PORT = 3000
   const server = app.listen(APP_PORT, () => {
-    console.log(`[${process.pid} M] Express app running on port ${APP_PORT}!`)
+    console.log(`[${process.pid} M] Express app running at http://localhost:${APP_PORT}`)
   })
   const io = require('socket.io')(server)
   
