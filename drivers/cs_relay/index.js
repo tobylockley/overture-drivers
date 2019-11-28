@@ -92,7 +92,7 @@ exports.createDevice = base => {
     
     socket.on('opencap.log', (data) => {
       for (let log of data) {
-        if ( !/(?:Get Logs|cs_relay)/.test(log.msg) ) {
+        if ( !/(?:Get Logs|cs_relay|Get Project)/.test(log.msg) ) {
           // Filter out logs from this behaviour
           unreadLogs.push(log)
         }
@@ -149,15 +149,13 @@ exports.createDevice = base => {
   function updateUser(id) {
     userId = id
     if (userTimeout) {
-      userTimeout.refresh()
+      clearTimeout(userTimeout)
     }
-    else {
-      userTimeout = setTimeout(() => {
-        clearTimeout(userTimeout)
-        userTimeout = null
-        userId = null
-      }, USER_TIMEOUT)
-    }
+    userTimeout = setTimeout(() => {
+      clearTimeout(userTimeout)
+      userTimeout = null
+      userId = null
+    }, USER_TIMEOUT)
   }
 
   function getTimeLeft(timeout) {
