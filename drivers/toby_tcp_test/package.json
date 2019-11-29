@@ -1,0 +1,156 @@
+{
+  "name": "toby_tcp_test",
+  "version": "1.0.0-beta.2",
+  "description": "Driver",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "contributors": [
+    {
+      "name": "Toby Lockley",
+      "email": "toby@avdistributors.com.au",
+      "url": "https://www.avdistributors.com.au"
+    }
+  ],
+  "license": "MIT",
+  "overture": {
+    "brand": "Virtual",
+    "models": [
+      "MODEL"
+    ],
+    "type": "device",
+    "subtype": "generic",
+
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Text",
+        "type": "string",
+        "perform": {
+          "action": "Send Command",
+          "params": {
+            "Name": "setText",
+            "Value": "$string"
+          }
+        }
+      },
+      {
+        "name": "Red",
+        "type": "integer",
+        "min": 0,
+        "max": 255,
+        "perform": {
+          "action": "Send Command",
+          "params": {
+            "Name": "setR",
+            "Value": "$value"
+          }
+        }
+      },
+      {
+        "name": "Green",
+        "type": "integer",
+        "min": 0,
+        "max": 255,
+        "perform": {
+          "action": "Send Command",
+          "params": {
+            "Name": "setG",
+            "Value": "$value"
+          }
+        }
+      },
+      {
+        "name": "Blue",
+        "type": "integer",
+        "min": 0,
+        "max": 255,
+        "perform": {
+          "action": "Send Command",
+          "params": {
+            "Name": "setB",
+            "Value": "$value"
+          }
+        }
+      },
+      {
+        "name": "Presets",
+        "type": "enum",
+        "enums": [
+          "Idle",
+          "MediumSeaGreen",
+          "OrangeRed",
+          "SteelBlue",
+          "SlateBlue",
+          "SaddleBrown"
+        ],
+        "perform": {
+          "action": "Recall Preset",
+          "params": {
+            "Name": "recallPreset",
+            "Value": "$string"
+          }
+        }
+      }
+    ],
+
+    "commands": [
+      {
+        "name": "Send Command",
+        "params": {
+          "Name": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Recall Preset",
+        "params": {
+          "Name": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Template Setup",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address:",
+          "type": "string"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 3001,
+          "minimum": 0,
+          "description": "Default: 3001"
+        },
+        "polltime": {
+          "title": "Polling Frequency:",
+          "type": "integer",
+          "default": 5,
+          "minimum": 0,
+          "description": "How often to update device variables (seconds)"
+        }
+      }
+    }
+  }
+}
