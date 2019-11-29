@@ -15,6 +15,10 @@ function initWorker(port) {
       // console.debug(`[${process.pid} W] TCP packet received: ${data.toString().replace(/\n/g, '\\n').replace(/\r/g, '\\r')}`)
       parser.push(data)
     })
+
+    socket.on('error', err => {
+      console.error(`[${process.pid} W] TCP Error: ${err.message}`)
+    })
   }).listen(port)
 }
 
