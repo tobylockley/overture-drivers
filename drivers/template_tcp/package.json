@@ -6,11 +6,7 @@
   "scripts": {
     "start": "node index.js"
   },
-  "author": {
-    "name": "Audio Visual Distributors",
-    "email": "support@avdistributors.com.au",
-    "url": "https://www.avdistributors.com.au"
-  },
+  "author": "Audio Visual Distributors",
   "contributors": [
     {
       "name": "Toby Lockley",
