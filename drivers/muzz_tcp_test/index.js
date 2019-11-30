@@ -97,6 +97,18 @@ exports.createDevice = base => {
     let pending = base.getPendingCommand()
     logger.debug(`onFrame (pending = ${pending && pending.action}): ${data}`)
 
+
+    match = data.match(/recallPreset,OK,(.*)\n/)
+    if (match) {
+     
+      base.getVar('Presets').string = match[1]
+      logger.silly('match')
+      logger.silly(match[1])
+      base.commandDone()
+      
+      return
+    }
+
     match = data.match(/getText,OK,(.*)\n/)
     if (match) {
       base.getVar('Text').string = match[1]
@@ -112,7 +124,14 @@ exports.createDevice = base => {
       base.commandDone()
       return
     }
-    
+
+    match = data.match(/set(.*)\n/)
+    if (match) {
+      base.getVar('Presets').value = 0
+      base.commandDone()
+      return
+    }
+
     logger.warn(`onFrame data not processed: ${data}`)
   }
 
