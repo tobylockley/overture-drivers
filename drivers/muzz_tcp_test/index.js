@@ -19,7 +19,7 @@ exports.createDevice = base => {
   let frameParser = host.createFrameParser()
   frameParser.setSeparator('\n')
   frameParser.on('data', data => onFrame(data))
-
+ 
   //------------------------------------------------------------------------- STANDARD SDK FUNCTIONS
   function setup(_config) {
     config = _config
@@ -31,7 +31,7 @@ exports.createDevice = base => {
   }
 
   function start() {
-    initTcpClient()
+    initTcpClient() 
   }
 
   function tick() {
@@ -100,12 +100,8 @@ exports.createDevice = base => {
 
     match = data.match(/recallPreset,OK,(.*)\n/)
     if (match) {
-     
       base.getVar('Presets').string = match[1]
-      logger.silly('match')
-      logger.silly(match[1])
       base.commandDone()
-      
       return
     }
 
@@ -137,7 +133,7 @@ exports.createDevice = base => {
 
   //---------------------------------------------------------------------------------- GET FUNCTIONS
   function getText() {
-    sendDefer('getText\n')
+    sendDefer('getText\n') 
   }
 
   function getRGB() {
