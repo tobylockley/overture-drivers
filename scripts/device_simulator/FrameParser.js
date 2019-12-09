@@ -1,15 +1,13 @@
+const EventEmitter = require('events')
 const BUF_MAX = 2**20 // About 1MB
 
-class FrameParser {
-  constructor(separator, onFrame) {
-    if (typeof onFrame !== 'function') {
-      throw new TypeError(`FrameParser(separator, onFrame): expected "onFrame" to be function, but got: [${typeof onFrame}] ${onFrame}`)
-    }
+class FrameParser extends EventEmitter {
+  constructor(separator) {
+    super()
     if (!(typeof separator === 'string' || separator instanceof String)) {
       throw new TypeError(`FrameParser(separator, onFrame): expected "separator" to be string, but got: [${typeof separator}] ${separator}`)
     }
     this.separator = separator
-    this.onFrame = onFrame
     this.buffer = ''
   }
 
@@ -18,9 +16,9 @@ class FrameParser {
     if (data.includes(this.separator)) {
       let sliceIndex = data.indexOf(this.separator) + this.separator.length
       let chunk = data.slice(0, sliceIndex)
-      setImmediate(this.onFrame, this.buffer + chunk) // Call asyncronously
-      this.buffer = '' // Clear buffer, then push rest of data
-      this.push(data.slice(sliceIndex))
+      this.emit('data', this.buffer + chunk) // Trigger data event
+      this.buffer = '' // Clear buffer
+      this.push(data.slice(sliceIndex)) // Push leftover data into buffer
     }
     else {
       this.buffer = this.buffer + data
