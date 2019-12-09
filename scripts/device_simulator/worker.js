@@ -7,24 +7,28 @@ let device
 let socketCount = 0
 
 function initWorker(port) {
-  console.log(`[${process.pid} W] Worker starting on port ${port}`)
+  console.log(`[${process.pid} W / Port: ${port}] Worker starting on port ${port}`)
   device = new VirtualDevice()
+  device.text = `Virtual Device initialised! PID: ${process.pid} Port: ${port}`
   net.createServer(socket => {
     let parser = new FrameParser('\n')
     socket.id = `${process.pid}.${++socketCount}`
-    console.log(`[${process.pid} W] New socket connected: ${socket.id}`)
+    console.log(`[${process.pid} W / Port: ${port}] New socket connected: ${socket.id}`)
     parser.on('data', data => onFrame(data, socket))
     socket.on('data', function(data) {
       // console.debug(`[${process.pid} W] TCP packet received: ${data.toString().replace(/\n/g, '\\n').replace(/\r/g, '\\r')}`)
       parser.push(data)
     })
     socket.on('error', err => {
-      console.error(`[${process.pid} W] TCP Error: ${err.message}`)
+      console.error(`[${process.pid} W / Port: ${port}] TCP Error: ${err.message}`)
     })
     socket.on('close', () => {
-      console.log(`[${process.pid} W] Socket closed: ${socket.id}`)
+      console.log(`[${process.pid} W / Port: ${port}] Socket closed: ${socket.id}`)
     })
-  }).listen(port)
+  }).listen(port).on('close', () => {
+    console.log(`[${process.pid} W / Port: ${port}] Server closing`)
+  })
+
 }
 
 // PROCESS TCP FRAMES
