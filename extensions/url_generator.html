@@ -1,0 +1,316 @@
+<!-- 
+To use, add Page Link to the top of views/home.html, and link to this page
+See start of <script> tag for folder/file filters
+-->
+
+<med-header med-title="URL Generator"></med-header>
+
+<div id="ui_container">
+    
+    <div class="selector">
+        <span>Page:</span>
+        <select name="page" onchange="generateUrl()">
+            <option selected disabled value="">Select a page...</option>
+        </select>
+    </div>
+    
+    <div class="selector">
+        <span>Room:</span>
+        <select name="room" onchange="generateUrl()">
+            <option selected value="">Select a room...</option>
+        </select>
+    </div>
+    
+    <div class="selector">
+        <span>User:</span>
+        <select name="user" onchange="generateUrl()">
+            <option selected value="">Select a user...</option>
+        </select>
+    </div>
+    
+    <div id="url_container">
+        <!--<span>Generated URL Below</span>-->
+        <button id="copy_button">Copy To Clipboard</button>
+        <div id="copy_alert_success" class="alert alert-success hidden">
+            <strong>Success!</strong> Generated URL was copied to the clipboard.
+        </div>
+        <div id="copy_alert_fail" class="alert alert-danger hidden">
+            <strong>Error!</strong> Could not access clipboard, please copy manually.
+        </div>
+        <div id="copy_alert_nourl" class="alert alert-danger hidden">
+            URL has not been generated yet, please select a page above.
+        </div>
+        <textarea id="generated_url" onClick="selectTextbox(this)" placeholder="Make selections above..."></textarea>
+    </div>
+</div>
+
+<script>
+var ignoreFolders = ['common', 'archive', 'extensions']
+var ignoreFiles = ['home.html', 'footer.html']
+var containerFilter = ['room']  // See Configurator > (Views) Types for all available container id names
+
+$(function onStartup() {
+    // Get currently logged in users auth token
+    $.ajaxSetup({ headers: {'Authorization': `Bearer ${localStorage.getItem('authtoken')}`} })
+    
+    $.when(
+        $.get('/assets'),
+        $.get('/api/v2/points'),
+        $.get('/api/v2/users')
+    ).then((assetData, pointData, userData) => {
+        let views = assetData[0].children.filter(x => x.name == 'views')[0].children  // Get all objects inside "views" folder
+        let points = pointData[0]
+        users = userData[0].filter(x => x.permanentToken === true)  // Only show users with permanent tokens
+        
+        // Process pages
+        for (let file of scrapeFolder(views, true)) {
+            $('select[name="page"]').append(`<option value="${file.path}">${file.path}</option>`)
+        }
+        
+        // Get containers from pointData
+        for (let container of retrieveContainers(points)) {
+            $('select[name="room"]').append(`<option value="${container.varname}">${container.path}</option>`)
+        }
+        
+        // Process users
+        for (let user of users) {
+            $.when(
+                $.get(`/api/v2/users/${user.id}/token`)
+            ).then(token => {
+                token = token.token
+                $('select[name="user"]').append(`<option value="${token}">${user.name}</option>`)
+            }).catch(err => {
+                console.error(`Error retrieving user token (${user.name})`, err)
+            })
+        }
+        
+    }).catch(err => {
+        console.error('Overture API:', err)
+    })
+})
+
+// Gets all html files from folder. If deep is true, also scrape subfolders.
+// Returns file objects containing name, path, type
+function scrapeFolder(folder, deep) {
+    let files = []
+    let pendingFolders = []
+    for (let item of folder) {
+        if (item.type === 'file' && /\.html$/.test(item.path)) {
+            if (ignoreFiles.includes(item.name)) {
+                console.log(`Ignoring: ${item.path}`)
+            }
+            else {
+                files.push(item)
+            }
+        }
+        else if (item.type === 'folder' && deep && !ignoreFolders.includes(item.name)) {
+            pendingFolders.push(item.children)
+        }
+    }
+    
+    // Array contains all files, not dive into folders
+    for (let subfolder of pendingFolders) {
+        files = files.concat(scrapeFolder(subfolder, deep))
+    }
+    
+    return files
+}
+
+// Retrieve containers, and return an array of objects with varname and path
+function retrieveContainers(points) {
+    let containers = points.filter(x => containerFilter.includes(x.type))
+    containers = containers.map( x => ({varname: x.variable_name, path: getContainerPath(x, points)}) )
+    containers.sort((a, b) => {
+        if(a.path < b.path) return -1
+        if(a.path > b.path) return 1
+        return 0
+    })
+    return containers
+}
+
+// Return string showing containers path, e.g. BUILDING > FLOOR > ROOM
+function getContainerPath(container, points) {
+    if (container.parent) {
+        let parent = points.find(x => x.id === container.parent)
+        if (parent) {
+            return `${getContainerPath(parent, points)} > ${container.name}`
+        }
+        else {
+            console.error(`Could not find parent for ${container.variable_name}`)
+            return container.name
+        }
+    }
+    else {
+        return container.name
+    }
+}
+
+
+function generateUrl() {
+    // Called whenever a dropdown box changes
+    let page = $('select[name="page"] :selected').val()
+    let room = $('select[name="room"] :selected').val()
+    let user = $('select[name="user"] :selected').val()
+    
+    console.log(page)
+    
+    
+    
+    if (page) {
+        
+        $.when(
+            $.get(`/assets/${page}`)
+        ).then((pageData) => {
+            // Use special 'room' context key if the page supports it
+            roomKey = pageData.includes('context.room') ? 'room' : 'point'
+            page = page.match(/views\/(.*?)\.html/)[1].replace(/\//g, '+')
+            let home = `home=${page}`
+            let point = room ? `&${roomKey}=${room}` : ''
+            let token = user ? `&token=${user}` : ''
+            let magiclink = `${window.location.origin}/magicmenu/?${home}${point}${token}`
+            document.getElementById('generated_url').value = magiclink
+            
+        }).catch(err => {
+            console.error('Overture API:', err)
+        })
+    }
+}
+
+function selectTextbox(caller) {
+    caller.setSelectionRange(0, 0)
+    caller.setSelectionRange(0, caller.value.length)
+}
+
+function copyTextToClipboard(text) {
+    if (!navigator.clipboard) {
+        fallbackCopyTextToClipboard(text);
+        return;
+    }
+    navigator.clipboard.writeText(text).then(function() {
+        console.debug('Async: Copying to clipboard was successful!');
+    }, function(err) {
+        throw new Error('Async: Could not copy text', err);
+    });
+}
+
+function fallbackCopyTextToClipboard(text) {
+    var textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+        var successful = document.execCommand('copy');
+        var msg = successful ? 'successful' : 'unsuccessful';
+        console.debug('Fallback: Copying text command was ' + msg);
+    } catch (err) {
+        throw new Error('Fallback: Unable to copy', err);
+    }
+    document.body.removeChild(textArea);
+}
+
+function tempAlert(alertSelector) {
+    let alert = $(alertSelector)
+    alert.removeClass('hidden')
+    setTimeout(() => alert.addClass('hidden'), 5000)
+}
+
+$('#copy_button').click(function(event) {
+    let url = $('#generated_url').val()
+    if (url.length) {
+        try {
+            copyTextToClipboard(url)
+            tempAlert('#copy_alert_success')
+        }
+        catch (err) {
+            tempAlert('#copy_alert_fail')
+        }
+    }
+    else {
+        console.debug('URL has not been generated yet')
+        tempAlert('#copy_alert_nourl')
+    }
+})
+
+</script>
+
+<style>
+#ui_container {
+    --page-bg: hsl(223, 6%, 23%);
+    --text-bg: hsl(0, 0%, 70%);
+    --text-green: hsl(152, 100%, 45%);
+    --text-blue: hsl(220, 70%, 30%);
+    --text-blue-bright: hsl(230, 100%, 50%);
+    position: absolute;
+    top: 45px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 45px);
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    font-size: 20px;
+    padding: 10px;
+    font-family: Arial;
+    background: var(--page-bg);
+}
+
+.selector {
+    flex: 0 1 60px;
+    margin: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.selector > span {
+    width: 70px;
+    text-align: right;
+    margin-right: 20px;
+    color: var(--text-green);
+    font-weight: bold;
+}
+
+.selector > select {
+    height: 100%;
+    width: 50%;
+    flex: 1 1 auto;
+    background-color: var(--text-bg);
+    color: var(--text-blue);
+}
+
+#url_container {
+    flex: 1 1 50%;
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #EE7000;
+}
+
+#url_container button {
+    border-radius: 10px;
+    border: none;
+    background: var(--text-green);
+    color: var(--page-bg);
+    margin-bottom: 20px;
+    height: 50px;
+    width: 250px;
+    font-weight: bold;
+    font-family: Arial;
+}
+
+#url_container textarea {
+    flex: 1 1 auto;
+    width: 100%;
+    color: var(--text-blue-bright);
+    background: var(--text-bg);
+    resize: none;
+    padding: 8px;
+    line-height: 1.4rem;
+}
+
+#url_container textarea::placeholder {
+    color: var(--text-blue);
+}
+</style>

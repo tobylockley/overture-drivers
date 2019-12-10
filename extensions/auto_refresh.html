@@ -1,0 +1,71 @@
+<!--
+To use, copy the following line to the top of another file, med-context parameters optional
+refreshSeconds = seconds desired for source check interval
+<med-include med-file="extensions/auto_refresh" med-context="{refreshSeconds: 60}"></med-include>
+-->
+
+<script>
+// Using an IIFE to enclose variable scope: https://developer.mozilla.org/en-US/docs/Glossary/IIFE
+(function scopeContainer() {
+  const DEFAULT_INTERVAL = 60
+  var sourceSnapshot
+  var ajaxErrorState = false
+  
+  function checkSourceChange(url) {
+      const ovtScope = $('.med-magic-menu-view').scope()
+      if (ovtScope.data.editMode) return console.error('[AUTO_REFRESH] Edit mode detected, auto refresh aborted!')
+      
+      $.get({
+          url: `/assets/views/${ovtScope.data.page}.html`,
+          headers: {'Authorization': `Bearer ${localStorage.getItem('authtoken')}`}
+      })
+      .done(data => {
+          if (ajaxErrorState) {
+              console.debug('[AUTO_REFRESH] Recovered from error, reloading')
+              return window.location.reload()
+          }
+          if (!sourceSnapshot) {
+              console.debug('First run, saving a snapshot of current page...')
+          }
+          else if (sourceSnapshot !== data) {
+              console.debug('[AUTO_REFRESH] Page source changed, reloading')
+              return window.location.reload()
+          }
+          else {
+              console.debug('[AUTO_REFRESH] No changes...')
+          }
+          sourceSnapshot = data
+      })
+      .fail(() => {
+          console.error('[AUTO_REFRESH] AJAX request failed, will refresh on next success')
+          ajaxErrorState = true
+      })
+  }
+  
+  $(function autoRefreshBootstrap() {
+      const ovtScope = $('.med-magic-menu-view').scope()
+      const pageScope = $('#auto_refresh_context').scope().$parent
+      if (!ovtScope || !pageScope) throw new Error(`[AUTO_REFRESH] Could not retrieve Angular scope objects`)
+      // Only apply auto refresh interval when not in edit mode (GUI editor)
+      if (ovtScope.data.editMode) {
+          return console.log('[AUTO_REFRESH] Edit mode detected, auto refresh not loaded.')
+      }
+      else {
+          let refreshSeconds = pageScope.context.refreshSeconds
+          
+          if (_.isNumber(refreshSeconds) && refreshSeconds > 0) {
+              console.log(`[AUTO_REFRESH] Starting auto-refresh interval: ${refreshSeconds} seconds`)
+          }
+          else {
+              refreshSeconds = DEFAULT_INTERVAL
+              console.log(`[AUTO_REFRESH] Starting auto-refresh interval: ${refreshSeconds} seconds (default)`)
+          }
+          
+          checkSourceChange()  // Run on startup to get initial state of pages source code
+          setInterval(checkSourceChange, (refreshSeconds * 1000))
+      }
+  })
+  
+})();
+</script>
+<div id="auto_refresh_context"></div>
