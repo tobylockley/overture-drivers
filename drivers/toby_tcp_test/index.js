@@ -16,6 +16,8 @@ exports.createDevice = base => {
   let config
   let tcpClient
 
+  let info = base.parent.getCSInfo()
+
   let frameParser = host.createFrameParser()
   frameParser.setSeparator('\n')
   frameParser.on('data', data => onFrame(data))

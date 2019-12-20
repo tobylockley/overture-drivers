@@ -1,0 +1,231 @@
+<!----------
+Zoom Room Video Conference Template
+-------->
+
+<div ng-init="
+  inUse = findPoint({parent:point, variablename:'InUse'});
+  status = findPoint({parent:point, variablename:'Status'});
+  canRec = findPoint({parent:point, variablename:'CanRecord'});
+  layout = findPoint({parent:point, variablename:'Layout'});
+  hasPages = findPoint({parent:point, variablename:'LayoutHasPages'});
+  callHost = findPoint({parent:point, variablename:'CallHost'});
+  callType = findPoint({parent:point, variablename:'CallType'});
+  sharing = findPoint({parent:point, variablename:'Sharing'});
+  callers = findPoint({parent:point, variablename:'Callers'});
+"></div>
+
+
+<med-display
+    med-point=".Status"
+></med-display>
+
+<div ng-if="[1,3].includes(status.value)">
+    <med-display
+        med-point=".CallStatus"
+    ></med-display>
+
+    <med-point-table
+    	med-point="point"
+    	med-icon=""
+    	med-label=""
+    	med-subpoints=".DeviceName,.FirmwareVersion,.SharingKey,.WifiName,.AirplayPassword,.PairingCode,.ScreenCount,.HDMISource,.HDMISignal"
+    ></med-point-table>
+
+    <div ng-if="callers.enums.length > 0">
+        <med-list
+            med-label="Calls"
+            med-point=".Callers"
+            med-count="2"
+        ></med-list>
+        <med-button-bar>
+            <med-button
+                med-point=".Callers"
+                med-label="Answer Call"
+                med-click="perform(point, 'Answer', {Name: $string})"
+                med-on-state="10000"
+            ></med-button>
+
+            <med-button
+                med-point=".Callers"
+                med-label="Reject Call"
+                med-click="perform(point, 'Reject', {Name: $string})"
+                med-on-state="10000"
+            ></med-button>
+        </med-button-bar>
+    </div>
+
+    <med-list
+        med-label="Contacts"
+        med-point=".AddressBook"
+        med-count="5"
+    ></med-list>
+
+    <med-button
+        med-point=".AddressBook"
+        med-label="Invite Contact"
+        med-click="perform(point, 'Call Name', {Name: $string})"
+        med-on-state="10000"
+    ></med-button>
+
+    <div ng-if="inUse.value == 0">
+        <med-text-input
+            med-point=".Number"
+            med-label="Join Meeting Number"
+            med-change="perform(point, 'Call Number', {Number: $string})"
+            med-confirm="1"
+        ></med-text-input>
+
+        <med-list
+            med-point=".Meetings"
+            med-count="5"
+        ></med-list>
+
+        <med-button-bar>
+            <med-button
+                med-point=".Meetings"
+                med-label="Start Meeting"
+                med-click="perform(point, 'Start Meeting', {Name: $string})"
+            ></med-button>
+            <med-button
+                med-point='point'
+                med-label="Create Meeting"
+                med-click="perform(point, 'Create Meeting')"
+            ></med-button>
+        </med-button-bar>
+        <med-button
+            med-point=".Sharing"
+        	med-label="Start Presentation"
+        	med-click="perform(point, 'Start Presentation', {Display: 'Laptop'})"
+        ></med-button>
+    </div>
+
+    <div ng-if="inUse.value == 1">
+        <hr/>
+        <med-display
+    	    med-point=".MeetingNumber"
+        ></med-display>
+        <med-display
+            med-label="Meeting Type"
+    	    med-point=".CallType"
+        ></med-display>
+        <med-display
+            med-point=".Sharing"
+        ></med-display>
+        <med-list
+            med-point=".Participants"
+            med-count="3"
+        ></med-list>
+        <med-on-off
+            ng-disabled="hasPages.value == 0"
+    	    med-point=".LayoutHasPages"
+    	    med-label=""
+    	    med-label-on="Prev Page"
+    	    med-click-on="perform(point, 'Turn Page', {Direction: 'Backward'})"
+    	    med-state-on="2"
+    	    med-label-off="Next Page"
+    	    med-click-off="perform(point, 'Turn Page', {Direction: 'Forward'})"
+    	    med-state-off="2"
+    	    med-icon-on="glyphicons-chevron-left"
+    	    med-icon-off="glyphicons-chevron-right"
+        ></med-on-off>
+         <h5>Instructions</h5>
+    <med-button-bar>
+        <med-button
+            med-point='.ShowInstructions'
+            med-label="Off"
+            med-on-state="0"
+            med-click="perform(point, 'Set Instructions', {Display: 'Off'})"
+        ></med-button>
+        <med-button
+            med-point='.ShowInstructions'
+            med-label="Laptop"
+            med-on-state="1"
+            med-click="perform(point, 'Set Instructions', {Display: 'Laptop'})"
+        ></med-button>
+        <med-button
+            med-point='.ShowInstructions'
+            med-label="iOS"
+            med-on-state="2"
+            med-click="perform(point, 'Set Instructions', {Display: 'iOS'})"
+        ></med-button>
+    </med-button-bar>
+        <med-select
+    	    med-point=".Layout"
+        ></med-select>
+        <med-select
+    	    med-point=".Whiteboard"
+        ></med-select>
+        <med-button
+            ng-if="callType.string != 'Sharing' && sharing.value != 0"
+            med-point=".Sharing"
+    	    med-label="Stop Sharing"
+    	    med-click="perform(point, 'Set Sharing', {Status: 'Off'})"
+        ></med-button>
+        <med-button
+            ng-if="sharing.value == 0"
+            med-point=".Sharing"
+    	    med-label="Start Sharing"
+    	    med-click="perform(point, 'Set Sharing', {Status: 'On'})"
+        ></med-button>
+        <med-button
+            ng-if="callType.string == 'Sharing'"
+            med-point='point'
+            med-label="Disconnect Presentation"
+            med-click="perform(point, 'Disconnect Presentation')"
+        ></med-button>
+        <med-button
+            ng-if="callType.string == 'Sharing'"
+            med-point='point'
+            med-label="Stop Presentation"
+            med-click="perform(point, 'Stop Presentation')"
+        ></med-button>
+        <med-button-bar>
+        <med-button
+            med-point='point'
+            med-label="Leave Meeting"
+            med-click="perform(point,'Hang Up')"
+        ></med-button>
+        <med-button
+            med-point='point'
+            med-label="End Meeting"
+            med-click="perform(point, 'End Meeting')"
+        ></med-button>
+        </med-button-bar>
+
+        <med-on-off
+            ng-disabled="canRec.value == 0"
+            med-point=".Recording"
+        ></med-on-off>
+
+        <med-on-off
+            ng-disabled="callHost.value == 0"
+            med-point=".CallLocked"
+        ></med-on-off>
+    </div>
+  
+    <hr/>
+    <med-select
+    	med-point=".Cameras"
+    ></med-select>
+    
+    <med-on-off
+            med-point=".VideoMute"
+            med-change-on="setVariable($point, 1)"
+            med-change-off="setVariable($point, 0)"
+    ></med-on-off>
+    <hr/>
+    <med-slider
+    	med-repeat="{parent: point, variablename: 'AudioLevel'}"
+    ></med-slider>
+
+    <med-on-off
+    	med-repeat="{parent: point, variablename: 'AudioMute'}"
+    ></med-on-off>
+    <hr/>
+</div>
+
+<med-button
+    ng-disabled="[0,3,5].includes(status.value)"
+    med-label="Restart Zoom Room"
+    med-click="perform(point, 'Restart')"
+></med-button>

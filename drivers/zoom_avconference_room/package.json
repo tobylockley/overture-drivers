@@ -1,0 +1,438 @@
+{
+  "name": "zoom_avconference_room",
+  "version": "1.1.0-beta.1",
+  "description": "Driver For Zoom Room Video Conference Systems",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Medialon",
+  "license": "SEE LICENSE IN license.txt",
+  "overture": {
+    "overtureCSVersion": "1.4.0",
+    "brand": "Zoom",
+    "models": [
+      "Room"
+    ],
+    "type": "device",
+    "subtype": "avconference",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected",
+          "REST API Only",
+          "CS API Only",
+          "REST OK - CS Busy",
+          "REST Off - CS Busy"
+        ]
+      },
+      {
+        "name": "InUse",
+        "type": "enum",
+        "enums": ["Idle","Busy"]
+      },
+      {
+        "name": "FirmwareVersion",
+        "type": "string"
+      },
+      {
+        "name": "DeviceName",
+        "type": "string"
+      },
+      {
+        "name": "CallStatus",
+        "type": "enum",
+        "enums": [
+          "Idle",
+          "OnCall",
+          "Connecting",
+          "Unknown"
+        ]
+      },
+      {
+        "name": "AddressBook",
+        "type": "enum",
+        "enums": []
+      },
+      {
+        "name": "Meetings",
+        "type": "enum",
+        "enums": []
+      },
+      {
+        "name": "Callers",
+        "type": "enum",
+        "enums": []
+      },
+      {
+        "name": "Participants",
+        "type": "enum",
+        "enums": []
+      },
+      {
+        "name": "Cameras",
+        "type": "enum",
+        "enums": ["Fetching Camera List..."],
+        "perform": {"action": "Select Camera", "params": { "Camera": "$string"}}
+      },
+      {
+        "name": "Whiteboard",
+        "type": "enum",
+        "enums": ["Fetching Camera List..."],
+        "perform": {"action": "Set Whiteboard", "params": { "Camera": "$string"}}
+      },
+      {
+        "name": "HDMISource",
+        "type": "enum",
+        "enums": ["Disconnected", "Connected"]
+      },
+      {
+        "name": "HDMISignal",
+        "type": "enum",
+        "enums": ["Unavalaible", "Available"]
+      },
+      {
+        "name": "Number",
+        "type": "string"
+      },
+      {
+        "name": "MeetingNumber",
+        "type": "string"
+      },
+      {
+        "name": "CallLocked",
+        "type": "enum",
+        "enums": ["Off", "On"],
+        "perform": {"action": "Set Call Locked", "params": { "Status": "$string"}},
+        "smooth": 6000
+      },
+      {
+        "name": "CallType",
+        "type": "enum",
+        "enums": ["None", "Normal", "Sharing", "PSTN"]
+      },
+      {
+        "name": "Sharing",
+        "type": "enum",
+        "enums": ["Off", "Direct", "AirPlay", "HDMI", "Camera"]
+      },
+      {
+        "name": "SharingKey",
+        "type": "string"
+      },
+      {
+        "name": "AirplayPassword",
+        "type": "string"
+      },
+      {
+        "name": "WifiName",
+        "type": "string"
+      },
+      {
+        "name": "PairingCode",
+        "type": "string"
+      },
+      {
+        "name": "ShowInstructions",
+        "type": "enum",
+        "enums": ["Off", "Laptop", "iOS"],
+        "perform": {"action": "Set Instructions", "params": { "Display": "$string"}},
+        "smooth": 6000
+      },
+      {
+        "name": "Recording",
+        "type": "enum",
+        "enums": ["Off", "On"],
+        "perform": {"action": "Set Recording", "params": { "Status": "$string"}}
+      },
+      {
+        "name": "CanRecord",
+        "type": "enum",
+        "enums": ["No", "Yes"]
+      },
+      {
+        "name": "ScreenCount",
+        "type": "integer"
+      },
+      {
+        "name": "Layout",
+        "type": "enum",
+        "enums": ["Gallery","Speaker","Strip","ShareAll"],
+        "perform":{"action":"Set Layout", "params": { "Name":"$string"}}
+      },
+      {
+        "name": "LayoutHasPages",
+        "type": "enum",
+        "enums": ["No","Yes"]
+      },
+      {
+        "name": "CallHost",
+        "type": "enum",
+        "enums": ["Self","Other"]
+      },
+      {
+        "name": "VideoMute",
+        "type": "enum",
+        "enums": ["Off","On"],
+        "perform":{"action":"Set Video Mute", "params": { "Status":"$string"}}
+      },
+      {
+        "name": "AudioLevelInput",
+        "type": "integer",
+        "perform":{"action":"Set Audio Level In", "params": { "Level":"$value"}}
+      },
+      {
+        "name": "AudioMuteOutput",
+        "type": "enum",
+        "enums": ["Off","On"],
+        "perform":{"action":"Set Audio Mute", "params": { "Status":"$string"}}
+      },
+      {
+        "name": "AudioLevelOutput",
+        "type": "integer",
+        "perform":{"action":"Set Audio Level Out", "params": { "Level":"$value"}}
+      }
+    ],
+    "commands": [
+      {
+        "name": "Call Number",
+        "params": {
+          "Number": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Call Name",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Start Meeting",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Create Meeting"
+      },
+      {
+        "name": "Answer",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Reject",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Hang Up"
+      },
+      {
+        "name": "End Meeting"
+      },
+      {
+        "name": "StartPresentation",
+        "params": {
+          "Display": {
+            "type": "enum",
+            "enums": ["Off", "Laptop", "iOS"]
+          }
+        }
+      },
+      {
+        "name": "StopPresentation"
+      },
+      {
+        "name": "Set Instructions",
+        "params": {
+          "Display": {
+            "type": "enum",
+            "enums": ["Off", "Laptop", "iOS"]
+          }
+        }
+      },
+      {
+        "name": "Set Sharing",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off", "On"]
+          }
+        }
+      },
+      {
+        "name": "Set Recording",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off", "On"]
+          }
+        }
+      },
+      {
+        "name": "Set Layout",
+        "params": {
+          "Name": {
+            "type": "enum",
+            "enums": ["Gallery","Speaker","Strip","ShareAll"]
+          }
+        }
+      },
+      {
+        "name": "Turn Page",
+        "params": {
+          "Direction": {
+            "type": "enum",
+            "enums": ["Backward","Forward"]
+          }
+        }
+      },
+      {
+        "name": "Set Call Locked",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off", "On"]
+          }
+        }
+      },
+      {
+        "name": "Select Camera",
+        "params": {
+          "Camera": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Set Whiteboard",
+        "params": {
+          "Camera": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Set Video Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off","On"]
+          }
+        }
+      },
+      {
+        "name": "Set Audio Level In",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        },
+        "optimize": true
+      },
+      {
+        "name": "Set Audio Level Out",
+        "params": {
+          "Level": {
+            "type": "integer"
+          }
+        },
+        "optimize": true
+      },
+      {
+        "name": "Set Audio Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off", "On"]
+          }
+        },
+        "optimize": true
+      },
+      {
+        "name": "Restart"
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Zoom Room",
+      "properties": {
+        "userEmail": {
+          "title": "The Zoom User Email",
+          "type": "string",
+          "description": "The Zoom User Email used for calling and creating meetings."
+        },
+        "roomName": {
+          "title": "The Zoom Room Name",
+          "type": "string",
+          "description": "The Zoom Room Name"
+        },
+        "useProxy": {
+          "title": "Proxy for Zoom Room API",
+          "type": "string",
+          "enum": ["No Proxy", "Use http", "Use https"],
+          "default": "No Proxy",
+          "description": "Use the Control Server Proxy setting to access the Zoom Room REST API.  Default: 'No Proxy'"
+        },
+        "apiKey": {
+          "title": "Zoom API Key",
+          "type": "string",
+          "description": "The Zoom API key used for API authentication."
+        },
+        "apiSecret": {
+          "title": "Zoom API Secret",
+          "type": "string",
+          "description": "The Zoom API secret used for API authentication."
+        },
+        "csAPIHost": {
+          "title": "ZR-CSAPI Host IP Address",
+          "type": "string",
+          "description": "The ZR-CSAPI Network Name or IP Address"
+        },
+        "csAPIPort": {
+          "title": "ZR-CSAPI Host IP Port",
+          "type": "integer",
+          "default": 2244,
+          "description": "The ZR-CSAPI Network Port.  Default: 2244"
+        },
+        "csAPIPass": {
+          "title": "ZR-CSAPI Access Password",
+          "type": "string",
+          "default": "zoomus123",
+          "description": "The ZR-CSAPI Access Password.  Default: zoomus123"
+        }
+      },
+      "required": [
+        "userEmail",
+        "roomName",
+        "useProxy",
+        "apiKey",
+        "apiSecret",
+        "csAPIHost",
+        "csAPIPort",
+        "csAPIPass"
+      ]
+    }
+  },
+  "dependencies": {
+    "jsrsasign": "8.0.12",
+    "moment": "2.22.1",
+    "ssh2": "0.6.1"
+  }
+}
