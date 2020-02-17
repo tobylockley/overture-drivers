@@ -1,5 +1,4 @@
-'use strict'
-
+//------------------------------------------------------------------------------------------ CONSTANTS
 const CMD_DEFER_TIME = 1000        // Timeout when using commandDefer
 const TICK_PERIOD = 5000           // In-built tick interval
 const POLL_PERIOD = 5000           // Continuous polling function interval
@@ -21,10 +20,11 @@ exports.createDevice = base => {
     frameParser.on('data', data => onFrame(data))
 
 
-    // ------------------------------ SETUP FUNCTIONS ------------------------------
+    //------------------------------------------------------------------------------- HELPER FUNCTIONS
+    function isConnected() { return base.getVar('Status').string == 'Connected' }
 
-    function isConnected() { return base.getVar('Status').string === 'Connected' }
 
+    //------------------------------------------------------------------------- STANDARD SDK FUNCTIONS
     function setup(_config) {
         config = _config
         base.setTickPeriod(TICK_PERIOD)
@@ -136,8 +136,7 @@ exports.createDevice = base => {
     }
 
 
-    // ------------------------------ SEND/RECEIVE HANDLERS ------------------------------
-
+    //-------------------------------------------------------------------------- SEND/RECEIVE HANDLERS
     function send(data) {
         logger.silly(`TCPClient send: ${data}`)
         return tcpClient && tcpClient.write(data)
@@ -186,8 +185,7 @@ exports.createDevice = base => {
     }
 
 
-    // ------------------------------ GET FUNCTIONS ------------------------------
-
+    //---------------------------------------------------------------------------------- GET FUNCTIONS
     function getAudioLevel(params) {
         sendDefer(`GETL ${config.device} FDRLVL ${params.InstanceId} ${params.Channel}\n`)
     }
@@ -197,8 +195,7 @@ exports.createDevice = base => {
     }
 
 
-    // ------------------------------ SET FUNCTIONS ------------------------------
-
+    //---------------------------------------------------------------------------------- SET FUNCTIONS
     function setAudioLevel(params) {
         sendDefer(`SETL ${config.device} FDRLVL ${params.InstanceId} ${params.Channel} ${params.Level * 10}\n`)
     }
@@ -209,7 +206,7 @@ exports.createDevice = base => {
     }
 
 
-    // ------------------------------ EXPORTED FUNCTIONS ------------------------------
+    //----------------------------------------------------------------------------- EXPORTED FUNCTIONS
     return {
         setup, start, stop, tick,
         getAudioLevel, getAudioMute,
