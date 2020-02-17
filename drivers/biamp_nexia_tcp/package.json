@@ -69,18 +69,17 @@
     ],
     "pointSetupSchema": {
       "type": "object",
-      "title": "Setup for Biamp Nexia via Global Cache RS232",
+      "title": "Setup for Biamp Nexia via Telnet",
       "properties": {
         "host": {
-          "title": "GC RS232 IP/Hostname",
+          "title": "Hostname/IP Address:",
           "type": "string",
-          "default": "192.168."
+          "default": ""
         },
         "port": {
           "title": "Port:",
           "type": "integer",
-          "default": 4999,
-          "description": "Default: 4999"
+          "default": 23
         },
         "device": {
           "title": "Device ID:",
@@ -118,22 +117,10 @@
                 "type": "string",
                 "pattern": "^[A-Za-z0-9_]+$"
               }
-            },
-            "required": [
-              "type",
-              "instance",
-              "channel",
-              "name"
-            ]
+            }
           }
         }
-      },
-      "required": [
-        "host",
-        "port",
-        "device",
-        "controls"
-      ]
+      }
     }
   }
 }
