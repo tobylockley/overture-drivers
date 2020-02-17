@@ -2,10 +2,7 @@
   "name": "template_tcp",
   "version": "1.0.0",
   "description": "Driver",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
-  },
+  "license": "MIT",
   "author": "Audio Visual Distributors",
   "contributors": [
     {
@@ -14,7 +11,10 @@
       "url": "https://www.avdistributors.com.au"
     }
   ],
-  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
   "overture": {
     "brand": "BRAND",
     "models": [
@@ -22,7 +22,6 @@
     ],
     "type": "device",
     "subtype": "generic",
-
     "variables": [
       {
         "name": "Status",
@@ -47,7 +46,6 @@
         }
       }
     ],
-
     "commands": [
       {
         "name": "Set Power",
@@ -58,7 +56,6 @@
         }
       }
     ],
-
     "pointSetupSchema": {
       "type": "object",
       "title": "Template Setup",
