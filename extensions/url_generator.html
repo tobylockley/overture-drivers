@@ -1,7 +1,13 @@
 <!-- 
 To use, add Page Link to the top of views/home.html, and link to this page
-See start of <script> tag for folder/file filters
+Adjust folder/file filters to see appropriate files
 -->
+
+<script>
+var ignoreFolders = ['common', 'archive', 'extensions']
+var ignoreFiles = ['home.html', 'footer.html']
+var containerFilter = ['room']  // See Configurator > Views > Types for all available container id names
+</script>
 
 <med-header med-title="URL Generator"></med-header>
 
@@ -45,10 +51,6 @@ See start of <script> tag for folder/file filters
 </div>
 
 <script>
-var ignoreFolders = ['common', 'archive', 'extensions']
-var ignoreFiles = ['home.html', 'footer.html']
-var containerFilter = ['room']  // See Configurator > (Views) Types for all available container id names
-
 $(function onStartup() {
     // Get currently logged in users auth token
     $.ajaxSetup({ headers: {'Authorization': `Bearer ${localStorage.getItem('authtoken')}`} })
@@ -108,7 +110,7 @@ function scrapeFolder(folder, deep) {
         }
     }
     
-    // Array contains all files, not dive into folders
+    // Array contains all files, now recurse into subfolders
     for (let subfolder of pendingFolders) {
         files = files.concat(scrapeFolder(subfolder, deep))
     }
@@ -136,7 +138,6 @@ function getContainerPath(container, points) {
             return `${getContainerPath(parent, points)} > ${container.name}`
         }
         else {
-            console.error(`Could not find parent for ${container.variable_name}`)
             return container.name
         }
     }
@@ -145,19 +146,13 @@ function getContainerPath(container, points) {
     }
 }
 
-
+// Called whenever a dropdown box changes
 function generateUrl() {
-    // Called whenever a dropdown box changes
     let page = $('select[name="page"] :selected').val()
     let room = $('select[name="room"] :selected').val()
     let user = $('select[name="user"] :selected').val()
     
-    console.log(page)
-    
-    
-    
     if (page) {
-        
         $.when(
             $.get(`/assets/${page}`)
         ).then((pageData) => {
