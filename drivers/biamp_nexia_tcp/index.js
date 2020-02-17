@@ -89,12 +89,11 @@ exports.createDevice = base => {
     }
 
     function start() {
-        if (config.simulation) base.getVar('Status').string = 'Connected'
-        else initTcpClient()
+        initTcpClient()
     }
 
     function tick() {
-        if (!config.simulation && !tcpClient) initTcpClient()
+        if (!tcpClient) initTcpClient()
     }
 
     function stop() {
@@ -104,7 +103,7 @@ exports.createDevice = base => {
     }
 
     function initTcpClient() {
-        if (tcpClient) return  // Return if tcpClient already exists
+        if (tcpClient) return  // Abort if tcpClient already exists
 
         tcpClient = host.createTCPClient()
         tcpClient.setOptions({
@@ -121,7 +120,7 @@ exports.createDevice = base => {
         })
 
         tcpClient.on('data', data => {
-            frameParser.push( data.toString() )
+            frameParser.push(data.toString())
         })
 
         tcpClient.on('close', () => {
@@ -201,8 +200,8 @@ exports.createDevice = base => {
     }
 
     function setAudioMute(params) {
-        if (params.Status == 'Off') sendDefer(`SET ${config.device} FDRMUTE ${params.InstanceId} ${params.Channel} 0\n`)
-        else if (params.Status == 'On') sendDefer(`SET ${config.device} FDRMUTE ${params.InstanceId} ${params.Channel} 1\n`)
+        const val = params.Status == 'On' ? 1 : 0
+        sendDefer(`SET ${config.device} FDRMUTE ${params.InstanceId} ${params.Channel} ${val}\n`)
     }
 
 
