@@ -1,0 +1,139 @@
+{
+  "name": "biamp_nexia",
+  "version": "1.0.0-beta.2",
+  "description": "Driver for Biamp Nexia Audio DSP",
+  "license": "MIT",
+  "author": "Audio Visual Distributors",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "overture": {
+    "brand": "Biamp",
+    "models": [
+      "Nexia CS",
+      "Nexia TC"
+    ],
+    "type": "device",
+    "subtype": "audiosystem",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "name": "setAudioLevel",
+        "params": {
+          "InstanceId": {
+            "type": "integer"
+          },
+          "Channel": {
+            "type": "integer"
+          },
+          "Level": {
+            "type": "integer"
+          },
+          "OvertureVar": {
+            "type": "string"
+          }
+        },
+        "optimize": true
+      },
+      {
+        "name": "setAudioMute",
+        "params": {
+          "InstanceId": {
+            "type": "integer"
+          },
+          "Channel": {
+            "type": "integer"
+          },
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          },
+          "OvertureVar": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Setup for Biamp Nexia via Global Cache RS232",
+      "properties": {
+        "host": {
+          "title": "GC RS232 IP/Hostname",
+          "type": "string",
+          "default": "192.168."
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 4999,
+          "description": "Default: 4999"
+        },
+        "device": {
+          "title": "Device ID:",
+          "type": "integer",
+          "default": 1
+        },
+        "controls": {
+          "title": "Control Elements",
+          "type": "array",
+          "format": "table",
+          "uniqueItems": true,
+          "items": {
+            "title": "Control",
+            "type": "object",
+            "properties": {
+              "type": {
+                "title": "Control Type",
+                "type": "string",
+                "enum": [
+                  "Level",
+                  "Mute"
+                ]
+              },
+              "instance": {
+                "title": "Instance ID",
+                "type": "integer"
+              },
+              "channel": {
+                "title": "Channel",
+                "type": "integer",
+                "default": 1
+              },
+              "name": {
+                "title": "Human Name",
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_]+$"
+              }
+            },
+            "required": [
+              "type",
+              "instance",
+              "channel",
+              "name"
+            ]
+          }
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "device",
+        "controls"
+      ]
+    }
+  }
+}
