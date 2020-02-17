@@ -46,7 +46,7 @@
         "optimize": true
       },
       {
-        "name": "setAudioMute",
+        "name": "setBinary",
         "params": {
           "InstanceId": {
             "type": "integer"
@@ -60,6 +60,9 @@
               "Off",
               "On"
             ]
+          },
+          "Attribute": {
+              "type": "string"
           },
           "OvertureVar": {
             "type": "string"
@@ -99,8 +102,9 @@
                 "title": "Control Type",
                 "type": "string",
                 "enum": [
-                  "Level",
-                  "Mute"
+                  "Level Fader",
+                  "Mute Fader",
+                  "Logic State"
                 ]
               },
               "instance": {

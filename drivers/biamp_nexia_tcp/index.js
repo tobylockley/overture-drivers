@@ -32,7 +32,7 @@ exports.createDevice = base => {
         config.controls.forEach(control => {
             let human_name = control.name ? `_${control.name}` : ''
 
-            if (control.type == 'Level') {
+            if (control.type == 'Level Fader') {
                 let varname = `AudioLevel_${control.channel}${human_name}`
 
                 base.createVariable({
@@ -59,27 +59,36 @@ exports.createDevice = base => {
                     startImmediately: true
                 })
             }
-            else if (control.type == 'Mute') {
-                let varname = `AudioMute_${control.channel}${human_name}`
+            else if (control.type == 'Mute Fader' || control.type === 'Logic State') {
+                let varname, attribute
+                if (control.type === 'Mute Fader') {
+                    varname = `AudioMute_${control.channel}${human_name}`
+                    attribute = 'FDRMUTE'
+                }
+                else if (control.type === 'Logic State') {
+                    varname = `LogicState_${control.channel}${human_name}`
+                    attribute = 'LGSTATE'
+                }
 
                 base.createVariable({
                     name: varname,
                     type: 'enum',
                     enums: ['Off', 'On'],
                     perform: {
-                        action: 'setAudioMute',
+                        action: 'setBinary',
                         params: {
                             InstanceId: control.instance,
                             Channel: control.channel,
                             Status: '$string',
+                            Attribute: attribute,
                             OvertureVar: varname
                         }
                     }
                 })
 
                 base.setPoll({
-                    action: 'getAudioMute',
-                    params: { InstanceId: control.instance, Channel: control.channel, OvertureVar: varname },
+                    action: 'getBinary',
+                    params: { InstanceId: control.instance, Channel: control.channel, Attribute: attribute, OvertureVar: varname },
                     period: POLL_PERIOD,
                     enablePollFn: isConnected,
                     startImmediately: true
@@ -160,7 +169,7 @@ exports.createDevice = base => {
                 base.commandDone()
             }
         }
-        else if ( pendingCommand && pendingCommand.action == 'getAudioMute' ) {
+        else if ( pendingCommand && pendingCommand.action == 'getBinary' ) {
             match = data.match(/(\d+)/)
             if (match) {
                 base.getVar(pendingCommand.params.OvertureVar).value = parseInt(match[1])
@@ -174,7 +183,7 @@ exports.createDevice = base => {
                 base.commandDone()
             }
         }
-        else if ( pendingCommand && pendingCommand.action == 'setAudioMute' ) {
+        else if ( pendingCommand && pendingCommand.action == 'setBinary' ) {
             match = data.match(/\+OK/)
             if (match) {
                 base.getVar(pendingCommand.params.OvertureVar).string = pendingCommand.params.Status
@@ -189,8 +198,8 @@ exports.createDevice = base => {
         sendDefer(`GETL ${config.device} FDRLVL ${params.InstanceId} ${params.Channel}\n`)
     }
 
-    function getAudioMute(params) {
-        sendDefer(`GET ${config.device} FDRMUTE ${params.InstanceId} ${params.Channel}\n`)
+    function getBinary(params) {
+        sendDefer(`GET ${config.device} ${params.Attribute} ${params.InstanceId} ${params.Channel}\n`)
     }
 
 
@@ -199,16 +208,16 @@ exports.createDevice = base => {
         sendDefer(`SETL ${config.device} FDRLVL ${params.InstanceId} ${params.Channel} ${params.Level * 10}\n`)
     }
 
-    function setAudioMute(params) {
+    function setBinary(params) {
         const val = params.Status == 'On' ? 1 : 0
-        sendDefer(`SET ${config.device} FDRMUTE ${params.InstanceId} ${params.Channel} ${val}\n`)
+        sendDefer(`SET ${config.device} ${params.Attribute} ${params.InstanceId} ${params.Channel} ${val}\n`)
     }
 
 
     //----------------------------------------------------------------------------- EXPORTED FUNCTIONS
     return {
         setup, start, stop, tick,
-        getAudioLevel, getAudioMute,
-        setAudioLevel, setAudioMute
+        getAudioLevel, getBinary,
+        setAudioLevel, setBinary
     }
 }
