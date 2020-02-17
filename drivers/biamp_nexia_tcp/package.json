@@ -1,5 +1,5 @@
 {
-  "name": "biamp_nexia",
+  "name": "biamp_nexia_tcp",
   "version": "1.0.0-beta.2",
   "description": "Driver for Biamp Nexia Audio DSP",
   "license": "MIT",
