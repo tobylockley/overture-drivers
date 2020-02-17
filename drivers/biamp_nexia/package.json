@@ -2,42 +2,67 @@
   "name": "biamp_nexia",
   "version": "1.0.0-beta.2",
   "description": "Driver for Biamp Nexia Audio DSP",
+  "license": "MIT",
+  "author": "Audio Visual Distributors",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
-  "author": "Audio Visual Distributors",
-  "license": "MIT",
   "overture": {
     "brand": "Biamp",
-    "models": ["Nexia CS"],
+    "models": [
+      "Nexia CS"
+    ],
     "type": "device",
     "subtype": "audiosystem",
     "variables": [
       {
         "name": "Status",
         "type": "enum",
-        "enums": [ "Disconnected", "Connected" ]
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
       }
     ],
     "commands": [
       {
         "name": "setAudioLevel",
         "params": {
-          "InstanceId": { "type": "integer" },
-          "Channel": { "type": "integer" },
-          "Level": { "type": "integer" },
-          "OvertureVar": { "type": "string" }
+          "InstanceId": {
+            "type": "integer"
+          },
+          "Channel": {
+            "type": "integer"
+          },
+          "Level": {
+            "type": "integer"
+          },
+          "OvertureVar": {
+            "type": "string"
+          }
         },
         "optimize": true
       },
       {
         "name": "setAudioMute",
         "params": {
-          "InstanceId": { "type": "integer" },
-          "Channel": { "type": "integer" },
-          "Status": { "type": "enum", "enums": [ "Off", "On" ] },
-          "OvertureVar": { "type": "string" }
+          "InstanceId": {
+            "type": "integer"
+          },
+          "Channel": {
+            "type": "integer"
+          },
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          },
+          "OvertureVar": {
+            "type": "string"
+          }
         }
       }
     ],
