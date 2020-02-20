@@ -6,5 +6,5 @@
   "debug.toolBarLocation": "floating",
   // "editor.rulers": [100],
   "eslint.alwaysShowStatus": true,
-  "editor.codeActionsOnSave": { "source.fixAll": true }
+//   "editor.codeActionsOnSave": { "source.fixAll": true }
 }
