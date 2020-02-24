@@ -1,0 +1,62 @@
+{
+  "name": "dynalite",
+  "version": "1.0.0-beta.9",
+  "description": "lighting system simulator",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"    
+  },
+  "keywords": [],
+  "author": "AB",
+  "license": "AVD",
+
+  "overture":{
+    "brand": "Phillips",
+    "model": "Lighting System",
+    "type": "device",
+    "subtype": "lighting", 
+    
+    
+    "pointSetupSchema": {
+      "title": "lighting system simulator",
+      "type": "object",
+      "properties": {
+        "host": {
+          "title":"Host",
+          "type": "string",
+          "description": "Host address",
+          "default": "192.168.1.10"
+        },
+        "port": {
+          "title":"Port",
+          "type": "integer",
+          "default": 4352
+        },
+        "Area": {
+          "title":"Area",
+          "type": "integer",
+          "description:":"Dynalite area for room"
+        },
+        "channels": {
+          "title":"Channels",
+          "type": "integer",
+          "description":"number of channels for this area"
+        }
+      }
+    },
+    "variables": [
+      { "name":"Status", "type":"enum", "enums":["Disconnected", "Connected"]},
+      { 
+        "name":"Presets", "type":"enum", 
+        "enums":["None", "Off", "Meeting", "Night", "Day","Special Event"], 
+        "perform":{"action":"Recall Preset", "params":{ "Name":"$string"}},
+        "persistent": true
+      },
+          { 
+        "name":"Power", "type":"enum", 
+        "enums":["Off", "On"], 
+        "perform":{"action":"Set Power", "params":{ "Name":"$string"}}
+      }
+    ]
+  }
+}

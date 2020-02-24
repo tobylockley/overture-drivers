@@ -1,0 +1,147 @@
+{
+  "name": "epson_projector_g5-series",
+  "version": "1.0.0-beta.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Barco",
+  "license": "SEE LICENSE IN license.txt",
+  "overture": {
+    "brand": "Epson",
+    "model": "G6-Series",
+    "models": [
+      "G6970WU",
+      "G6770WU",
+      "G6570WU",
+      "G6470WU",
+      "G6270W",
+      "G6070W",
+      "G6870",
+      "G6370",
+      "G6170"
+    ],
+    "type": "device",
+    "subtype": "projector",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On",
+          "Powering Off",
+          "Powering On"
+        ],
+        "perform": {
+          "action": "Set Power",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "Sources",
+        "type": "enum",
+        "enums": [],
+        "perform": {
+          "action": "Select Source",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      },
+      {
+        "name": "VideoMute",
+        "type": "enum",
+        "enums": [
+          "Off",
+          "On"
+        ],
+        "perform": {
+          "action": "Set Video Mute",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "Error",
+        "type": "string"
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Set Video Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": [
+              "Off",
+              "On"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Select Source",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Set Zoom",
+        "params": {
+          "Position": {
+            "type": "integer"
+          }
+        },
+        "optimize": true
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Driver",
+      "properties": {
+        "host": {
+          "title": "host name or IP address:",
+          "type": "string",
+          "default": "127.0.0.1"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 3629,
+          "description": "Default: 3629"
+        }
+      },
+      "required": [
+        "host",
+        "port"
+      ]
+    }
+  }
+}
