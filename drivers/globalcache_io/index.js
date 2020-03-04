@@ -135,6 +135,7 @@ exports.createDevice = base => {
     }
 
     function onFrame(data) {
+        logger.silly(`onFrame: ${data}`)
         if (/ERR/.test(data)) {
             logger.error(`GC IO error: ${data}`)
             base.commandError('Error from module, check Error variable')
