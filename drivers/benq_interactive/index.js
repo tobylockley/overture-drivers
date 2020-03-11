@@ -139,6 +139,7 @@ exports.createDevice = base => {
                     '002': 'HDMI2',
                     '021': 'HDMI3',
                     '022': 'HDMI4',
+                    '007': 'DisplayPort',
                     '101': 'Android',
                     '102': 'OPS',
                 }
@@ -225,6 +226,9 @@ exports.createDevice = base => {
         else if (params.Name === 'HDMI2') benqSet(SET_SRC, 2)
         else if (params.Name === 'HDMI3') benqSet(SET_SRC, 21)
         else if (params.Name === 'HDMI4') benqSet(SET_SRC, 22)
+        else if (params.Name === 'DisplayPort') benqSet(SET_SRC, 7)
+        else if (params.Name === 'Android') benqSet(SET_SRC, 101)
+        else if (params.Name === 'OPS') benqSet(SET_SRC, 102)
     }
 
     function setAudioLevel(params) {

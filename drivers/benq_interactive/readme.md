@@ -60,5 +60,8 @@ Mute or unmute the device.
 
 ## Revisions
 
+### 1.0.1
+- Added support for android, OPS, DisplayPort
+
 ### 1.0.0
 - Initial version
