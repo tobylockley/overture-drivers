@@ -1,0 +1,29 @@
+<!--
+Yamaha Multicast Audio System Template
+
+-->
+
+<med-display
+	med-point=".Status"
+></med-display>
+
+<med-on-off
+  med-label=""
+	med-point=".Power"
+  med-label-on="Power On"
+	med-state-on="1"
+  med-label-off="Power Standby"
+	med-state-off="0"
+></med-on-off>
+
+<med-slider
+	med-repeat="{parent: point, variablename: 'AudioLevel'}"
+></med-slider>
+
+<med-toggle
+	med-repeat="{parent: point, variablename: 'AudioMute'}"
+></med-toggle>
+
+<med-select
+	med-repeat="{parent: point, variablename: 'Sources'}"
+></med-select>
