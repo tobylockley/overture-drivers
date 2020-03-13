@@ -61,7 +61,6 @@ exports.createDevice = base => {
             receiveTimeout: TCP_TIMEOUT,
             autoReconnectionAttemptDelay: TCP_RECONNECT_DELAY
         })
-        tcpClient.connect(config.port, config.host)
 
         tcpClient.on('connect', () => {
             logger.silly('TCPClient connected')
@@ -82,6 +81,8 @@ exports.createDevice = base => {
             logger.error(`TCPClient: ${err}`)
             stop() // Throw out the tcpClient and get a fresh connection
         })
+
+        tcpClient.connect(config.port, config.host)
     }
 
     //-------------------------------------------------------------------------- SEND/RECEIVE HANDLERS
