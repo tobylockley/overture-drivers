@@ -21,25 +21,13 @@
           "Disconnected",
           "Connected"
         ]
-      },
-      {
-        "name": "Commands",
-        "type": "enum",
-        "enums": [
-          "Idle"
-        ],
-        "perform": {
-          "action": "Send Command",
-          "params": {
-            "Name": "$string"
-          }
-        }
       }
     ],
     "commands": [
       {
         "name": "Send Command",
         "params": {
+          "Port": { "type": "integer" },
           "Name": { "type": "string" }
         }
       }
@@ -65,20 +53,35 @@
           "min": 1,
           "description": "Module of GC (1 for Itach)"
         },
-        "ir1_enable": {
+        "ir1_enabled": {
           "title": "IR Port 1 Enabled",
           "type": "checkbox",
           "default": true
         },
-        "ir2_enable": {
+        "ir1_name": {
+          "title": "IR Port 1 Nickname (Optional)",
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]+$"
+        },
+        "ir2_enabled": {
           "title": "IR Port 2 Enabled",
           "type": "checkbox",
           "default": true
         },
-        "ir3_enable": {
+        "ir2_name": {
+          "title": "IR Port 2 Nickname (Optional)",
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]+$"
+        },
+        "ir3_enabled": {
           "title": "IR Port 3 Enabled",
           "type": "checkbox",
           "default": true
+        },
+        "ir3_name": {
+          "title": "IR Port 3 Nickname (Optional)",
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]+$"
         },
         "commands": {
           "title": "IR Commands",

@@ -2,7 +2,7 @@
 
 const CMD_DEFER_TIME = 1000        // Timeout when using commandDefer
 const TICK_PERIOD = 5000           // In-built tick interval
-const POLL_PERIOD = 30000           // Continuous polling function interval
+const POLL_PERIOD = 30000          // Continuous polling function interval
 const TCP_TIMEOUT = 30000          // Will timeout after this length of inactivity
 const TCP_RECONNECT_DELAY = 3000   // How long to wait before attempting to reconnect
 
@@ -16,9 +16,7 @@ exports.createDevice = base => {
     let config
     let tcpClient
 
-
-    // ------------------------------ SETUP FUNCTIONS ------------------------------
-
+    //------------------------------------------------------------------------- STANDARD SDK FUNCTIONS
     function isConnected() { return base.getVar('Status').string === 'Connected' }
 
     function setup(_config) {
@@ -27,11 +25,25 @@ exports.createDevice = base => {
         base.setPoll({ action: 'keepAlive', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
 
         // Construct commands enum
-        let cmd_enums = base.getVar('Commands').enums
+        let cmdEnums = ['Idle']
         for (let cmd of config.commands) {
-            cmd_enums.push(cmd.name)
+            cmdEnums.push(cmd.name)
         }
-        base.getVar('Commands').enums = cmd_enums
+
+        for (let i = 1; i <= 3; i++) {
+            if (!config[`ir${i}_enabled`]) continue // Continue to next port if not enabled
+            const nickname = config[`ir${i}_name`]
+            const varname = nickname ? `Commands_${nickname}` : `Commands_Port${i}`
+            base.createVariable({
+                name: varname,
+                type: 'enum',
+                enums: cmdEnums,
+                perform: {
+                    action: 'sendCommand',
+                    params: { Port: i, Name: '$string' }
+                }
+            })
+        }
     }
 
     function start() {
@@ -39,11 +51,11 @@ exports.createDevice = base => {
     }
 
     function stop() {
-    //Clear pending commands?
-    // base.clearPendingCommands();
         base.getVar('Status').string = 'Disconnected'
         tcpClient && tcpClient.end()
         tcpClient = null
+        base.stopPolling()
+        base.clearPendingCommands()
     }
 
     function tick() {
@@ -76,16 +88,16 @@ exports.createDevice = base => {
 
         tcpClient.on('error', err => {
             logger.error(`TCPClient: ${err}`)
-            stop()  // Throw out the tcpClient and get a fresh connection
+            base.getVar('Status').string = 'Disconnected'
+            tcpClient && tcpClient.end()
+            tcpClient = null // Throw out the tcpClient and get a fresh connection
         })
 
         // Finally, initiate connection
         tcpClient.connect(config.port, config.host)
     }
 
-
-    // ------------------------------ SEND/RECEIVE HANDLERS ------------------------------
-
+    //-------------------------------------------------------------------------- SEND/RECEIVE HANDLERS
     function send(data) {
         logger.silly(`TCPClient send: ${data}`)
         return tcpClient && tcpClient.write(data)
@@ -104,7 +116,7 @@ exports.createDevice = base => {
     function sendCommand(params) {
         let search = config.commands.filter(cmd => cmd.name === params.Name)
         if (search.length === 1) {
-            sendDefer(`sendir,${config.module}:${config.ir_port},${search[0].ir_code}\r`)
+            sendDefer(`sendir,${config.module}:${params.Port},${search[0].code}\r`)
         }
         else if (search.length > 1) {
             logger.error(`Function sendCommand(): Multiple commands configured for '${params.Name}', please check device configuration.`)
@@ -118,9 +130,7 @@ exports.createDevice = base => {
         sendDefer('getversion\r')
     }
 
-
-    // ------------------------------ EXPORTED FUNCTIONS ------------------------------
-
+    //----------------------------------------------------------------------------- EXPORTED FUNCTIONS
     return {
         setup, start, stop, tick,
         keepAlive, sendCommand
