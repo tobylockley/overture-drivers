@@ -1,8 +1,8 @@
 //---------------------------------------------------------------------------------------- CONSTANTS
-const CMD_DEFER_TIME = 3000        // Timeout when using commandDefer
-const TICK_PERIOD = 5000           // In-built tick interval
-const TCP_TIMEOUT = 30000          // Will timeout after this length of inactivity
-const TCP_RECONNECT_DELAY = 5000   // How long to wait before attempting to reconnect
+const CMD_DEFER_TIME = 3000 // Timeout when using commandDefer
+const TICK_PERIOD = 5000 // In-built tick interval
+const TCP_TIMEOUT = 30000 // Will timeout after this length of inactivity
+const TCP_RECONNECT_DELAY = 5000 // How long to wait before attempting to reconnect
 
 let host
 exports.init = _host => {
@@ -24,7 +24,12 @@ exports.createDevice = base => {
         base.setTickPeriod(TICK_PERIOD)
         // Register polling functions
         let pollms = config.polltime * 1000
-        base.setPoll({action: 'getPower', period: pollms, enablePollFn: isConnected, startImmediately: true})
+        base.setPoll({
+            action: 'getPower',
+            period: pollms,
+            enablePollFn: isConnected,
+            startImmediately: true
+        })
     }
 
     function start() {
@@ -49,7 +54,7 @@ exports.createDevice = base => {
     }
 
     function initTcpClient() {
-        if (tcpClient) return  // Do nothing if tcpClient already exists
+        if (tcpClient) return // Do nothing if tcpClient already exists
 
         tcpClient = host.createTCPClient()
         tcpClient.setOptions({
@@ -96,7 +101,7 @@ exports.createDevice = base => {
         let match = data.match(/POWR(\d+)/)
         if (match && pending) {
             if (match && pending.action == 'getPower') {
-                base.getVar('Power').value = parseInt(match[1])  // 0 = Off, 1 = On
+                base.getVar('Power').value = parseInt(match[1]) // 0 = Off, 1 = On
                 base.commandDone()
             }
             else if (match && pending.action == 'setPower') {
@@ -134,7 +139,10 @@ exports.createDevice = base => {
 
     //----------------------------------------------------------------------------- EXPORTED FUNCTIONS
     return {
-        setup, start, stop, tick,
+        setup,
+        start,
+        stop,
+        tick,
         getPower,
         setPower
     }
