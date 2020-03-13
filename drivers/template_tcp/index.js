@@ -1,8 +1,8 @@
-//---------------------------------------------------------------------------------------- CONSTANTS
-const CMD_DEFER_TIME = 3000 // Timeout when using commandDefer
-const TICK_PERIOD = 5000 // In-built tick interval
-const TCP_TIMEOUT = 30000 // Will timeout after this length of inactivity
-const TCP_RECONNECT_DELAY = 5000 // How long to wait before attempting to reconnect
+//------------------------------------------------------------------------------------------ CONSTANTS
+const CMD_DEFER_TIME = 3000         // Timeout when using commandDefer
+const TICK_PERIOD = 5000            // In-built tick interval
+const TCP_TIMEOUT = 30000           // Will timeout after this length of inactivity
+const TCP_RECONNECT_DELAY = 5000    // How long to wait before attempting to reconnect
 
 let host
 exports.init = _host => {
