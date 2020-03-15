@@ -158,9 +158,7 @@ exports.createDevice = base => {
     function onFrame(data) {
         let match  // Used for regex matching below
         const pendingCommand = base.getPendingCommand()
-
-        logger.silly(`onFrame: ${data}`)
-        pendingCommand && logger.debug(`pendingCommand: ${pendingCommand.action}`)
+        logger.silly(`onFrame (pending = ${pendingCommand && pendingCommand.action}): ${data}`)
 
         if ( pendingCommand && pendingCommand.action == 'getAudioLevel' ) {
             match = data.match(/(\d+)/)
