@@ -95,6 +95,26 @@ exports.createDevice = base => {
                 })
             }
         })
+
+        const presetEnums = ['Idle']
+        for (let preset of config.presets) {
+            const name = preset.name ? preset.name : `Preset_${preset.number}`
+            preset.enumName = name // Store reference to the actual enum name, to retrieve preset number
+            presetEnums.push(name)
+        }
+        if (presetEnums.length > 1) { // Only generate dynamic variable if we actually have presets defined
+            base.createVariable({
+                name: 'Presets',
+                type: 'enum',
+                enums: presetEnums,
+                perform: {
+                    action: 'recallPreset',
+                    params: {
+                        Name: '$string'
+                    }
+                }
+            })
+        }
     }
 
     function start() {
@@ -211,11 +231,19 @@ exports.createDevice = base => {
         sendDefer(`SET ${config.device} ${params.Attribute} ${params.InstanceId} ${params.Channel} ${val}\n`)
     }
 
+    function recallPreset(params) {
+        const val = config.presets.find(x => x.varName === params.Name)
+        // Recall preset always uses device ID 0, see Nexia.chm > Control Blocks
+        if (val) sendDefer(`RECALL 0 PRESET ${val}\n`)
+        else logger.error(`No preset found with name ${params.Name}, please check driver configuration`)
+    }
+
 
     //----------------------------------------------------------------------------- EXPORTED FUNCTIONS
     return {
         setup, start, stop, tick,
         getAudioLevel, getBinary,
-        setAudioLevel, setBinary
+        setAudioLevel, setBinary,
+        recallPreset
     }
 }

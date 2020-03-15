@@ -1,6 +1,6 @@
 {
     "name": "biamp_nexia_tcp",
-    "version": "1.0.1-beta.1",
+    "version": "1.0.2-beta.1",
     "description": "Driver for Biamp Nexia Audio DSP",
     "license": "MIT",
     "author": "Audio Visual Distributors",
@@ -117,9 +117,31 @@
                                 "default": 1
                             },
                             "name": {
-                                "title": "Human Name",
+                                "title": "Nickname",
                                 "type": "string",
-                                "pattern": "^[A-Za-z0-9_]+$"
+                                "pattern": "^[A-Za-z][A-Za-z0-9_]+$"
+                            }
+                        }
+                    }
+                },
+                "presets": {
+                    "title": "Presets",
+                    "type": "array",
+                    "format": "table",
+                    "uniqueItems": true,
+                    "items": {
+                        "title": "Preset",
+                        "type": "object",
+                        "properties": {
+                            "number": {
+                                "title": "Preset Number",
+                                "type": "integer",
+                                "minimum": 1001
+                            },
+                            "name": {
+                                "title": "Nickname",
+                                "type": "string",
+                                "pattern": "^[A-Za-z][A-Za-z0-9_]+$"
                             }
                         }
                     }
