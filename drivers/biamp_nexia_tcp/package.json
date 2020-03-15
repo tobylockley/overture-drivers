@@ -117,7 +117,7 @@
                                 "default": 1
                             },
                             "name": {
-                                "title": "Nickname",
+                                "title": "Nickname (Optional)",
                                 "type": "string",
                                 "pattern": "^[A-Za-z][A-Za-z0-9_]+$"
                             }
@@ -139,7 +139,7 @@
                                 "minimum": 1001
                             },
                             "name": {
-                                "title": "Nickname",
+                                "title": "Nickname (Optional)",
                                 "type": "string",
                                 "pattern": "^[A-Za-z][A-Za-z0-9_]+$"
                             }

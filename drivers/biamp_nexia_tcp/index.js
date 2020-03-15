@@ -30,10 +30,10 @@ exports.createDevice = base => {
         base.setTickPeriod(TICK_PERIOD)
 
         config.controls.forEach(control => {
-            let human_name = control.name ? `_${control.name}` : ''
+            let nickname = control.name ? `_${control.name}` : ''
 
             if (control.type == 'Level Fader') {
-                let varname = `AudioLevel_${control.channel}${human_name}`
+                let varname = `AudioLevel_${control.channel}${nickname}`
 
                 base.createVariable({
                     name: varname,
@@ -62,11 +62,11 @@ exports.createDevice = base => {
             else if (control.type == 'Mute Fader' || control.type === 'Logic State') {
                 let varname, attribute
                 if (control.type === 'Mute Fader') {
-                    varname = `AudioMute_${control.channel}${human_name}`
+                    varname = `AudioMute_${control.channel}${nickname}`
                     attribute = 'FDRMUTE'
                 }
                 else if (control.type === 'Logic State') {
-                    varname = `LogicState_${control.channel}${human_name}`
+                    varname = `LogicState_${control.channel}${nickname}`
                     attribute = 'LGSTATE'
                 }
 
