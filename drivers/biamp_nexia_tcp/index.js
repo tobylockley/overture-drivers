@@ -209,6 +209,9 @@ exports.createDevice = base => {
                 base.commandDone()
             }
         }
+        else if ( pendingCommand && pendingCommand.action == 'recallPreset' ) {
+            base.commandDone()
+        }
     }
 
 
@@ -233,10 +236,16 @@ exports.createDevice = base => {
     }
 
     function recallPreset(params) {
-        const val = config.presets.find(x => x.varName === params.Name)
+        const preset = config.presets.find(x => x.enumName === params.Name)
         // Recall preset always uses device ID 0, see Nexia.chm > Control Blocks
-        if (val) sendDefer(`RECALL 0 PRESET ${val}\n`)
-        else logger.error(`No preset found with name ${params.Name}, please check driver configuration`)
+        if (preset) {
+            sendDefer(`RECALL 0 PRESET ${preset.number}\n`)
+            base.getVar('Presets').string = params.Name // Set so that we can reset to idle
+            setImmediate(() => base.getVar('Presets').value = 0) // Reset to idle after event loop
+        }
+        else {
+            logger.error(`No preset found with name ${params.Name}, please check driver configuration`)
+        }
     }
 
 
