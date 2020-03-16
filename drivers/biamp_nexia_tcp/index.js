@@ -30,7 +30,8 @@ exports.createDevice = base => {
         base.setTickPeriod(TICK_PERIOD)
 
         config.controls.forEach(control => {
-            let nickname = control.name ? `_${control.name}` : ''
+            // Remove non-legal characters from nickname
+            let nickname = control.name ? `_${control.name.replace(/[^A-Za-z0-9_]/g, '')}` : ''
 
             if (control.type == 'Level Fader') {
                 let varname = `AudioLevel_${control.channel}${nickname}`
