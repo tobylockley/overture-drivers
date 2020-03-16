@@ -16,6 +16,7 @@ exports.createDevice = base => {
     let config
     let tcpClient
     let getAllTally = 0  // Used for counting getAllOutputs response frames
+    let getAllAudioTally = 0  // As above but for audio outputs
 
     let frameParser = host.createFrameParser()
     frameParser.setSeparator('\r\n')
@@ -31,19 +32,39 @@ exports.createDevice = base => {
             enablePollFn: isConnected,
             startImmediately: true
         })
+        base.setPoll({
+            action: 'getAllAudioOutputs',
+            period: POLL_PERIOD,
+            enablePollFn: isConnected,
+            startImmediately: true
+        })
         // Create an enum variable for each output, each containing enum of inputs
         let match = config.model.toString().match(/AC-MX(\d)(\d)/)
         if (match) {
             config.num_inputs = parseInt(match[1])
             config.num_outputs = parseInt(match[2])
-            let enums = Array.from(Array(config.num_inputs).keys(), x => `IN${x+1}`)
+            let enumInputs = Array.from(Array(config.num_inputs).keys(), x => `IN${x+1}`)
             for (let i = 1; i <= config.num_outputs; i++) {
                 base.createVariable({
                     name: `Sources_OUT${i}`,
                     type: 'enum',
-                    enums: enums,
+                    enums: enumInputs,
                     perform: {
                         action: 'Select Source',
+                        params: {
+                            Channel: i,
+                            Name: '$string'
+                        }
+                    }
+                })
+            }
+            for (let i = 1; i <= config.num_outputs; i++) {
+                base.createVariable({
+                    name: `Sources_AUDIO_OUT${i}`,
+                    type: 'enum',
+                    enums: enumInputs,
+                    perform: {
+                        action: 'Select Audio Source',
                         params: {
                             Channel: i,
                             Name: '$string'
@@ -119,6 +140,7 @@ exports.createDevice = base => {
         let match  // Used for regex matching below
         const pending = base.getPendingCommand()
         logger.debug(`onFrame (pending = ${pending && pending.action}): ${data}`)
+
         match = data.match(/(OUT\d) VS (IN\d)/i)
         if (match) {
             base.getVar(`Sources_${match[1]}`).string = match[2]
@@ -130,12 +152,30 @@ exports.createDevice = base => {
                 base.commandDone()
             }
         }
+
+        // Duplicate of above for audio
+        match = data.match(/(OUT\d) AS (IN\d)/i)
+        if (match) {
+            base.getVar(`Sources_AUDIO_${match[1]}`).string = match[2]
+            if (pending && pending.action === 'getAllAudioOutputs') {
+                getAllAudioTally += 1
+                if (getAllAudioTally === config.num_outputs) base.commandDone()
+            }
+            else if (pending && pending.action === 'selectAudioSource') {
+                base.commandDone()
+            }
+        }
     }
 
     //---------------------------------------------------------------------------------- GET FUNCTIONS
     function getAllOutputs() {
         getAllTally = 0
         sendDefer('GET OUT0 VS\r\n')  // Get all outputs
+    }
+
+    function getAllAudioOutputs() {
+        getAllAudioTally = 0
+        sendDefer('GET OUT0 AS\r\n')  // Get all outputs
     }
 
     //---------------------------------------------------------------------------------- SET FUNCTIONS
@@ -147,6 +187,13 @@ exports.createDevice = base => {
         }
         sendDefer(`SET OUT${params.Channel} VS ${params.Name}\r\n`)
     }
+    function selectAudioSource(params) {
+        if (config.simulation) {
+            base.getVar(`Sources_AUDIO_OUT${params.Channel}`).string = params.Name
+            return
+        }
+        sendDefer(`SET OUT${params.Channel} AS ${params.Name}\r\n`)
+    }
 
     //------------------------------------------------------------------------------- HELPER FUNCTIONS
     function isConnected() {
@@ -156,7 +203,8 @@ exports.createDevice = base => {
     //----------------------------------------------------------------------------- EXPORTED FUNCTIONS
     return {
         setup, start, stop, tick,
-        getAllOutputs, selectSource
+        getAllOutputs, getAllAudioOutputs,
+        selectSource, selectAudioSource
     }
 }
 
