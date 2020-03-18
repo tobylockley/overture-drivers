@@ -14,10 +14,6 @@ exports.createDevice = base => {
     let config
     let tcpClient
 
-    let frameParser = host.createFrameParser()
-    frameParser.setSeparator('\n')
-    frameParser.on('data', data => onFrame(data))
-
     //------------------------------------------------------------------------- STANDARD SDK FUNCTIONS
     function setup(_config) {
         config = _config
