@@ -1,0 +1,227 @@
+{
+    "name": "visca_camera",
+    "version": "1.0.0-beta.1",
+    "description": "Driver",
+    "license": "MIT",
+    "author": "Audio Visual Distributors",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "overture": {
+        "brand": "MINRRAY",
+        "models": [
+            "UV100T"
+        ],
+        "type": "device",
+        "subtype": "generic",
+        "variables": [
+            {
+                "name": "Status",
+                "type": "enum",
+                "enums": [
+                    "Disconnected",
+                    "Connected"
+                ]
+            },
+            {
+                "name": "Power",
+                "type": "enum",
+                "enums": [
+                    "Off",
+                    "On"
+                ],
+                "perform": {
+                    "action": "setPower",
+                    "params": {
+                        "Status": "$string"
+                    }
+                }
+            },
+            {
+                "name": "AutoTracking",
+                "type": "enum",
+                "enums": [
+                    "Off",
+                    "On"
+                ],
+                "perform": {
+                    "action": "setAutoTracking",
+                    "params": {
+                        "Status": "$string"
+                    }
+                }
+            },
+            {
+                "name": "SetPreset",
+                "type": "enum",
+                "enums": [
+                    "Idle",
+                    "Preset 0",
+                    "Preset 1",
+                    "Preset 2",
+                    "Preset 3",
+                    "Preset 4"
+                ],
+                "perform": {
+                    "action": "setPreset",
+                    "params": {
+                        "Name": "$string"
+                    }
+                }
+            },
+            {
+                "name": "RecallPreset",
+                "type": "enum",
+                "enums": [
+                    "Idle",
+                    "Preset 0",
+                    "Preset 1",
+                    "Preset 2",
+                    "Preset 3",
+                    "Preset 4"
+                ],
+                "perform": {
+                    "action": "recallPreset",
+                    "params": {
+                        "Name": "$string"
+                    }
+                }
+            },
+            {
+                "name": "PanTiltCommands",
+                "type": "enum",
+                "enums": [
+                    "Stop",
+                    "Up",
+                    "Down",
+                    "Left",
+                    "Right",
+                    "Up Left",
+                    "Up Right",
+                    "Down Left",
+                    "Down Right"
+                ],
+                "perform": {
+                    "action": "sendPanTiltCommand",
+                    "params": {
+                        "Name": "$string"
+                    }
+                }
+            },
+            {
+                "name": "ZoomCommands",
+                "type": "enum",
+                "enums": [
+                    "Stop",
+                    "Tele",
+                    "Wide"
+                ],
+                "perform": {
+                    "action": "sendZoomCommand",
+                    "params": {
+                        "Name": "$string"
+                    }
+                }
+            }
+        ],
+        "commands": [
+            {
+                "name": "setPower",
+                "params": {
+                    "Status": {
+                        "type": "string"
+                    }
+                }
+            },
+            {
+                "name": "setAutoTracking",
+                "params": {
+                    "Status": {
+                        "type": "string"
+                    }
+                }
+            },
+            {
+                "name": "setPreset",
+                "params": {
+                    "Name": {
+                        "type": "string"
+                    }
+                }
+            },
+            {
+                "name": "recallPreset",
+                "params": {
+                    "Name": {
+                        "type": "string"
+                    }
+                }
+            },
+            {
+                "name": "sendPanTiltCommand",
+                "params": {
+                    "Name": {
+                        "type": "string"
+                    }
+                }
+            },
+            {
+                "name": "sendZoomCommand",
+                "params": {
+                    "Name": {
+                        "type": "string"
+                    }
+                }
+            }
+        ],
+        "pointSetupSchema": {
+            "type": "object",
+            "title": "VISCA Camera Settings",
+            "properties": {
+                "host": {
+                    "title": "Host name or IP address:",
+                    "type": "string"
+                },
+                "port": {
+                    "title": "Port:",
+                    "type": "integer",
+                    "default": 4999,
+                    "minimum": 0
+                },
+                "address": {
+                    "title": "Camera Address:",
+                    "type": "integer",
+                    "default": 1,
+                    "minimum": 1,
+                    "maximum": 7,
+                    "description": "Default: 1"
+                },
+                "panspeed": {
+                    "title": "Pan Speed:",
+                    "type": "integer",
+                    "default": 12,
+                    "minimum": 1,
+                    "maximum": 24,
+                    "description": "1 - 24"
+                },
+                "tiltspeed": {
+                    "title": "Tilt Speed:",
+                    "type": "integer",
+                    "default": 10,
+                    "minimum": 1,
+                    "maximum": 20,
+                    "description": "1 - 20"
+                },
+                "zoomspeed": {
+                    "title": "Zoom Speed:",
+                    "type": "integer",
+                    "default": 4,
+                    "minimum": 1,
+                    "maximum": 7,
+                    "description": "1 - 7"
+                }
+            }
+        }
+    }
+}
