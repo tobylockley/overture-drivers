@@ -63,13 +63,6 @@
                     "default": 9999,
                     "minimum": 0,
                     "description": "Default: 9999"
-                },
-                "polltime": {
-                    "title": "Polling Frequency:",
-                    "type": "integer",
-                    "default": 5,
-                    "minimum": 0,
-                    "description": "How often to update device variables (seconds)"
                 }
             }
         }
