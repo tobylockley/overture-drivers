@@ -123,14 +123,14 @@ exports.createDevice = base => {
             }
         }
         else {
-            if (data[1] === 0x41) {
-                logger.silly(`ACK received - ${pending.action}:`, pending.params)
-            }
-            else if (data[1] === 0x60 && data[2] === 0x02) {
+            if (data[1] === 0x60 && data[2] === 0x02) {
                 base.commandError('Syntax Error')
             }
             else if (data[1] === 0x61 && data[2] === 0x41) {
                 base.commandError('Command Not Executable')
+            }
+            else if (data[1] === 0x41) {
+                logger.silly(`ACK received - ${pending.action}:`, pending.params)
             }
             else if (data[1] === 0x51) {
                 base.commandDone()
