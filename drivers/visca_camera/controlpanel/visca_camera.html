@@ -1,0 +1,46 @@
+<med-display
+	med-point=".Status"
+></med-display>
+
+<med-remote
+	med-label=""
+	med-point="point"
+	med-up-mouse-down="setVariable('.PanTilt', 'Up')"
+	med-up-mouse-up="setVariable('.PanTilt', 'Stop')"
+	med-down-mouse-down="setVariable('.PanTilt', 'Down')"
+	med-down-mouse-up="setVariable('.PanTilt', 'Stop')"
+	med-left-mouse-down="setVariable('.PanTilt', 'Left')"
+	med-left-mouse-up="setVariable('.PanTilt', 'Stop')"
+	med-right-mouse-down="setVariable('.PanTilt', 'Right')"
+	med-right-mouse-up="setVariable('.PanTilt', 'Stop')"
+	med-button-a-mouse-down="setVariable('.Zoom', 'In')"
+	med-button-a-mouse-up="setVariable('.Zoom', 'Stop')"
+	med-button-b-mouse-down="setVariable('.Zoom', 'Out')"
+	med-button-b-mouse-up="setVariable('.Zoom', 'Stop')"
+></med-remote>
+
+<med-enum-button-bar
+	med-point=".Power"
+></med-enum-button-bar>
+
+<med-enum-button-bar
+	med-point=".AutoTracking"
+></med-enum-button-bar>
+
+<med-enum-button-bar
+    id="recall-preset"
+	med-point=".RecallPreset"
+></med-enum-button-bar>
+
+<med-enum-button-bar
+    id="set-preset"
+	med-point=".SetPreset"
+></med-enum-button-bar>
+
+<style>
+/* Hide "Idle" preset button */
+#recall-preset med-button:first-of-type,
+#set-preset med-button:first-of-type {
+    display: none;
+}
+</style>

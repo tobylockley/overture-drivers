@@ -1,6 +1,6 @@
 {
     "name": "visca_camera",
-    "version": "1.0.0-beta.1",
+    "version": "1.0.0-beta.3",
     "description": "Driver",
     "license": "MIT",
     "author": "Audio Visual Distributors",
@@ -14,7 +14,7 @@
             "UV100T"
         ],
         "type": "device",
-        "subtype": "generic",
+        "subtype": "camera",
         "variables": [
             {
                 "name": "Status",
@@ -89,7 +89,7 @@
                 }
             },
             {
-                "name": "PanTiltCommands",
+                "name": "PanTilt",
                 "type": "enum",
                 "enums": [
                     "Stop",
@@ -110,12 +110,12 @@
                 }
             },
             {
-                "name": "ZoomCommands",
+                "name": "Zoom",
                 "type": "enum",
                 "enums": [
                     "Stop",
-                    "Tele",
-                    "Wide"
+                    "In",
+                    "Out"
                 ],
                 "perform": {
                     "action": "sendZoomCommand",
@@ -186,7 +186,7 @@
                 "port": {
                     "title": "Port:",
                     "type": "integer",
-                    "default": 4999,
+                    "default": 1259,
                     "minimum": 0
                 },
                 "address": {

@@ -69,7 +69,8 @@ exports.createDevice = base => {
         })
 
         tcpClient.on('data', data => {
-            frameParser.push(data.toString())
+            // frameParser.push(data)
+            onFrame(data)
         })
 
         tcpClient.on('close', () => {
@@ -87,7 +88,7 @@ exports.createDevice = base => {
 
     //-------------------------------------------------------------------------- SEND/RECEIVE HANDLERS
     function send(data) {
-        logger.silly(`TCPClient send: ${data}`)
+        logger.silly('TCPClient send:', bufferToHex(data))
         return tcpClient && tcpClient.write(data)
     }
 
@@ -98,7 +99,15 @@ exports.createDevice = base => {
 
     function onFrame(data) {
         let pending = base.getPendingCommand()
-        logger.debug(`onFrame (pending = ${pending && pending.action}): ${data}`)
+        if (pending && pending.params) {
+            logger.debug(`onFrame (${pending.action}: `, pending.params, '):', bufferToHex(data))
+        }
+        else if (pending) {
+            logger.debug(`onFrame (${pending.action}):`, bufferToHex(data))
+        }
+        else {
+            logger.debug('onFrame (no pending actions):', bufferToHex(data))
+        }
 
         if (pending.action === 'getPower') {
             if (data[2] === 0x02) {
@@ -114,9 +123,29 @@ exports.createDevice = base => {
             }
         }
         else {
-            if (data[1] === 0x41) logger.silly(`ACK received (${pending.action})`)
-            else if (data[1] === 0x51) base.commandDone()
-            logger.warn(`onFrame data not processed: ${data}`)
+            if (data[1] === 0x41) {
+                logger.silly(`ACK received - ${pending.action}:`, pending.params)
+            }
+            else if (data[1] === 0x60 && data[2] === 0x02) {
+                base.commandError('Syntax Error')
+            }
+            else if (data[1] === 0x61 && data[2] === 0x41) {
+                base.commandError('Command Not Executable')
+            }
+            else if (data[1] === 0x51) {
+                base.commandDone()
+                if (pending.action === 'setPreset') {
+                    base.getVar('SetPreset').string = pending.params.Name
+                    setImmediate(() => base.getVar('SetPreset').value = 0) // Revert back to idle
+                }
+                else if (pending.action === 'recallPreset') {
+                    base.getVar('RecallPreset').string = pending.params.Name
+                    setImmediate(() => base.getVar('RecallPreset').value = 0) // Revert back to idle
+                }
+            }
+            else {
+                logger.warn('onFrame data not processed:', bufferToHex(data))
+            }
         }
     }
 
@@ -195,11 +224,11 @@ exports.createDevice = base => {
         const header = 0x80 + config.address
         const codes = {
             'Stop': 0x00,
-            'Tele': 0x20 + config.zoomspeed,
-            'Wide': 0x30 + config.zoomspeed
+            'In': 0x20 + config.zoomspeed,
+            'Out': 0x30 + config.zoomspeed
         }
         const cmdCode = codes[params.Name]
-        if (cmdCode) {
+        if (cmdCode !== undefined) {
             sendDefer(Buffer.from([header, 0x01, 0x04, 0x07, cmdCode, 0xFF]))
         }
         else {
@@ -210,6 +239,13 @@ exports.createDevice = base => {
     //------------------------------------------------------------------------------- HELPER FUNCTIONS
     function isConnected() {
         return base.getVar('Status').string === 'Connected'
+    }
+
+    function bufferToHex(buffer) {
+        return '[' + Array
+            .from (new Uint8Array(buffer))
+            .map (b => '0x' + b.toString(16).padStart (2, '0'))
+            .join (' ') + ']'
     }
 
     //----------------------------------------------------------------------------- EXPORTED FUNCTIONS
