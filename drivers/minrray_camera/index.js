@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------------------ CONSTANTS
 const CMD_DEFER_TIME = 3000         // Timeout when using commandDefer
-const POLL_PERIOD = 5000            // Polling function interval
+const POLL_PERIOD = 20000           // Polling function interval
 const TICK_PERIOD = 5000            // In-built tick interval
 const TCP_TIMEOUT = 30000           // Will timeout after this length of inactivity
 const TCP_RECONNECT_DELAY = 5000    // How long to wait before attempting to reconnect
@@ -109,12 +109,14 @@ exports.createDevice = base => {
             logger.debug('onFrame (no pending actions):', bufferToHex(data))
         }
 
-        if (pending.action === 'getPower') {
-            if (data[2] === 0x02) {
+        if (pending && pending.action === 'getPower') {
+            // Using Version INQ command, as power INQ has no response when off
+            if (data[1] === 0x50) {
                 base.getVar('Power').string = 'On'
                 base.commandDone()
             }
-            else if (data[2] === 0x03) {
+            else if (data[1] === 0x61 && data[2] === 0x41) {
+                // When off, version INQ returns "not executable" error
                 base.getVar('Power').string = 'Off'
                 base.commandDone()
             }
@@ -129,12 +131,23 @@ exports.createDevice = base => {
             else if (data[1] === 0x61 && data[2] === 0x41) {
                 base.commandError('Command Not Executable')
             }
-            else if (data[1] === 0x41) {
-                logger.silly(`ACK received - ${pending.action}:`, pending.params)
-            }
-            else if (data[1] === 0x51) {
+            else if (pending && (data[1] === 0x41 || data[1] === 0x51)) {
+                // Inconsistent behaviour between ACK and "completed" responses on various commands, so combining logic
                 base.commandDone()
-                if (pending.action === 'setPreset') {
+                if (pending.action === 'setPower') {
+                    base.getVar('Power').string = pending.params.Status
+                }
+                else if (pending.action === 'sendPanTiltCommand') {
+                    base.getVar('PanTilt').string = pending.params.Name
+                }
+                else if (pending.action === 'sendZoomCommand') {
+                    base.getVar('Zoom').string = pending.params.Name
+                }
+                else if (pending.action === 'setAutoTracking') {
+                    base.getVar('AutoTracking').string = pending.params.Status
+                    setImmediate(() => base.getVar('AutoTracking').value = 0) // Revert back to unknown
+                }
+                else if (pending.action === 'setPreset') {
                     base.getVar('SetPreset').string = pending.params.Name
                     setImmediate(() => base.getVar('SetPreset').value = 0) // Revert back to idle
                 }
@@ -142,12 +155,9 @@ exports.createDevice = base => {
                     base.getVar('RecallPreset').string = pending.params.Name
                     setImmediate(() => base.getVar('RecallPreset').value = 0) // Revert back to idle
                 }
-                else if (pending.action === 'setAutoTracking') {
-                    base.getVar('AutoTracking').string = pending.params.Status
-                    setImmediate(() => base.getVar('AutoTracking').value = 0) // Revert back to unknown
-                }
             }
-            else {
+            else if (data[1] !== 0x51) {
+                // Ignore "Action complete" frame
                 logger.warn('onFrame data not processed:', bufferToHex(data))
             }
         }
@@ -155,8 +165,9 @@ exports.createDevice = base => {
 
     //---------------------------------------------------------------------------------- GET FUNCTIONS
     function getPower() {
+        // Using Version INQ command, as power INQ has no response when off
         const header = 0x80 + config.address
-        sendDefer(Buffer.from([header, 0x09, 0x04, 0x00, 0xFF]))
+        sendDefer(Buffer.from([header, 0x09, 0x00, 0x02, 0xFF]))
     }
 
     //---------------------------------------------------------------------------------- SET FUNCTIONS
