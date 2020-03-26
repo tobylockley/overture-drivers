@@ -24,12 +24,9 @@ exports.createDevice = base => {
         config = _config
         base.setTickPeriod(TICK_PERIOD)
         // Register polling functions
-        base.setPoll({
-            action: 'getPower',
-            period: POLL_PERIOD,
-            enablePollFn: isConnected,
-            startImmediately: true
-        })
+        const defaults = {period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true}
+        base.setPoll({...defaults, action: 'getPower'})
+        base.setPoll({...defaults, action: 'getSource', enablePollFn: isPoweredOn})
     }
 
     function start() {
@@ -123,6 +120,10 @@ exports.createDevice = base => {
         sendDefer('*SEPOWR################\n')
     }
 
+    function getSource() {
+        sendDefer('*SEINPT################\n')
+    }
+
     //---------------------------------------------------------------------------------- SET FUNCTIONS
     function setPower(params) {
         if (params.Status == 'Off') sendDefer('*SCPOWR0000000000000000\n')
@@ -145,6 +146,7 @@ exports.createDevice = base => {
         stop,
         tick,
         getPower,
+        getSource,
         setPower
     }
 }
