@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------------------------ CONSTANTS
 const CMD_DEFER_TIME = 3000         // Timeout when using commandDefer
 const TICK_PERIOD = 5000            // In-built tick interval
+const POLL_PERIOD = 5000            // Polling frequency
 const TCP_TIMEOUT = 30000           // Will timeout after this length of inactivity
 const TCP_RECONNECT_DELAY = 5000    // How long to wait before attempting to reconnect
 
@@ -19,13 +20,9 @@ exports.createDevice = base => {
         config = _config
         base.setTickPeriod(TICK_PERIOD)
         // Register polling functions
-        let pollms = config.polltime * 1000
-        base.setPoll({
-            action: 'getPower',
-            period: pollms,
-            enablePollFn: isConnected,
-            startImmediately: true
-        })
+        const defaults = { period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true }
+        base.setPoll({ ...defaults, action: 'getPower' })
+        base.setPoll({ ...defaults, action: 'getSource', enablePollFn: isPoweredOn })
     }
 
     function start() {
@@ -136,6 +133,10 @@ exports.createDevice = base => {
 
     //---------------------------------------------------------------------------------- GET FUNCTIONS
     function getPower() {
+        sendDefer('*SEPOWR################\n')
+    }
+
+    function getSource() {
         sendDefer('*SEPOWR################\n')
     }
 
