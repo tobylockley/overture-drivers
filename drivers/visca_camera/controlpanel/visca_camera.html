@@ -24,6 +24,7 @@
 ></med-enum-button-bar>
 
 <med-enum-button-bar
+    id="auto-track"
 	med-point=".AutoTracking"
 ></med-enum-button-bar>
 
@@ -40,7 +41,8 @@
 <style>
 /* Hide "Idle" preset button */
 #recall-preset med-button:first-of-type,
-#set-preset med-button:first-of-type {
+#set-preset med-button:first-of-type,
+#auto-track med-button:first-of-type {
     display: none;
 }
 </style>

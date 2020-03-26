@@ -142,6 +142,10 @@ exports.createDevice = base => {
                     base.getVar('RecallPreset').string = pending.params.Name
                     setImmediate(() => base.getVar('RecallPreset').value = 0) // Revert back to idle
                 }
+                else if (pending.action === 'setAutoTracking') {
+                    base.getVar('AutoTracking').string = pending.params.Status
+                    setImmediate(() => base.getVar('AutoTracking').value = 0) // Revert back to unknown
+                }
             }
             else {
                 logger.warn('onFrame data not processed:', bufferToHex(data))

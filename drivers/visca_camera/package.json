@@ -1,6 +1,6 @@
 {
     "name": "visca_camera",
-    "version": "1.0.0-beta.3",
+    "version": "1.0.0-beta.4",
     "description": "Driver",
     "license": "MIT",
     "author": "Audio Visual Distributors",
@@ -42,6 +42,7 @@
                 "name": "AutoTracking",
                 "type": "enum",
                 "enums": [
+                    "Unknown",
                     "Off",
                     "On"
                 ],
