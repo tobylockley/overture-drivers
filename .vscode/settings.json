@@ -15,5 +15,5 @@
         "vue",
         "json"
     ]
-    // "editor.codeActionsOnSave": { "source.fixAll": true } // ADD THIS TO USER SETTING 
+    // "editor.codeActionsOnSave": { "source.fixAll": true } // ADD THIS TO USER SETTINGS
 }
