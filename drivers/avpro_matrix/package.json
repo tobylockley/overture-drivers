@@ -1,6 +1,6 @@
 {
   "name": "avpro_matrix",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Driver for AV Pro Connect Matrix",
   "main": "index.js",
   "scripts": {
@@ -38,6 +38,17 @@
             "type": "string"
           }
         }
+      },
+      {
+        "name": "Select Audio Source",
+        "params": {
+          "Channel": {
+            "type": "integer"
+          },
+          "Name": {
+            "type": "string"
+          }
+        }
       }
     ],
     "pointSetupSchema": {
@@ -46,13 +57,13 @@
       "properties": {
         "host": {
           "title": "Host name or IP address:",
-          "type": "string",
-          "default": "192.168.1.239"
+          "type": "string"
         },
         "port": {
           "title": "Port:",
           "type": "integer",
-          "default": 23
+          "default": 23,
+          "description": "Default: 23 (telnet)"
         },
         "model": {
           "title": "Model:",

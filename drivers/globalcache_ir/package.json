@@ -1,6 +1,6 @@
 {
   "name": "globalcache_ir",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Generic driver for IR control of any device using a globalcache IR module",
   "main": "index.js",
   "scripts": {
@@ -21,25 +21,13 @@
           "Disconnected",
           "Connected"
         ]
-      },
-      {
-        "name": "Commands",
-        "type": "enum",
-        "enums": [
-          "Idle"
-        ],
-        "perform": {
-          "action": "Send Command",
-          "params": {
-            "Name": "$string"
-          }
-        }
       }
     ],
     "commands": [
       {
         "name": "Send Command",
         "params": {
+          "Port": { "type": "integer" },
           "Name": { "type": "string" }
         }
       }
@@ -50,8 +38,7 @@
       "properties": {
         "host": {
           "title": "GC IR emitter IP/Hostname",
-          "type": "string",
-          "default": "192.168.1.70"
+          "type": "string"
         },
         "port": {
           "title": "Port:",
@@ -66,16 +53,38 @@
           "min": 1,
           "description": "Module of GC (1 for Itach)"
         },
-        "ir_port": {
-          "title": "IR Port:",
-          "type": "integer",
-          "default": 1,
-          "min": 1,
-          "max": 3,
-          "description": "IR blaster port in use (1-3)"
+        "ir1_enabled": {
+          "title": "IR Port 1 Enabled",
+          "type": "checkbox",
+          "default": true
+        },
+        "ir1_name": {
+          "title": "IR Port 1 Nickname (Optional)",
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]+$"
+        },
+        "ir2_enabled": {
+          "title": "IR Port 2 Enabled",
+          "type": "checkbox",
+          "default": true
+        },
+        "ir2_name": {
+          "title": "IR Port 2 Nickname (Optional)",
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]+$"
+        },
+        "ir3_enabled": {
+          "title": "IR Port 3 Enabled",
+          "type": "checkbox",
+          "default": true
+        },
+        "ir3_name": {
+          "title": "IR Port 3 Nickname (Optional)",
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]+$"
         },
         "commands": {
-          "title": "Commands",
+          "title": "IR Commands",
           "type": "array",
           "format": "table",
           "uniqueItems": true,
@@ -88,26 +97,14 @@
                 "type": "string",
                 "pattern": "^[A-Za-z][A-Za-z0-9_]+$"
               },
-              "ir_code": {
-                "title": "IR Code Sequence",
+              "code": {
+                "title": "IR Code (Global Cache format)",
                 "type": "string"
               }
-            },
-            "required": [
-              "name",
-              "ir_code"
-            ]
+            }
           }
         }
-      },
-      "required": [
-        "host",
-        "port",
-        "module",
-        "ir_port",
-        "commands"
-      ]
+      }
     }
-  },
-  "dependencies": {}
+  }
 }

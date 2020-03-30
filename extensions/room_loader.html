@@ -1,0 +1,90 @@
+<!--
+THIS IS A WORK IN PROGRESS!
+To use, copy the following line to the top of another file
+<med-include med-file="extensions/room_loader" med-context="{debugFallback: 'room_name_here'}"></med-include>
+-->
+
+<script>
+    $(function roomLoader() {
+        const ovtScope = $('.med-magic-menu-view').scope()
+        const pageScope = $('#ui-container').scope()
+        const thisPageScope = $('#room_error').scope().$parent
+        if (!ovtScope || !pageScope || !thisPageScope) throw new Error(`[ROOM_LOADER] Could not retrieve Angular scope objects`)
+        
+        console.log('[ROOM_LOADER] debugFallback:', thisPageScope.context.debugFallback)
+        console.log('[ROOM_LOADER] room:', pageScope.context.room)
+        
+        console.log(pageScope)
+        if (ovtScope.data.editMode) {
+            pageScope.context.room = thisPageScope.context.debugFallback
+            pageScope.context.room && console.log(`[ROOM_LOADER] Edit mode detected, using debugFallback room: ${pageScope.context.room}`)
+        }
+        else {
+            pageScope.context.room && console.log(`[ROOM_LOADER] Loading page using room reference: ${pageScope.context.room}`)
+        }
+        
+        let roomCheck = ovtScope.findPoints({type: 'room', variablename: pageScope.context.room})
+        if (!pageScope.context.room) {
+            showError('Please provide URL query parameter in the form: <b>room=variable_name</b>')
+        }
+        else if (roomCheck.length === 0) {
+            showError(`Could not find room: <b>${pageScope.context.room}</b>`)
+        }
+        else if (roomCheck.length > 1) {
+            showError(`Multiple rooms matched variable name: <b>${pageScope.context.room}</b>`)
+        }
+        else {
+            pageScope.room = roomCheck[0]
+            pageScope.room_mode = ovtScope.findPoint({parent:pageScope.room, variablename:'.room_mode'})
+            pageScope.zeevee_mode = ovtScope.findPoint({parent:pageScope.room, variablename:'.zeevee_mode'})
+        }
+    })
+    
+    function showError(text) {
+        console.error(`[ROOM_LOADER] ${text.replace(/\<.*?\>/g, '')}`)  // Remove html tags from error text
+        $('#room_error .error-body').html(text)
+        $('#room_error').css('display', 'flex')
+    }
+    </script>
+    
+    <div id="room_error">
+        <div class="room-error-body">
+            <p class="error-heading">Error Loading Page!</p>
+            <p class="error-body"></p>
+        </div>
+    </div>
+    
+    <style>
+    #room_error {
+        z-index: 100;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        font-family: Arial, sans-serif;
+        line-height: 1.2;
+        background: linear-gradient(to top, hsl(220, 50%, 5%), hsl(210, 75%, 20%), hsl(210, 100%, 25%));
+        display: flex;
+        justify-content: center;
+        display: none;
+    }
+    
+    #room_error .room-error-body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    
+    #room_error .room-error-body .error-heading {
+        font-size: 2.5rem;
+        color: hsl(0, 100%, 45%);
+        font-weight: bold;
+    }
+    
+    #room_error .room-error-body .error-body {
+        font-size: 1.5rem;
+    }
+    </style>

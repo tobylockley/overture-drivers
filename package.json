@@ -4,7 +4,7 @@
   "description": "Repository of Overture Drivers by AVD",
   "dependencies": {},
   "devDependencies": {
-    "eslint": "^6.3.0",
+    "eslint": "^6.8.0",
     "recursive-install": "^1.4.0"
   },
   "scripts": {

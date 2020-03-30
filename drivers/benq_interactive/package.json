@@ -1,6 +1,6 @@
 {
   "name": "benq_interactive",
-  "version": "1.0.0-beta.6",
+  "version": "1.0.1",
   "description": "Driver for BenQ Interactive Panel",
   "main": "index.js",
   "scripts": {
@@ -46,6 +46,7 @@
           "HDMI2",
           "HDMI3",
           "HDMI4",
+          "DisplayPort",
           "Android",
           "OPS"
         ],

@@ -3,39 +3,48 @@ const FrameParser = require('./FrameParser.js')
 const VirtualDevice = require('./VirtualDevice.js')
 const colorCodes = require('./colorCodes.json')
 
-let device, parser, socket
+let device
+let socketCount = 0
 
 function initWorker(port) {
-  console.log(`[${process.pid} W] Worker starting on port ${port}`)
+  console.log(`[${process.pid} W / Port: ${port}] Worker starting on port ${port}`)
   device = new VirtualDevice()
-  parser = new FrameParser('\n', onFrame)
-  net.createServer(_socket => {
-    socket = _socket
+  device.text = `Virtual Device initialised! PID: ${process.pid} Port: ${port}`
+  net.createServer(socket => {
+    let parser = new FrameParser('\n')
+    socket.id = `${process.pid}.${++socketCount}`
+    console.log(`[${process.pid} W / Port: ${port}] New socket connected: ${socket.id}`)
+    parser.on('data', data => onFrame(data, socket))
     socket.on('data', function(data) {
       // console.debug(`[${process.pid} W] TCP packet received: ${data.toString().replace(/\n/g, '\\n').replace(/\r/g, '\\r')}`)
       parser.push(data)
     })
-
     socket.on('error', err => {
-      console.error(`[${process.pid} W] TCP Error: ${err.message}`)
+      console.error(`[${process.pid} W / Port: ${port}] TCP Error: ${err.message}`)
     })
-  }).listen(port)
+    socket.on('close', () => {
+      console.log(`[${process.pid} W / Port: ${port}] Socket closed: ${socket.id}`)
+    })
+  }).listen(port).on('close', () => {
+    console.log(`[${process.pid} W / Port: ${port}] Server closing`)
+  })
+
 }
 
 // PROCESS TCP FRAMES
-function onFrame(data) {
+function onFrame(data, socket) {
   let match
-  console.log(`[${process.pid} W] onFrame data: ${data.replace(/\n/g, '\\n').replace(/\r/g, '\\r')}`)
+  console.log(`[${process.pid} W] [sockID: ${socket.id}] onFrame data: ${data.replace(/\n/g, '\\n').replace(/\r/g, '\\r')}`)
 
   // GETTERS
-  match = data.match(/getText\n/)
+  match = data.match(/getText[\r\n]+/)
   if (match) {
     // console.debug(`[${process.pid} W] getText:`, match)
     socket.write(`getText,OK,${device.text}\n`)
     return
   }
 
-  match = data.match(/getRGB\n/)
+  match = data.match(/getRGB[\r\n]+/)
   if (match) {
     // console.debug(`[${process.pid} W] getRGB:`, match)
     socket.write(`getRGB,OK,${device.rgb.r},${device.rgb.g},${device.rgb.b}\n`)
@@ -43,7 +52,7 @@ function onFrame(data) {
   }
 
   // SETTERS
-  match = data.match(/setText,(.*?)\n/)
+  match = data.match(/setText,(.*?)[\r\n]+/)
   if (match) {
     // console.debug(`[${process.pid} W] setText:`, match)
     try {
@@ -57,7 +66,7 @@ function onFrame(data) {
     return
   }
 
-  match = data.match(/setR,(.*?)\n/)
+  match = data.match(/setR,(.*?)[\r\n]+/)
   if (match) {
     // console.debug(`[${process.pid} W] setR:`, match)
     try {
@@ -71,7 +80,7 @@ function onFrame(data) {
     return
   }
 
-  match = data.match(/setG,(.*?)\n/)
+  match = data.match(/setG,(.*?)[\r\n]+/)
   if (match) {
     // console.debug(`[${process.pid} W] setG:`, match)
     try {
@@ -85,7 +94,7 @@ function onFrame(data) {
     return
   }
 
-  match = data.match(/setB,(.*?)\n/)
+  match = data.match(/setB,(.*?)[\r\n]+/)
   if (match) {
     // console.debug(`[${process.pid} W] setB:`, match)
     try {
@@ -99,7 +108,7 @@ function onFrame(data) {
     return
   }
 
-  match = data.match(/recallPreset,(.*?)\n/)
+  match = data.match(/recallPreset,(.*?)[\r\n]+/)
   if (match) {
     // console.debug(`[${process.pid} W] recallPreset:`, match)
     try {

@@ -1,0 +1,23 @@
+<!--
+Gives access to angular scope
+To use, copy the following line to the top of another file
+<med-include med-file="extensions/angular_scope"></med-include>
+-->
+
+<script>
+    var $rootScope
+    var $pageScope
+    $(function getAngularScope() {
+        // Get Angular scope for access to overture database
+        $rootScope = $('.med-magic-menu-view').scope()
+        if (!$rootScope) throw new Error(`[ANGULAR_SCOPE] Could not retrieve Angular root scope object`)
+        console.log('[ANGULAR_SCOPE] Root Overture scope stored in global var: $rootScope')
+        console.debug('[ANGULAR_SCOPE] $rootScope', $rootScope)
+        $pageScope = $('#ui-container').scope()
+        if (!$pageScope) throw new Error(`[ANGULAR_SCOPE] Could not retrieve Angular page scope object (expected element with id 'ui-container'`)
+        console.log('[ANGULAR_SCOPE] Page scope stored in global var: $pageScope')
+        console.debug('[ANGULAR_SCOPE] $pageScope', $pageScope)
+        // let myPage = $('#angular_scope_context').scope().$parent
+    })
+    </script>
+    <!--<div id="angular_scope_context"></div>-->

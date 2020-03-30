@@ -1,0 +1,110 @@
+{
+  "name": "yamaha_audiosystem_musiccast-wx-50-series",
+  "version": "1.0.1",
+  "description": "Driver For Yamaha Musiccast WX Series audiosystems",
+  "main": "index.js",
+    "scripts": {
+	"start": "node index.js"
+  },
+  "author": "Medialon",
+  "license": "SEE LICENSE IN license.txt",
+  "overture": {
+    "brand": "Yamaha",
+    "model": "WX",
+    "models": [
+      "WXA-50",
+      "WXC-50"
+    ],
+    "type": "device",
+    "subtype": "audiosystem",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": ["Disconnected","Connected"]       
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "enums": ["Off","On"],
+        "perform":{"action":"Set Power", "params": { "Status":"$string"}}
+      },
+      {
+        "name": "AudioMute",
+        "smooth": true,
+        "type": "enum",
+        "enums": ["Off","On"],
+        "perform":{"action":"Set Audio Mute", "params": { "Status":"$string"}}
+      },
+      {
+        "name": "AudioLevel",
+        "type": "integer",
+        "min": -80,
+        "max": 0,
+        "unit": "leveldB",
+        "perform":{"action":"Set Audio Level", "params": { "Level":"$value"}}  
+      },
+      {
+        "name": "Sources",
+        "smooth": true,
+        "type": "enum",
+        "enums": ["None"],
+        "perform":{"action":"Select Source", "params": { "Name":"$string"}}
+        
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off","On"]
+          }
+        }
+      },
+      {
+        "name": "Set Audio Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off","On"]
+          }
+        }
+      },
+      {
+        "name": "Set Audio Level",
+        "params": {
+          "Level": {
+            "type": "string"
+          }
+        },
+        "optimize": true
+      },
+      {
+        "name": "Select Source",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Driver",
+      "properties": {
+        "host": {
+          "title": "Musiccast network host name or IP address:",
+          "type": "string",
+          "default": "127.0.0.1",
+          "description": "IP address or hostname"
+        }
+      },
+      "required": [
+        "host"
+      ]
+    }
+
+  }
+}

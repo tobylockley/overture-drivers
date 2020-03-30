@@ -1,0 +1,105 @@
+{
+  "name": "bluestream_sw41ab-v2",
+  "version": "1.0.0-beta.1",
+  "description": "Driver for bluestream sw41ab-v2 4x1 HDMI switcher",
+  "main": "index.js",
+  "scripts": {
+	  "start": "node index.js"
+  },
+  "author": "Barco",
+  "license": "MIT",
+  "overture": {
+    "brand": "Bluestream",
+    "models": ["sw41ab-v2"],
+    "type": "device",
+    "subtype": "matrix",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": ["Disconnected","Connected"]
+      },
+      {
+        "name": "Power",
+        "type": "enum",
+        "enums": ["Off", "On"],
+        "perform": {
+          "action": "Set Power",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "Sources",
+        "type": "enum",
+        "enums": ["HDMI1", "HDMI2", "HDMI3", "HDMI4"],
+        "perform": {
+          "action": "Select Source",
+          "params": {
+            "Name": "$string"
+          }
+        }
+      },
+      {
+        "name": "Mute",
+        "type": "enum",
+        "enums": ["Off", "On"],
+        "perform": {
+          "action": "Set Mute",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Power",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off","On"]
+          }
+        }
+      },
+      {
+        "name": "Set Mute",
+        "params": {
+          "Status": {
+            "type": "enum",
+            "enums": ["Off","On"]
+          }
+        }
+      },
+      {
+        "name": "Select Source",
+        "params": {
+          "Name": {
+            "type": "string"
+          }
+        }
+      }
+    ],    
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Bluestream 4x1 HDMI switcher Configuration",
+      "properties": {
+        "host": {
+          "title": "Global Cache ip-rs232 IP address",
+          "type": "string"
+        },
+        "port": {
+          "title": "Port:",
+          "type": "integer",
+          "default": 4999,
+          "description": "Default: 4999"
+        }
+      },
+      "required": [
+        "host",
+        "port"
+      ]
+    }
+  }
+}

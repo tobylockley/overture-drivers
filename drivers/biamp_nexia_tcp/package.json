@@ -1,0 +1,152 @@
+{
+    "name": "biamp_nexia_tcp",
+    "version": "1.0.2",
+    "description": "Driver for Biamp Nexia Audio DSP",
+    "license": "MIT",
+    "author": "Audio Visual Distributors",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "overture": {
+        "brand": "Biamp",
+        "models": [
+            "Nexia CS",
+            "Nexia TC"
+        ],
+        "type": "device",
+        "subtype": "audiosystem",
+        "variables": [
+            {
+                "name": "Status",
+                "type": "enum",
+                "enums": [
+                    "Disconnected",
+                    "Connected"
+                ]
+            }
+        ],
+        "commands": [
+            {
+                "name": "setAudioLevel",
+                "params": {
+                    "InstanceId": {
+                        "type": "integer"
+                    },
+                    "Channel": {
+                        "type": "integer"
+                    },
+                    "Level": {
+                        "type": "integer"
+                    },
+                    "OvertureVar": {
+                        "type": "string"
+                    }
+                },
+                "optimize": true
+            },
+            {
+                "name": "setBinary",
+                "params": {
+                    "InstanceId": {
+                        "type": "integer"
+                    },
+                    "Channel": {
+                        "type": "integer"
+                    },
+                    "Status": {
+                        "type": "enum",
+                        "enums": [
+                            "Off",
+                            "On"
+                        ]
+                    },
+                    "Attribute": {
+                        "type": "string"
+                    },
+                    "OvertureVar": {
+                        "type": "string"
+                    }
+                }
+            }
+        ],
+        "pointSetupSchema": {
+            "type": "object",
+            "title": "Setup for Biamp Nexia via Telnet",
+            "properties": {
+                "host": {
+                    "title": "Hostname/IP Address:",
+                    "type": "string",
+                    "default": ""
+                },
+                "port": {
+                    "title": "Port:",
+                    "type": "integer",
+                    "default": 23
+                },
+                "device": {
+                    "title": "Device ID:",
+                    "type": "integer",
+                    "default": 1
+                },
+                "controls": {
+                    "title": "Control Elements",
+                    "type": "array",
+                    "format": "table",
+                    "uniqueItems": true,
+                    "items": {
+                        "title": "Control",
+                        "type": "object",
+                        "properties": {
+                            "type": {
+                                "title": "Control Type",
+                                "type": "string",
+                                "enum": [
+                                    "Level Fader",
+                                    "Mute Fader",
+                                    "Logic State"
+                                ]
+                            },
+                            "instance": {
+                                "title": "Instance ID",
+                                "type": "integer"
+                            },
+                            "channel": {
+                                "title": "Channel",
+                                "type": "integer",
+                                "default": 1
+                            },
+                            "name": {
+                                "title": "Nickname (Optional)",
+                                "type": "string",
+                                "pattern": "^[A-Za-z][A-Za-z0-9_]+$"
+                            }
+                        }
+                    }
+                },
+                "presets": {
+                    "title": "Presets",
+                    "type": "array",
+                    "format": "table",
+                    "uniqueItems": true,
+                    "items": {
+                        "title": "Preset",
+                        "type": "object",
+                        "properties": {
+                            "number": {
+                                "title": "Preset Number",
+                                "type": "integer",
+                                "minimum": 1001,
+                                "default": 1001
+                            },
+                            "name": {
+                                "title": "Nickname (Optional)",
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

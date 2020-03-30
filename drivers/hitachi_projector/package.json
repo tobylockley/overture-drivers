@@ -1,0 +1,70 @@
+{
+    "name": "hitachi_projector",
+    "version": "1.0.0-beta.1",
+    "description": "Driver",
+    "license": "MIT",
+    "author": "Audio Visual Distributors",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "overture": {
+        "brand": "BRAND",
+        "models": [
+            "MODEL"
+        ],
+        "type": "device",
+        "subtype": "generic",
+        "variables": [
+            {
+                "name": "Status",
+                "type": "enum",
+                "enums": [
+                    "Disconnected",
+                    "Connected"
+                ]
+            },
+            {
+                "name": "Power",
+                "type": "enum",
+                "enums": [
+                    "Off",
+                    "On"
+                ],
+                "perform": {
+                    "action": "Set Power",
+                    "params": {
+                        "Status": "$string"
+                    }
+                }
+            }
+        ],
+        "commands": [
+            {
+                "name": "Set Power",
+                "params": {
+                    "Status": {
+                        "type": "string"
+                    }
+                }
+            }
+        ],
+        "pointSetupSchema": {
+            "type": "object",
+            "title": "Template Setup",
+            "properties": {
+                "host": {
+                    "title": "Host name or IP address:",
+                    "type": "string"
+                },
+                "port": {
+                    "title": "Port:",
+                    "type": "integer",
+                    "default": 23,
+                    "minimum": 0,
+                    "description": "Default: 23"
+                }
+            }
+        }
+    }
+}

@@ -24,10 +24,18 @@ Driver for an AV Pro Connect matrix switcher. Current models supported:
 ### Sources_OUT{N}
 [enum] Which input is being switched to this output.
 
+### Sources_AUDIO_OUT{N}
+[enum] Which input is being switched to this audio output.
+
 ## Commands
 
 ### Select Source
 Set the specified output to display the specified input.
+- "Channel": [integer] the output to assign the input to.
+- "Name": [string] the input to take the source from.
+
+### Select Audio Source
+Set the specified audio output to the specified input.
 - "Channel": [integer] the output to assign the input to.
 - "Name": [string] the input to take the source from.
 
@@ -52,3 +60,6 @@ Returns all current input -> output assignments. Used when polling.
 ### 1.0.2
 - Fixed bug where function name for setting outputs was wrong.
 - Removed nicknames to keep it simple.
+
+### 1.0.3
+- Added support for audio switching

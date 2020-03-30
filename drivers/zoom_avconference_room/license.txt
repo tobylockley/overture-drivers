@@ -1,0 +1,10 @@
+© 2018, Barco NV. 
+ 
+The software included in the Device Drivers ("this Software") may be used by you if you have obtained a valid license to use Barco Overture and subject to the terms of such Barco Overture License Agreement.
+
+You are permitted to modify this Software, in both source and object code format, strictly as required for your use of Barco Overture, and without removing or obscuring the above copyright notice.
+
+No rights are granted to use this Software, whether modified or as is, outside Barco Overture or otherwise than in connection with the Barco Overture product.  All other rights, whether to copy, distribute, modify or otherwise, are reserved by Barco.
+
+Barco does not assume any liability in respect of any modifications to this Software.
+

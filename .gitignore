@@ -1,12 +1,12 @@
 *.code-workspace
 drivers/_*/
-**/node_modules/
-**/overture_macros/
+node_modules/
+drivers/overture_*/
 toby_test*/
 tobytest*/
 toby_test*.zip
 desktop.ini
-OvertureCS/
+OvertureCS*/
 .DS_Store
 
 zip/archive/

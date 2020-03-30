@@ -55,6 +55,9 @@ Open or close a contact
 
 ## Release Notes
 
+### 1.1.5
+- Added logging for incoming data frames
+
 ### 1.1.4
 - Updated syntax and tcp reconnect logic
 
