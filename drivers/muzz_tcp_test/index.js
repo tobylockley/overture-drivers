@@ -121,9 +121,15 @@ exports.createDevice = base => {
       return
     }
 
-    match = data.match(/set(.*)\n/)
+    match = data.match(/set(.*)\n/) && !data.match(/setT(.*)\n/)
     if (match) {
       base.getVar('Presets').value = 0
+      base.commandDone()
+      return
+    }
+
+    match = data.match(/set(.*)\n/) 
+    if (match) {
       base.commandDone()
       return
     }
