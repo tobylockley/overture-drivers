@@ -1,18 +1,19 @@
 {
-  "editor.tabSize": 4,
-  "editor.insertSpaces": true,
-  "editor.detectIndentation": false,
-  "debug.inlineValues": true,
-  "debug.toolBarLocation": "floating",
-  // "editor.rulers": [100],
-  "eslint.alwaysShowStatus": true,
-  "eslint.probe": [
-      "javascript",
-      "javascriptreact",
-      "typescript",
-      "typescriptreact",
-      "html",
-      "vue",
-      "json"
-  ]
-  // "editor.codeActionsOnSave": { "source.fixAll": true } // ADD THIS TO USER SETTING
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    "debug.inlineValues": true,
+    "debug.toolBarLocation": "floating",
+    // "editor.rulers": [100],
+    "eslint.alwaysShowStatus": true,
+    "eslint.probe": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact",
+        "html",
+        "vue",
+        "json"
+    ]
+    // "editor.codeActionsOnSave": { "source.fixAll": true } // ADD THIS TO USER SETTING 
+}
