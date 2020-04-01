@@ -1,0 +1,84 @@
+{
+    "name": "template_globalcache_ir",
+    "version": "1.0.0",
+    "description": "Driver",
+    "license": "MIT",
+    "author": "Audio Visual Distributors",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "overture": {
+        "brand": "BRAND",
+        "models": [
+            "MODEL"
+        ],
+        "type": "device",
+        "subtype": "generic",
+        "variables": [
+            {
+                "name": "Status",
+                "type": "enum",
+                "enums": [
+                    "Disconnected",
+                    "Connected"
+                ]
+            },
+            {
+              "name": "IR_Commands",
+              "type": "enum",
+              "enums": [
+                "Idle"
+              ],
+              "perform": {
+                "action": "Send Command",
+                "params": {
+                  "Index": "$value"
+                }
+              }
+            }
+        ],
+        "commands": [
+            {
+              "name": "Send Command",
+              "params": {
+                "Index": {
+                  "type": "integer"
+                }
+              }
+            }
+        ],
+        "pointSetupSchema": {
+            "type": "object",
+            "title": "Setup",
+            "properties": {
+                "host": {
+                    "title": "Host name or IP address:",
+                    "type": "string"
+                },
+                "port": {
+                    "title": "Port:",
+                    "type": "integer",
+                    "default": 4998,
+                    "minimum": 0,
+                    "description": "Default: 4998"
+                },
+                "module": {
+                  "title": "GlobalCache Module:",
+                  "type": "integer",
+                  "minimum": 1,
+                  "default": 1,
+                  "description": "iTach = 1"
+                },
+                "ir_port": {
+                  "title": "GlobaclCache IR Port:",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 3,
+                  "default": 1,
+                  "description": "IR emitter port to use (1-3)"
+                }
+            }
+        }
+    }
+}
