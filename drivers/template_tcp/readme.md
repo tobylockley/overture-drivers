@@ -1,16 +1,12 @@
-# Display Template (CHANGE ME)
-
+# Display Template
 ## Overview
-Driver for a display (CHANGE ME).
-
+Template driver for a display.
 
 ## Setup
 - "Host": The IP address or host name of the device. (Default 192.168.1.100)
 - "Port": The port of TCP communication. (Default 20060)
 
-
 ## Variables
-
 ### Status
 [enum] The current connection status of the device.
 - "Disconnected" : The device is not connected
@@ -34,9 +30,7 @@ Driver for a display (CHANGE ME).
 - minimum: 0
 - maximum: 100
 
-
 ## Commands
-
 ### Set Power
 Turn on or off the device power.
 - "Status": [enum] "On" or "Off" to turn power on or off.
@@ -49,9 +43,6 @@ To select the input source to display.
 Set Audio level of the device (between 0 and 100)
 - "Level": [integer] audio level for the display.
 
-
 ## Revisions
-
 ### 1.0.0
 - Initial version
-
