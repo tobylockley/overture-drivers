@@ -8,7 +8,7 @@
       "type": "shell",
       "command": "node ${workspaceFolder}/scripts/package_driver/index.js ${fileDirname} ${workspaceFolder}/zip",
       "windows": {
-          "command": "node \"${workspaceFolder}\\scripts\\package_driver\\index.js ${fileDirname} ${workspaceFolder}\\zip\""
+          "command": "node \"${workspaceFolder}\\scripts\\package_driver\\index.js\" \"${fileDirname}\" \"${workspaceFolder}\\zip\""
       },
     }
   ]
