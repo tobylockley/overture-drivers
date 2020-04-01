@@ -30,10 +30,25 @@
                 "enums": [
                     "Off",
                     "On"
-                ]
+                ],
+                "perform": {
+                    "action": "Set Power",
+                    "params": {
+                        "Status": "$string"
+                    }
+                }
             }
         ],
-        "commands": [],
+        "commands": [
+            {
+                "name": "Set Power",
+                "params": {
+                    "Status": {
+                        "type": "string"
+                    }
+                }
+            }
+        ],
         "pointSetupSchema": {
             "type": "object",
             "title": "Settings",
@@ -41,7 +56,7 @@
                 "host": {
                     "title": "Host name or IP address:",
                     "type": "string",
-                    "default": "192.168."
+                    "default": ""
                 },
                 "port": {
                     "title": "Port:",
@@ -49,11 +64,7 @@
                     "default": 23,
                     "description": "Telnet: 23"
                 }
-            },
-            "required": [
-                "host",
-                "port"
-            ]
+            }
         }
     },
     "dependencies": {

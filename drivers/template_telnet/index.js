@@ -1,11 +1,9 @@
-'use strict'
-
-const CMD_DEFER_TIME = 1000        // Timeout when using commandDefer
-const TICK_PERIOD = 5000           // In-built tick interval
-const POLL_PERIOD = 5000           // Continuous polling function interval
-const TELNET_TIMEOUT = 10000       // Socket will timeout after specified milliseconds of inactivity
-const SEND_TIMEOUT = 1000          // Timeout when using telnet send function
-
+//------------------------------------------------------------------------------------------ CONSTANTS
+const CMD_DEFER_TIME = 3000         // Timeout when using commandDefer
+const POLL_PERIOD = 5000            // Polling function interval
+const TICK_PERIOD = 5000            // In-built tick interval
+const TELNET_TIMEOUT = 10000        // Socket will timeout after specified milliseconds of inactivity
+const SEND_TIMEOUT = 1000           // Timeout when using telnet send function
 
 let host
 exports.init = _host => {
@@ -23,32 +21,35 @@ exports.createDevice = base => {
     frameParser.setSeparator('\n')
     frameParser.on('data', data => onFrame(data))
 
-    const isConnected = () => { return base.getVar('Status').string === 'Connected' }
-
+    //------------------------------------------------------------------------- STANDARD SDK FUNCTIONS
     function setup(_config) {
         config = _config
         base.setTickPeriod(TICK_PERIOD)
-        base.setPoll({ action: 'getPower', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
+        // Register polling functions
+        const defaults = {period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true}
+        base.setPoll({...defaults, action: 'getPower'})
+        base.setPoll({...defaults, action: 'getSource', enablePollFn: isPoweredOn})
     }
 
     function start() {
         initTelnetClient()
     }
 
-    function stop() {
-        disconnect()
-        if (telnetClient) {
-            telnetClient.end()
-            telnetClient = null
-        }
-    }
-
     function tick() {
-        !telnetClient && initTelnetClient()
+        if (!telnetClient) initTelnetClient()
     }
 
     function disconnect() {
         base.getVar('Status').string = 'Disconnected'
+        base.getVar('Power').string = 'Off'
+    }
+
+    function stop() {
+        disconnect()
+        telnetClient && telnetClient.end()
+        telnetClient = null
+        base.stopPolling()
+        base.clearPendingCommands()
     }
 
     function initTelnetClient() {
@@ -86,6 +87,7 @@ exports.createDevice = base => {
         }
     }
 
+    //-------------------------------------------------------------------------- SEND/RECEIVE HANDLERS
     function sendDefer(data) {
         base.commandDefer(CMD_DEFER_TIME)
         telnetClient.send(data).then(recvd => {
@@ -97,35 +99,54 @@ exports.createDevice = base => {
     }
 
     function onFrame(data) {
-        let match  // Used for regex matching below
-        const pendingCommand = base.getPendingCommand()
-
-        logger.silly(`onFrame: ${data}`)
-        pendingCommand && logger.debug(`pendingCommand: ${pendingCommand.action}`)
-
-        // Response from polling command
-        match = data.match(/something here/)
-        if (match) {
-            base.commandDone()
-        }
-
-        if (pendingCommand && pendingCommand.action == 'getPower') {
-            // Parse response after issueing a SET function
-
-            match = data.match(/POWR0{16}(\d+)/)
-            if (match) {
-                base.getVar('Power').value = match[1]
+        let pending = base.getPendingCommand()
+        logger.debug(`onFrame (pending = ${pending && pending.action}): ${data}`)
+        let match = data.match(/POWR(\d+)/)
+        if (match && pending) {
+            if (match && pending.action == 'getPower') {
+                base.getVar('Power').value = parseInt(match[1]) // 0 = Off, 1 = On
+                base.commandDone()
+            }
+            else if (match && pending.action == 'setPower') {
+                base.getVar('Power').string = pending.params.Status
                 base.commandDone()
             }
         }
+        else if (match && !pending) {
+            logger.warn(`Received data but no pending command: ${data}`)
+        }
+        else {
+            logger.warn(`onFrame data not processed: ${data}`)
+        }
     }
 
+    //---------------------------------------------------------------------------------- GET FUNCTIONS
     function getPower() {
         sendDefer('get power\r\n')
     }
 
+    //---------------------------------------------------------------------------------- SET FUNCTIONS
+    function setPower(params) {
+        if (params.Status == 'Off') sendDefer('set power 0\n')
+        else if (params.Status == 'On') sendDefer('set power 1\n')
+    }
+
+    //------------------------------------------------------------------------------- HELPER FUNCTIONS
+    function isConnected() {
+        return base.getVar('Status').string == 'Connected'
+    }
+
+    function isPoweredOn() {
+        return isConnected() && base.getVar('Power').string == 'On'
+    }
+
+    //----------------------------------------------------------------------------- EXPORTED FUNCTIONS
     return {
-        setup, start, stop, tick,
-        getPower
+        setup,
+        start,
+        stop,
+        tick,
+        getPower,
+        setPower
     }
 }
