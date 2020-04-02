@@ -25,8 +25,9 @@ exports.createDevice = base => {
         base.setTickPeriod(TICK_PERIOD)
         // Register polling functions
         const defaults = {period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true}
-        base.setPoll({...defaults, action: 'getPower'})
-        base.setPoll({...defaults, action: 'getSource', enablePollFn: isPoweredOn})
+        base.setPoll({ action: 'keepAlive', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
+        // base.setPoll({...defaults, action: 'getPower'})
+        // base.setPoll({...defaults, action: 'getSource', enablePollFn: isPoweredOn})
 
         let preset_enums = ['Idle']
         for (let preset of config.presets) {
@@ -84,6 +85,11 @@ exports.createDevice = base => {
         })
 
         tcpClient.on('data', data => {
+            logger.warn(`Type of data: ${typeof data}`)
+            if (data.length === 1 && data[0] === 0x06) {
+                let pending = base.getPendingCommand()
+                pending && logger.debug(`TCP DATA, Pending action = ${pending.action}). Params = ${pending.params}`)
+            }
             frameParser.push(data.toString())
         })
 
@@ -115,6 +121,9 @@ exports.createDevice = base => {
         let pending = base.getPendingCommand()
         logger.debug(`onFrame (pending = ${pending && pending.action}): ${data}`)
         let match = data.match(/POWR(\d+)/)
+        let iptest = data.match('IP')
+        let recalltest = data.match('06')
+        logger.warn(`The Data is: ${data}`)
         if (match && pending) {
             if (match && pending.action == 'getPower') {
                 base.getVar('Power').value = parseInt(match[1]) // 0 = Off, 1 = On
@@ -124,6 +133,14 @@ exports.createDevice = base => {
                 base.getVar('Power').string = pending.params.Status
                 base.commandDone()
             }
+        }
+        else if (iptest){
+            logger.warn(`Recieved ${data}`)
+            base.commandDone()
+        }
+        else if (recalltest){
+            logger.warn(`Recieved ${data}`)
+            base.commandDone()
         }
         else if (match && !pending) {
             logger.warn(`Received data but no pending command: ${data}`)
@@ -135,8 +152,9 @@ exports.createDevice = base => {
 
     //---------------------------------------------------------------------------------- GET FUNCTIONS
     function getPower() {
-        sendDefer('*SEPOWR################\n')
+        sendDefer('IP\r')
     }
+
 
     function getSource() {
         sendDefer('*SEINPT################\n')
@@ -156,7 +174,7 @@ exports.createDevice = base => {
         // }
 
         if (result) {
-            sendDefer(`.... ${result.number}\r`)
+            sendDefer(`SS ${result.number}\r`)
         }
         else {
             logger.error(`Preset not found: ${params.Name}`)
@@ -171,7 +189,10 @@ exports.createDevice = base => {
     function isPoweredOn() {
         return isConnected() && base.getVar('Power').string == 'On'
     }
-
+    
+    function keepAlive() {
+        sendDefer('IP\r')
+    }
     //----------------------------------------------------------------------------- EXPORTED FUNCTIONS
     return {
         setup,
@@ -181,6 +202,7 @@ exports.createDevice = base => {
         getPower,
         getSource,
         setPower,
+        keepAlive,
         recallPreset
     }
 }
