@@ -29,6 +29,7 @@ exports.createDevice = base => {
         // base.setPoll({...defaults, action: 'getPower'})
         // base.setPoll({...defaults, action: 'getSource', enablePollFn: isPoweredOn})
 
+        // PRESETS
         let preset_enums = ['Idle']
         for (let preset of config.presets) {
             preset_enums.push(preset.name)
@@ -42,6 +43,38 @@ exports.createDevice = base => {
                     action: 'Recall Preset',
                     params: {
                         Name: '$string'
+                    }
+                }
+            })
+        }
+
+        // GAIN MODULES
+        for (let gain of config.gains) {
+            const name = gain.name.replace(/[^A-Za-z0-9_]/g, '') // Create legal variable name
+
+            base.createVariable({
+                name: `AudioMute_${name}`,
+                type: 'enum',
+                enums: ['Off', 'On'],
+                perform: {
+                    action: 'Set Audio Mute',
+                    params: {
+                        Name: gain.name,
+                        Status: '$string'
+                    }
+                }
+            })
+
+            base.createVariable({
+                name: `AudioLevel_${name}`,
+                type: 'integer',
+                minimum: 0,
+                maximum: 100,
+                perform: {
+                    action: 'Set Audio Level',
+                    params: {
+                        Name: gain.name,
+                        Level: '$value'
                     }
                 }
             })
@@ -85,7 +118,7 @@ exports.createDevice = base => {
         })
 
         tcpClient.on('data', data => {
-            logger.warn(`Type of data: ${typeof data}`)
+            logger.warn(`Type of data: ${data.constructor.toString()}`)
             if (data.length === 1 && data[0] === 0x06) {
                 let pending = base.getPendingCommand()
                 pending && logger.debug(`TCP DATA, Pending action = ${pending.action}). Params = ${pending.params}`)
@@ -166,6 +199,14 @@ exports.createDevice = base => {
         else if (params.Status == 'On') sendDefer('*SCPOWR0000000000000001\n')
     }
 
+    function setAudioMute(params) {
+        if (params.Status == 'Off') sendDefer('*SCPOWR0000000000000000\n')
+        else if (params.Status == 'On') sendDefer('*SCPOWR0000000000000001\n')
+    }
+
+    function setAudioLevel(params) {
+    }
+
     function recallPreset(params) {
         let result = config.presets.find(entry => entry.name === params.Name)
         // Equivalent to: entry => entry.name === params.Name
@@ -189,19 +230,15 @@ exports.createDevice = base => {
     function isPoweredOn() {
         return isConnected() && base.getVar('Power').string == 'On'
     }
-    
+
     function keepAlive() {
         sendDefer('IP\r')
     }
     //----------------------------------------------------------------------------- EXPORTED FUNCTIONS
     return {
-        setup,
-        start,
-        stop,
-        tick,
-        getPower,
-        getSource,
-        setPower,
+        setup, start, stop, tick,
+        getPower, getSource,
+        setPower, setAudioMute, setAudioLevel,
         keepAlive,
         recallPreset
     }

@@ -49,6 +49,28 @@
                 }
             },
             {
+                "name": "Set Audio Mute",
+                "params": {
+                    "Name": {
+                        "type": "string"
+                    },
+                    "Status": {
+                        "type": "string"
+                    }
+                }
+            },
+            {
+                "name": "Set Audio Level",
+                "params": {
+                    "Name": {
+                        "type": "string"
+                    },
+                    "Level": {
+                        "type": "integer"
+                    }
+                }
+            },
+            {
                 "name": "Recall Preset",
                 "params": {
                     "Name": {
