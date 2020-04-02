@@ -40,4 +40,4 @@ Legal values are 0-255
 #### recallPreset (colour)
 "recallPreset,{COLOUR_NAME}\n"
 Change background colour using standard CSS colour names
-For reference, see: https://www.quackit.com/css/css_color_codes.cfm
+For reference, see: https://www.qhmit.com/css/color/charts/css_color_names_chart.cfm
