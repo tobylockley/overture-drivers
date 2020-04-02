@@ -16,7 +16,7 @@ exports.createDevice = base => {
     let tcpClient
 
     let frameParser = host.createFrameParser()
-    frameParser.setSeparator('\n')
+    frameParser.setSeparator('\r')
     frameParser.on('data', data => onFrame(data))
 
     //------------------------------------------------------------------------- STANDARD SDK FUNCTIONS
@@ -27,6 +27,24 @@ exports.createDevice = base => {
         const defaults = {period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true}
         base.setPoll({...defaults, action: 'getPower'})
         base.setPoll({...defaults, action: 'getSource', enablePollFn: isPoweredOn})
+
+        let preset_enums = ['Idle']
+        for (let preset of config.presets) {
+            preset_enums.push(preset.name)
+        }
+        if (preset_enums.length > 1) {
+            base.createVariable({
+                name: 'Preset',
+                type: 'enum',
+                enums: preset_enums,
+                perform: {
+                    action: 'Recall Preset',
+                    params: {
+                        Name: '$string'
+                    }
+                }
+            })
+        }
     }
 
     function start() {
@@ -130,6 +148,21 @@ exports.createDevice = base => {
         else if (params.Status == 'On') sendDefer('*SCPOWR0000000000000001\n')
     }
 
+    function recallPreset(params) {
+        let result = config.presets.find(entry => entry.name === params.Name)
+        // Equivalent to: entry => entry.name === params.Name
+        // function(entry) {
+        //     return (entry.name === params.Name)
+        // }
+
+        if (result) {
+            sendDefer(`.... ${result.number}\r`)
+        }
+        else {
+            logger.error(`Preset not found: ${params.Name}`)
+        }
+    }
+
     //------------------------------------------------------------------------------- HELPER FUNCTIONS
     function isConnected() {
         return base.getVar('Status').string == 'Connected'
@@ -147,6 +180,7 @@ exports.createDevice = base => {
         tick,
         getPower,
         getSource,
-        setPower
+        setPower,
+        recallPreset
     }
 }

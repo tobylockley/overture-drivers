@@ -47,6 +47,14 @@
                         "type": "string"
                     }
                 }
+            },
+            {
+                "name": "Recall Preset",
+                "params": {
+                    "Name": {
+                        "type": "string"
+                    }
+                }
             }
         ],
         "pointSetupSchema": {
@@ -60,9 +68,83 @@
                 "port": {
                     "title": "Port:",
                     "type": "integer",
-                    "default": 9999,
+                    "default": 4999,
                     "minimum": 0,
-                    "description": "Default: 9999"
+                    "description": "Default: 4999"
+                },
+                "presets": {
+                    "title": "Presets",
+                    "type": "array",
+                    "format": "table",
+                    "uniqueItems": true,
+                    "items": {
+                        "title": "Preset",
+                        "type": "object",
+                        "properties": {
+                            "number": {
+                                "title": "Preset Number",
+                                "type": "integer",
+                                "minimum": 1
+                            },
+                            "name": {
+                                "title": "Preset Nickname",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "gains": {
+                    "title": "Gain Modules",
+                    "type": "array",
+                    "format": "table",
+                    "uniqueItems": true,
+                    "items": {
+                        "title": "Gain Module",
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "title": "Module Name",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "sourceselectors": {
+                    "title": "Source Selector Modules",
+                    "type": "array",
+                    "format": "table",
+                    "uniqueItems": true,
+                    "items": {
+                        "title": "Source Selector Module",
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "title": "Module Name",
+                                "type": "string"
+                            },
+                            "number": {
+                                "title": "Number of Inputs",
+                                "type": "integer",
+                                "minimum": 1
+                            }
+                        }
+                    }
+                },
+                "tonecontrols": {
+                    "title": "Tone Control Modules",
+                    "type": "array",
+                    "format": "table",
+                    "uniqueItems": true,
+                    "items": {
+                        "title": "Tone Control Module",
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "title": "Module Name",
+                                "type": "string"
+                            }
+                        }
+                    }
                 }
             }
         }
