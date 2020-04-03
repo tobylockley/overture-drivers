@@ -181,6 +181,26 @@ exports.createDevice = base => {
                     base.commandError('Unexpected response')
                 }
             }
+            else if (pending.action === 'getAudioLevel') {
+                match = data.match(/GA"(.+?)">1=([0-9-.]+)/)
+                if (match) {
+                    let module_name = match[1]
+                    let val = parseFloat(match[2])
+                    let var_name = legalName('AudioLevel_', module_name)
+                    if (!isNaN(val)) {
+                        val = mapNum(val, LEVEL_MIN, LEVEL_MAX, 0, 100)
+                        base.getVar(var_name).value = parseInt(val)
+                        base.commandDone()
+                    }
+                    else  {
+                        base.commandError('unable to process level response')
+                    }
+
+                }
+                else {
+                    base.commandError('Unexpected response')
+                }
+            }
             else {
                 logger.warn(`onFrame data not processed: ${data}`)
             }
@@ -192,11 +212,11 @@ exports.createDevice = base => {
 
     //---------------------------------------------------------------------------------- GET FUNCTIONS
     function getAudioMute(params) {
-        sendDefer('IP\r')
+        sendDefer(`GA"${params.Name}">2\r`)
     }
 
     function getAudioLevel(params) {
-        sendDefer('IP\r')
+        sendDefer(`GA"${params.Name}">1\r`)
     }
 
     //---------------------------------------------------------------------------------- SET FUNCTIONS
