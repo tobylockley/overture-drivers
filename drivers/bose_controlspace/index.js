@@ -121,10 +121,10 @@ exports.createDevice = base => {
         })
 
         tcpClient.on('data', data => {
-            logger.warn(`Type of data: ${data.constructor.toString()}`)
-            if (data.length === 1 && data[0] === 0x06) {
-                let pending = base.getPendingCommand()
-                pending && logger.debug(`TCP DATA, Pending action = ${pending.action}). Params = ${pending.params}`)
+            let pending = base.getPendingCommand()
+            if (pending && data.length === 1 && data[0] === 0x06) {
+                logger.silly(`ACK (${pending.action})`, pending.params)
+                base.commandDone()
             }
             frameParser.push(data.toString())
         })

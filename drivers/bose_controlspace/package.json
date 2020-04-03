@@ -23,20 +23,6 @@
                     "Disconnected",
                     "Connected"
                 ]
-            },
-            {
-                "name": "Power",
-                "type": "enum",
-                "enums": [
-                    "Off",
-                    "On"
-                ],
-                "perform": {
-                    "action": "Set Power",
-                    "params": {
-                        "Status": "$string"
-                    }
-                }
             }
         ],
         "commands": [
@@ -68,7 +54,8 @@
                     "Level": {
                         "type": "integer"
                     }
-                }
+                },
+                "optimize": true
             },
             {
                 "name": "Recall Preset",
