@@ -27,8 +27,8 @@ exports.createDevice = base => {
         config = _config
         base.setTickPeriod(TICK_PERIOD)
         // Register polling functions
-        const defaults = {period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true}
-        base.setPoll({...defaults, action: 'keepAlive'})
+        const defaults = { period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true }
+        base.setPoll({ ...defaults, action: 'keepAlive' })
         // base.setPoll({...defaults, action: 'getSource', enablePollFn: isPoweredOn})
 
         // PRESETS
@@ -52,10 +52,8 @@ exports.createDevice = base => {
 
         // GAIN MODULES
         for (let gain of config.gains) {
-            const name = gain.name.replace(/[^A-Za-z0-9_]/g, '') // Create legal variable name
-
             base.createVariable({
-                name: `AudioMute_${name}`,
+                name: legalName('AudioMute_', gain.name),
                 type: 'enum',
                 enums: ['Off', 'On'],
                 perform: {
@@ -68,7 +66,7 @@ exports.createDevice = base => {
             })
 
             base.createVariable({
-                name: `AudioLevel_${name}`,
+                name: legalName('AudioLevel_', gain.name),
                 type: 'integer',
                 minimum: 0,
                 maximum: 100,
@@ -80,6 +78,9 @@ exports.createDevice = base => {
                     }
                 }
             })
+
+            base.setPoll({ ...defaults, action: 'getAudioMute', params: {Name: gain.name} })
+            base.setPoll({ ...defaults, action: 'getAudioLevel', params: {Name: gain.name} })
         }
     }
 
@@ -153,46 +154,49 @@ exports.createDevice = base => {
     }
 
     function onFrame(data) {
+        let match // Used for regex below
         let pending = base.getPendingCommand()
-        logger.debug(`onFrame (pending = ${pending && pending.action}): ${data}`)
-        let match = data.match(/POWR(\d+)/)
-        let iptest = data.match('IP')
-        let recalltest = data.match('06')
-        logger.warn(`The Data is: ${data}`)
-        if (match && pending) {
-            if (match && pending.action == 'getPower') {
-                base.getVar('Power').value = parseInt(match[1]) // 0 = Off, 1 = On
-                base.commandDone()
-            }
-            else if (match && pending.action == 'setPower') {
-                base.getVar('Power').string = pending.params.Status
-                base.commandDone()
-            }
-        }
-        else if (iptest){
-            logger.warn(`Recieved ${data}`)
+
+        if (pending && pending.action === 'keepAlive' && /IP/.test(data)) {
             base.commandDone()
         }
-        else if (recalltest){
-            logger.warn(`Recieved ${data}`)
-            base.commandDone()
-        }
-        else if (match && !pending) {
-            logger.warn(`Received data but no pending command: ${data}`)
+        else if (pending) {
+            logger.debug(`onFrame (pending = ${pending.action}): ${data}`)
+
+            if (pending.action === 'getAudioMute') {
+                match = data.match(/GA"(.+?)">2=(.+?)/)
+                if (match) {
+                    let module_name = match[1]
+                    let val = match[2]
+                    let var_name = legalName('AudioMute_', module_name)
+                    if (val === 'F') {
+                        base.getVar(var_name).string = 'Off'
+                    }
+                    else if (val === 'O') {
+                        base.getVar(var_name).string = 'On'
+                    }
+                    base.commandDone()
+                }
+                else {
+                    base.commandError('Unexpected response')
+                }
+            }
+            else {
+                logger.warn(`onFrame data not processed: ${data}`)
+            }
         }
         else {
-            logger.warn(`onFrame data not processed: ${data}`)
+            logger.warn(`Received data but no pending command: ${data}`)
         }
     }
 
     //---------------------------------------------------------------------------------- GET FUNCTIONS
-    function getPower() {
+    function getAudioMute(params) {
         sendDefer('IP\r')
     }
 
-
-    function getSource() {
-        sendDefer('*SEINPT################\n')
+    function getAudioLevel(params) {
+        sendDefer('IP\r')
     }
 
     //---------------------------------------------------------------------------------- SET FUNCTIONS
@@ -207,7 +211,6 @@ exports.createDevice = base => {
     }
 
     function setAudioLevel(params) {
-
         let levelSend = mapNum(params.Level, 0, 100, LEVEL_MIN, LEVEL_MAX)
         levelSend = roundHalf(levelSend)
         sendDefer(`SA"${params.Name}">1=${levelSend}\r`)
@@ -245,10 +248,14 @@ exports.createDevice = base => {
         sendDefer('IP\r')
     }
 
+    function legalName(prefix, name) {
+        return prefix + name.replace(/[^A-Za-z0-9_]/g, '')
+    }
+
     //----------------------------------------------------------------------------- EXPORTED FUNCTIONS
     return {
         setup, start, stop, tick,
-        getPower, getSource,
+        getAudioMute, getAudioLevel,
         setPower, setAudioMute, setAudioLevel,
         keepAlive,
         recallPreset
