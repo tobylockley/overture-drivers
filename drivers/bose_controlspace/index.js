@@ -121,12 +121,12 @@ exports.createDevice = base => {
         })
 
         tcpClient.on('data', data => {
-            let pending = base.getPendingCommand()
-            if (pending && data.length === 1 && data[0] === 0x06) {
-                logger.silly(`ACK (${pending.action})`, pending.params)
-                base.commandDone()
+            if (data.length === 1 && data[0] === 0x06) {
+                onAck()
             }
-            frameParser.push(data.toString())
+            else {
+                frameParser.push(data.toString())
+            }
         })
 
         tcpClient.on('close', () => {
@@ -207,6 +207,23 @@ exports.createDevice = base => {
         }
         else {
             logger.warn(`Received data but no pending command: ${data}`)
+        }
+    }
+
+    function onAck() {
+        let pending = base.getPendingCommand()
+        if (pending) {
+            base.commandDone()
+            logger.silly(`ACK (${pending.action})`, pending.params)
+            if (pending.action === 'setAudioMute') {
+                let var_name = legalName('AudioMute_', pending.params.Name)
+                base.getVar(var_name).string = pending.Status
+            }
+            else if (pending.action === 'setAudioLevel') {
+            }
+        }
+        else {
+            logger.warn('ACK received, but nothing pending!')
         }
     }
 
