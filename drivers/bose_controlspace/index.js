@@ -4,6 +4,9 @@ const POLL_PERIOD = 5000            // Polling function interval
 const TICK_PERIOD = 5000            // In-built tick interval
 const TCP_TIMEOUT = 30000           // Will timeout after this length of inactivity
 const TCP_RECONNECT_DELAY = 5000    // How long to wait before attempting to reconnect
+const LEVEL_MIN = -60
+const LEVEL_MAX = 12
+
 
 let host
 exports.init = _host => {
@@ -200,11 +203,15 @@ exports.createDevice = base => {
     }
 
     function setAudioMute(params) {
-        if (params.Status == 'Off') sendDefer('*SCPOWR0000000000000000\n')
-        else if (params.Status == 'On') sendDefer('*SCPOWR0000000000000001\n')
+        if (params.Status == 'Off') sendDefer(`SA"${params.Name}">2=F\r`)
+        else if (params.Status == 'On') sendDefer(`SA"${params.Name}">2=O\r`)
     }
 
     function setAudioLevel(params) {
+
+        let levelSend = mapNum(params.Level, 0, 100, LEVEL_MIN, LEVEL_MAX)
+        levelSend = roundHalf(levelSend)
+        sendDefer(`SA"${params.Name}">1=${levelSend}\r`)
     }
 
     function recallPreset(params) {
@@ -223,6 +230,14 @@ exports.createDevice = base => {
     }
 
     //------------------------------------------------------------------------------- HELPER FUNCTIONS
+
+    function mapNum(num, inMin, inMax, outMin, outMax) {
+        return ((num - inMin) / (inMax - inMin)) * (outMax - outMin) + outMin
+    }
+    function roundHalf(num) {
+        return Math.round(num*2)/2
+    }
+
     function isConnected() {
         return base.getVar('Status').string == 'Connected'
     }
