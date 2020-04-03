@@ -28,8 +28,7 @@ exports.createDevice = base => {
         base.setTickPeriod(TICK_PERIOD)
         // Register polling functions
         const defaults = {period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true}
-        base.setPoll({ action: 'keepAlive', period: POLL_PERIOD, enablePollFn: isConnected, startImmediately: true })
-        // base.setPoll({...defaults, action: 'getPower'})
+        base.setPoll({...defaults, action: 'keepAlive'})
         // base.setPoll({...defaults, action: 'getSource', enablePollFn: isPoweredOn})
 
         // PRESETS
@@ -230,10 +229,10 @@ exports.createDevice = base => {
     }
 
     //------------------------------------------------------------------------------- HELPER FUNCTIONS
-
     function mapNum(num, inMin, inMax, outMin, outMax) {
         return ((num - inMin) / (inMax - inMin)) * (outMax - outMin) + outMin
     }
+
     function roundHalf(num) {
         return Math.round(num*2)/2
     }
@@ -242,13 +241,10 @@ exports.createDevice = base => {
         return base.getVar('Status').string == 'Connected'
     }
 
-    function isPoweredOn() {
-        return isConnected() && base.getVar('Power').string == 'On'
-    }
-
     function keepAlive() {
         sendDefer('IP\r')
     }
+
     //----------------------------------------------------------------------------- EXPORTED FUNCTIONS
     return {
         setup, start, stop, tick,
