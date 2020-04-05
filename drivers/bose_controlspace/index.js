@@ -87,33 +87,29 @@ exports.createDevice = base => {
         }
 
         // Source MODULES
-        let source_enums = ['Idle']
         for (let source of config.sourceselectors) {
-            source_enums.push(source.name)
-            let source_array = ['idle']
+            let source_array = []
             let source_number = source.number
             let source_name = legalName('SourceSelect_', source.name)
             let i=1
             while (i <= source_number) {
-                source_array.push(i)
+                source_array.push(`Input ${i}`)
                 i++
             }
-            if (source_enums.length > 0) {
-                base.createVariable({
-                    name: source_name,
-                    type: 'enum',
-                    enums: source_array,
-                    perform: {
-                        action: 'Set Source',
-                        params: {
-                            Name: source.name,
-                            Input: '$value'
-                        }
+            base.createVariable({
+                name: source_name,
+                type: 'enum',
+                enums: source_array,
+                perform: {
+                    action: 'Set Source',
+                    params: {
+                        Name: source.name,
+                        Input: '$string'
                     }
-                })
+                }
+            })
 
-                base.setPoll({ ...defaults, action: 'getSource', params: {Name: source.name} })
-            }
+            base.setPoll({ ...defaults, action: 'getSource', params: {Name: source.name} })
         }
 
         // TONE MODULES
@@ -460,7 +456,9 @@ exports.createDevice = base => {
     }
 
     function setSource(params) {
-        sendDefer(`SA"${params.Name}">1=${params.Input}\r`)
+        const match = params.Input.match(/.*?(\d+)/)
+        if (match) sendDefer(`SA"${params.Name}">1=${match[1]}\r`)
+        else logger.error (`setSource: Unexpected params.Input: ${params.Input}`)
     }
 
     function setBassLevel(params) {
