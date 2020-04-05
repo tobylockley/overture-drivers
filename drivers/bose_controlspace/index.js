@@ -438,12 +438,8 @@ exports.createDevice = base => {
     function getEqBypass(params) {
         sendDefer(`GA"${params.Name}">2\r`)
     }
-    //---------------------------------------------------------------------------------- SET FUNCTIONS
-    function setPower(params) {
-        if (params.Status == 'Off') sendDefer('*SCPOWR0000000000000000\n')
-        else if (params.Status == 'On') sendDefer('*SCPOWR0000000000000001\n')
-    }
 
+    //---------------------------------------------------------------------------------- SET FUNCTIONS
     function setAudioMute(params) {
         if (params.Status == 'Off') sendDefer(`SA"${params.Name}">2=F\r`)
         else if (params.Status == 'On') sendDefer(`SA"${params.Name}">2=O\r`)
@@ -462,7 +458,8 @@ exports.createDevice = base => {
     }
 
     function setBassLevel(params) {
-        let levelSend = mapNumToEq(params.Level)
+        // let levelSend = mapNumToEq(params.Level)
+        let levelSend = mapNum(params.Level, 0, 100, EQLEVEL_MIN, EQLEVEL_MAX)
         sendDefer(`SA"${params.Name}">1=${levelSend}\r`)
     }
 
@@ -539,7 +536,7 @@ exports.createDevice = base => {
     return {
         setup, start, stop, tick,
         getAudioMute, getAudioLevel, getSource, getBassLevel, getHighLevel, getMidLevel, getEqBypass,
-        setPower, setAudioMute, setAudioLevel, setSource, setBassLevel, setHighLevel, setMidLevel, setEqBypass,
+        setAudioMute, setAudioLevel, setSource, setBassLevel, setHighLevel, setMidLevel, setEqBypass,
         keepAlive,
         recallPreset
     }
