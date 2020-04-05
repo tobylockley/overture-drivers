@@ -6,6 +6,9 @@ const TCP_TIMEOUT = 30000           // Will timeout after this length of inactiv
 const TCP_RECONNECT_DELAY = 5000    // How long to wait before attempting to reconnect
 const LEVEL_MIN = -60
 const LEVEL_MAX = 12
+const EQLEVEL_MIN = -15
+const EQLEVEL_MAX = 15
+const EQLEVEL_RANGE = EQLEVEL_MAX - EQLEVEL_MIN
 
 
 let host
@@ -82,6 +85,98 @@ exports.createDevice = base => {
             base.setPoll({ ...defaults, action: 'getAudioMute', params: {Name: gain.name} })
             base.setPoll({ ...defaults, action: 'getAudioLevel', params: {Name: gain.name} })
         }
+
+        // Source MODULES
+        let source_enums = ['Idle']
+        for (let source of config.sourceselectors) {
+            source_enums.push(source.name)
+            let source_array = ['idle']
+            let source_number = source.number
+            let source_name = legalName('SourceSelect_', source.name)
+            let i=1
+            while (i <= source_number) {
+                source_array.push(i)
+                i++
+            }
+            if (source_enums.length > 0) {
+                base.createVariable({
+                    name: source_name,
+                    type: 'enum',
+                    enums: source_array,
+                    perform: {
+                        action: 'Set Source',
+                        params: {
+                            Name: source.name,
+                            Input: '$value'
+                        }
+                    }
+                })
+
+                base.setPoll({ ...defaults, action: 'getSource', params: {Name: source.name} })
+            }
+        }
+
+        // TONE MODULES
+        for (let tone of config.tonecontrols) {
+            base.createVariable({
+                name: legalName('BassLevel_', tone.name),
+                type: 'integer',
+                minimum: 0,
+                maximum: 100,
+                perform: {
+                    action: 'Set Bass Level',
+                    params: {
+                        Name: tone.name,
+                        Level: '$value'
+                    }
+                }
+            })
+            base.createVariable({
+                name: legalName('MidLevel_', tone.name),
+                type: 'integer',
+                minimum: 0,
+                maximum: 100,
+                perform: {
+                    action: 'Set Mid Level',
+                    params: {
+                        Name: tone.name,
+                        Level: '$value'
+                    }
+                }
+            })
+            base.createVariable({
+                name: legalName('HighLevel_', tone.name),
+                type: 'integer',
+                minimum: 0,
+                maximum: 100,
+                perform: {
+                    action: 'Set High Level',
+                    params: {
+                        Name: tone.name,
+                        Level: '$value'
+                    }
+                }
+            })
+
+            base.createVariable({
+                name: legalName('EqBypass_', tone.name),
+                type: 'enum',
+                enums: ['Off', 'On'],
+                perform: {
+                    action: 'Set Eq Bypass',
+                    params: {
+                        Name: tone.name,
+                        Status: '$value'
+                    }
+                }
+            })
+
+            base.setPoll({ ...defaults, action: 'getBassLevel', params: {Name: tone.name} })
+            base.setPoll({ ...defaults, action: 'getMidLevel', params: {Name: tone.name} })
+            base.setPoll({ ...defaults, action: 'getHighLevel', params: {Name: tone.name} })
+            base.setPoll({ ...defaults, action: 'getEqBypass', params: {Name: tone.name} })
+        }
+
     }
 
     function start() {
@@ -161,7 +256,7 @@ exports.createDevice = base => {
             base.commandDone()
         }
         else if (pending) {
-            logger.debug(`onFrame (pending = ${pending.action}): ${data}`)
+            // logger.debug(`onFrame (pending = ${pending.action}): ${data}`)
 
             if (pending.action === 'getAudioMute') {
                 match = data.match(/GA"(.+?)">2=(.+?)/)
@@ -201,6 +296,79 @@ exports.createDevice = base => {
                     base.commandError('Unexpected response')
                 }
             }
+            else if (pending.action === 'getSource') {
+                match = data.match(/GA"(.+?)">1=([0-9-.]+)/)
+                if (match) {
+                    let module_name = match[1]
+                    let val = match[2]
+                    let var_name = legalName('SourceSelect_', module_name)
+                    if (!isNaN(val)) {
+                        base.getVar(var_name).value = parseInt(val)
+                        base.commandDone()
+                    }
+                    else  {
+                        base.commandError('unable to process source response')
+                    }
+
+                }
+                else {
+                    base.commandError('Unexpected response')
+                }
+            }
+            else if (pending.action === 'getBassLevel' || pending.action === 'getMidLevel' || pending.action === 'getHighLevel') {
+                match = data.match(/GA"(.+?)">([0-9-.]+)=([0-9-.]+)/)
+                let level_name
+                if (match[2] == 1){
+                    level_name = 'BassLevel_'
+                }
+                else if (match[2] == 3){
+                    level_name = 'MidLevel_'
+                }
+                else if (match[2] == 5){
+                    level_name = 'HighLevel_'
+                }
+                if (match) {
+                    let module_name = match[1]
+                    let val = match[3]
+                    //logger.warn(`eq level ${val}`)
+                    let var_name = legalName(`${level_name}`,`${module_name}`)
+                    if (!isNaN(val)) {
+                        val = mapNumFromEq(val)
+                        //logger.warn(`eq postlevel ${val}`)
+                        base.getVar(var_name).value = parseInt(val)
+                        base.commandDone()
+                    }
+                    else  {
+                        base.commandError('unable to process source response')
+                    }
+
+                }
+                else {
+                    base.commandError('Unexpected response EQ')
+                }
+            }
+            else if (pending.action === 'getEqBypass') {
+                match = data.match(/GA"(.+?)">([0-9-.]+)=(.+?)/)
+                if (match) {
+                    let module_name = match[1]
+                    let val = match[3]
+                    let var_name = legalName('EqBypass_', module_name)
+                    if (val === 'F') {
+                        base.getVar(var_name).string = 'Off'
+                    }
+                    else if (val === 'O') {
+                        base.getVar(var_name).string = 'On'
+                    }
+                    base.commandDone()
+                }
+                else {
+                    base.commandError('Unexpected response')
+                }
+            }
+            else if (pending.action === 'recallPreset'){
+                base.commandDone()
+            }
+
             else {
                 logger.warn(`onFrame data not processed: ${data}`)
             }
@@ -217,10 +385,29 @@ exports.createDevice = base => {
             logger.silly(`ACK (${pending.action})`, pending.params)
             if (pending.action === 'setAudioMute') {
                 let var_name = legalName('AudioMute_', pending.params.Name)
-                base.getVar(var_name).string = pending.Status
+                base.getVar(var_name).string = pending.params.Status
             }
             else if (pending.action === 'setAudioLevel') {
+                let var_name = legalName('AudioLevel_', pending.params.Name)
+                base.getVar(var_name).value = pending.params.Level
             }
+            else if (pending.action === 'setSource') {
+                let var_name = legalName('SourceSelect_', pending.params.Name)
+                base.getVar(var_name).value = pending.params.Input
+            }
+            else if (pending.action === 'setBassLevel' || pending.action === 'setMidLevel' || pending.action === 'setHighLevel') {
+                let name_prefix = 'BassLevel_'
+                if(pending.action === 'setMidLevel') {name_prefix = 'MidLevel_'}
+                if(pending.action === 'setHighLevel') {name_prefix = 'HighLevel_'}
+                let var_name = legalName(name_prefix, pending.params.Name)
+                base.getVar(var_name).value = pending.params.Level
+            }
+            if (pending.action === 'setEqBypass') {
+                //logger.warn(`here seteqbypass received${pending.Status}`)
+                let var_name = legalName('EqBypass_', pending.params.Name)
+                base.getVar(var_name).string = pending.params.Status
+            }
+
         }
         else {
             logger.warn('ACK received, but nothing pending!')
@@ -236,6 +423,25 @@ exports.createDevice = base => {
         sendDefer(`GA"${params.Name}">1\r`)
     }
 
+    function getSource(params) {
+        sendDefer(`GA"${params.Name}">1\r`)
+    }
+
+    function getHighLevel(params) {
+        sendDefer(`GA"${params.Name}">5\r`)
+    }
+
+    function getMidLevel(params) {
+        sendDefer(`GA"${params.Name}">3\r`)
+    }
+
+    function getBassLevel(params) {
+        sendDefer(`GA"${params.Name}">1\r`)
+    }
+
+    function getEqBypass(params) {
+        sendDefer(`GA"${params.Name}">2\r`)
+    }
     //---------------------------------------------------------------------------------- SET FUNCTIONS
     function setPower(params) {
         if (params.Status == 'Off') sendDefer('*SCPOWR0000000000000000\n')
@@ -253,6 +459,38 @@ exports.createDevice = base => {
         sendDefer(`SA"${params.Name}">1=${levelSend}\r`)
     }
 
+    function setSource(params) {
+        sendDefer(`SA"${params.Name}">1=${params.Input}\r`)
+    }
+
+    function setBassLevel(params) {
+        let levelSend = mapNumToEq(params.Level)
+        sendDefer(`SA"${params.Name}">1=${levelSend}\r`)
+    }
+
+    function setMidLevel(params) {
+        let levelSend = mapNumToEq(params.Level)
+        sendDefer(`SA"${params.Name}">3=${levelSend}\r`)
+    }
+
+    function setHighLevel(params) {
+        let levelSend = mapNumToEq(params.Level)
+        sendDefer(`SA"${params.Name}">5=${levelSend}\r`)
+    }
+
+    function setEqBypass(params) {
+        // logger.warn(params.Status)
+        if (params.Status == 0) {
+            sendDefer(`SA"${params.Name}">2=F\rSA"${params.Name}">4=F\rSA"${params.Name}">6=F\r`)
+
+        }
+        else if (params.Status == 1) {
+            sendDefer(`SA"${params.Name}">2=O\rSA"${params.Name}">4=O\rSA"${params.Name}">6=O\r`)
+            // logger.warn(`HERE IT IS SA"${params.Name}">2=O\r`)
+        }
+
+    }
+
     function recallPreset(params) {
         let result = config.presets.find(entry => entry.name === params.Name)
         // Equivalent to: entry => entry.name === params.Name
@@ -261,7 +499,7 @@ exports.createDevice = base => {
         // }
 
         if (result) {
-            sendDefer(`SS ${result.number}\r`)
+            sendDefer(`SS ${result.number}\rGS\r`)
         }
         else {
             logger.error(`Preset not found: ${params.Name}`)
@@ -271,6 +509,16 @@ exports.createDevice = base => {
     //------------------------------------------------------------------------------- HELPER FUNCTIONS
     function mapNum(num, inMin, inMax, outMin, outMax) {
         return ((num - inMin) / (inMax - inMin)) * (outMax - outMin) + outMin
+    }
+
+    function mapNumToEq(num){
+        return ((num/(100/EQLEVEL_RANGE))-15)
+    }
+
+    function mapNumFromEq(lev){
+        let level = parseFloat(lev)
+        return parseInt(((level+15)*(100/EQLEVEL_RANGE)))
+
     }
 
     function roundHalf(num) {
@@ -292,8 +540,8 @@ exports.createDevice = base => {
     //----------------------------------------------------------------------------- EXPORTED FUNCTIONS
     return {
         setup, start, stop, tick,
-        getAudioMute, getAudioLevel,
-        setPower, setAudioMute, setAudioLevel,
+        getAudioMute, getAudioLevel, getSource, getBassLevel, getHighLevel, getMidLevel, getEqBypass,
+        setPower, setAudioMute, setAudioLevel, setSource, setBassLevel, setHighLevel, setMidLevel, setEqBypass,
         keepAlive,
         recallPreset
     }

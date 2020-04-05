@@ -1,6 +1,6 @@
 {
     "name": "bose_controlspace",
-    "version": "1.0.0-beta.12",
+    "version": "1.0.0-beta.40",
     "description": "Driver",
     "license": "MIT",
     "author": "Audio Visual Distributors",
@@ -61,6 +61,64 @@
                 "name": "Recall Preset",
                 "params": {
                     "Name": {
+                        "type": "string"
+                    }
+                }
+            },
+            {
+                "name": "Set Source",
+                "params": {
+                    "Name": {
+                        "type": "string"
+                    },
+                    "Input": {
+                        "type": "integer"
+                    }
+                }
+            },
+            {
+                "name": "Set Bass Level",
+                "params": {
+                    "Name": {
+                        "type": "string"
+                    },
+                    "Level": {
+                        "type": "integer"
+                    }
+                },
+                "optimize": true
+            },
+            {
+                "name": "Set Mid Level",
+                "params": {
+                    "Name": {
+                        "type": "string"
+                    },
+                    "Level": {
+                        "type": "integer"
+                    }
+                },
+                "optimize": true
+            },
+            {
+                "name": "Set High Level",
+                "params": {
+                    "Name": {
+                        "type": "string"
+                    },
+                    "Level": {
+                        "type": "integer"
+                    }
+                },
+                "optimize": true
+            },
+            {
+                "name": "Set Eq Bypass",
+                "params": {
+                    "Name": {
+                        "type": "string"
+                    },
+                    "Status": {
                         "type": "string"
                     }
                 }
