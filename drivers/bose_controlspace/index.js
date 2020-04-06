@@ -8,7 +8,7 @@ const LEVEL_MIN = -60
 const LEVEL_MAX = 12
 const EQLEVEL_MIN = -15
 const EQLEVEL_MAX = 15
-const EQLEVEL_RANGE = EQLEVEL_MAX - EQLEVEL_MIN
+
 
 
 let host
@@ -162,7 +162,7 @@ exports.createDevice = base => {
                     action: 'Set Eq Bypass',
                     params: {
                         Name: tone.name,
-                        Status: '$value'
+                        Status: '$string'
                     }
                 }
             })
@@ -296,10 +296,10 @@ exports.createDevice = base => {
                 match = data.match(/GA"(.+?)">1=([0-9-.]+)/)
                 if (match) {
                     let module_name = match[1]
-                    let val = match[2]
+                    let val = parseInt(match[2])
                     let var_name = legalName('SourceSelect_', module_name)
                     if (!isNaN(val)) {
-                        base.getVar(var_name).value = parseInt(val)
+                        base.getVar(var_name).string = (`Input ${val}`)
                         base.commandDone()
                     }
                     else  {
@@ -313,25 +313,26 @@ exports.createDevice = base => {
             }
             else if (pending.action === 'getBassLevel' || pending.action === 'getMidLevel' || pending.action === 'getHighLevel') {
                 match = data.match(/GA"(.+?)">([0-9-.]+)=([0-9-.]+)/)
-                let level_name
-                if (match[2] == 1){
-                    level_name = 'BassLevel_'
-                }
-                else if (match[2] == 3){
-                    level_name = 'MidLevel_'
-                }
-                else if (match[2] == 5){
-                    level_name = 'HighLevel_'
-                }
                 if (match) {
                     let module_name = match[1]
-                    let val = match[3]
+                    let var_name
+                    if (match[2] == 1){
+
+                        var_name = legalName('BassLevel_',module_name)
+                    }
+                    else if (match[2] == 3){
+                        var_name = legalName('MidLevel_',module_name)
+                    }
+                    else if (match[2] == 5){
+                        var_name = legalName('HighLevel_',module_name)
+                    }
+                    let val = parseFloat(match[3])
                     //logger.warn(`eq level ${val}`)
-                    let var_name = legalName(`${level_name}`,`${module_name}`)
+
                     if (!isNaN(val)) {
-                        val = mapNumFromEq(val)
+                        val = mapNum(val,-15,15,0,100)
                         //logger.warn(`eq postlevel ${val}`)
-                        base.getVar(var_name).value = parseInt(val)
+                        base.getVar(var_name).value = val
                         base.commandDone()
                     }
                     else  {
@@ -389,7 +390,7 @@ exports.createDevice = base => {
             }
             else if (pending.action === 'setSource') {
                 let var_name = legalName('SourceSelect_', pending.params.Name)
-                base.getVar(var_name).value = pending.params.Input
+                base.getVar(var_name).string = pending.params.Input
             }
             else if (pending.action === 'setBassLevel' || pending.action === 'setMidLevel' || pending.action === 'setHighLevel') {
                 let name_prefix = 'BassLevel_'
@@ -454,6 +455,7 @@ exports.createDevice = base => {
     function setSource(params) {
         const match = params.Input.match(/.*?(\d+)/)
         if (match) sendDefer(`SA"${params.Name}">1=${match[1]}\r`)
+        //logger.warn('here ${}')
         else logger.error (`setSource: Unexpected params.Input: ${params.Input}`)
     }
 
@@ -464,22 +466,22 @@ exports.createDevice = base => {
     }
 
     function setMidLevel(params) {
-        let levelSend = mapNumToEq(params.Level)
+        let levelSend = mapNum(params.Level, 0, 100, EQLEVEL_MIN, EQLEVEL_MAX)
         sendDefer(`SA"${params.Name}">3=${levelSend}\r`)
     }
 
     function setHighLevel(params) {
-        let levelSend = mapNumToEq(params.Level)
+        let levelSend = mapNum(params.Level, 0, 100, EQLEVEL_MIN, EQLEVEL_MAX)
         sendDefer(`SA"${params.Name}">5=${levelSend}\r`)
     }
 
     function setEqBypass(params) {
         // logger.warn(params.Status)
-        if (params.Status == 0) {
+        if (params.Status === 'Off') {
             sendDefer(`SA"${params.Name}">2=F\rSA"${params.Name}">4=F\rSA"${params.Name}">6=F\r`)
 
         }
-        else if (params.Status == 1) {
+        else if (params.Status === 'On') {
             sendDefer(`SA"${params.Name}">2=O\rSA"${params.Name}">4=O\rSA"${params.Name}">6=O\r`)
             // logger.warn(`HERE IT IS SA"${params.Name}">2=O\r`)
         }
@@ -504,16 +506,6 @@ exports.createDevice = base => {
     //------------------------------------------------------------------------------- HELPER FUNCTIONS
     function mapNum(num, inMin, inMax, outMin, outMax) {
         return ((num - inMin) / (inMax - inMin)) * (outMax - outMin) + outMin
-    }
-
-    function mapNumToEq(num){
-        return ((num/(100/EQLEVEL_RANGE))-15)
-    }
-
-    function mapNumFromEq(lev){
-        let level = parseFloat(lev)
-        return parseInt(((level+15)*(100/EQLEVEL_RANGE)))
-
     }
 
     function roundHalf(num) {

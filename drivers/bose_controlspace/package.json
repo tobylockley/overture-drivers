@@ -1,6 +1,6 @@
 {
     "name": "bose_controlspace",
-    "version": "1.0.0-beta.40",
+    "version": "1.0.0",
     "description": "Driver",
     "license": "MIT",
     "author": "Audio Visual Distributors",
@@ -72,7 +72,7 @@
                         "type": "string"
                     },
                     "Input": {
-                        "type": "integer"
+                        "type": "string"
                     }
                 }
             },
