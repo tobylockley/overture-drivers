@@ -1,0 +1,97 @@
+{
+  "name": "Clickshare_Muzz",
+  "version": "1.0.0-beta.3",
+  "description": "Driver",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Audio Visual Distributors",
+  "license": "MIT",
+  "overture": {
+    "brand": "BRAND",
+    "models": [
+      "MODEL"
+    ],
+    "type": "device",
+    "subtype": "generic",
+    "variables": [
+      {
+        "name": "Status",
+        "type": "enum",
+        "enums": [
+          "Disconnected",
+          "Connected"
+        ]
+      },
+      {
+        "name": "WallpaperStatus",
+        "type": "enum",
+        "enums": ["Off","On"],
+        "perform": {
+          "action": "Set Wallpaper Status",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "MeetingRoomName",
+        "type": "string",
+        "perform": {
+          "action": "Set Meeting Room Name",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      },
+      {
+        "name": "LocationName",
+        "type": "string",
+        "perform": {
+          "action": "Set Location",
+          "params": {
+            "Status": "$string"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "name": "Set Meeting Room Name",
+        "params": {
+          "Status": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Set Wallpaper Status",
+        "params": {
+          "Status": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "Set Location",
+        "params": {
+          "Status": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+    "pointSetupSchema": {
+      "type": "object",
+      "title": "Template Setup",
+      "properties": {
+        "host": {
+          "title": "Host name or IP address:",
+          "type": "string",
+          "default": ""
+        }
+      }
+    }
+  }
+}
