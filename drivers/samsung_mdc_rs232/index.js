@@ -203,7 +203,7 @@ exports.createDevice = base => {
     }
 
     function sendWithChecksum(packet) {
-        // Packet including header as first element of array
+        // Slice off first element (header), add all bytes, then take lowest 8 bits
         const checksum = packet.slice(1).reduce((acc, val) => acc + val) & 0xFF
         sendDefer(Buffer.from([...packet, checksum]))
     }
