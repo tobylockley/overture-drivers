@@ -1,6 +1,6 @@
 {
     "name": "samsung_mdc_rs232",
-    "version": "1.0.0",
+    "version": "1.0.0-beta.1",
     "description": "Driver for Samsung MDC display using Globalcache TCP -> RS232",
     "main": "index.js",
     "scripts": {
