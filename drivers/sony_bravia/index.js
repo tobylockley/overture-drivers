@@ -12,6 +12,7 @@ exports.createDevice = base => {
     const logger = base.logger || host.logger
     let config
     let tcpClient
+    let ignoreAudio = false
 
     let frameParser = host.createFrameParser()
     frameParser.setSeparator('\n')
@@ -67,6 +68,7 @@ exports.createDevice = base => {
         disconnect()
         tcpClient && tcpClient.end()
         tcpClient = null
+        ignoreAudio = false // Gives ability to refresh driver if device has changed
     }
 
     //-------------------------------------------------------------------------- SEND/RECEIVE HANDLERS
@@ -127,9 +129,16 @@ exports.createDevice = base => {
         ]
 
         // General error check
-        match = data.match(/A\w{4}F{16}/)
+        match = data.match(/A(\w{4})F{16}/)
         if (pendingCommand && match) {
             base.commandError('Device responded with error')
+
+            // Stop polling Audio if error received
+            if (match[1] === 'VOLU' || match[1] === 'AMUT') {
+                ignoreAudio = true
+                logger.error("Audio polling has been disabled due to error. To reset, disable then enable this device from the Control Server.")
+            }
+
             return  // No need to check for anything else
         }
 
@@ -228,11 +237,11 @@ exports.createDevice = base => {
     }
 
     function getAudioLevel() {
-        sendDefer('*SEVOLU################\n')
+        if (!ignoreAudio) sendDefer('*SEVOLU################\n')
     }
 
     function getAudioMute() {
-        sendDefer('*SEAMUT################\n')
+        if (!ignoreAudio) sendDefer('*SEAMUT################\n')
     }
 
     function getChannel() {
